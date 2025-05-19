@@ -641,14 +641,14 @@ class _HomeContentState extends State<HomeContent> {
           return GestureDetector(
             onTap: () {
               print("${item['label']} tapped");
-              if (item['label'] == 'Live Location') {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const LiveLocationScreen(),
-                  ),
-                );
-              }
+              // if (item['label'] == 'Live Location') {
+              //   Navigator.push(
+              //     context,
+              //     MaterialPageRoute(
+              //       builder: (context) => const LiveLocationScreen(),
+              //     ),
+              //   );
+              // }
             },
             child: _buildQuickMenuItem(
               item['image']!,

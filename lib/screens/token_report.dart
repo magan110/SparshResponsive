@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:learning2/screens/token_details.dart';
-import 'package:learning2/screens/token_summary.dart';
+
+import 'package:learning2/screens/All_Tokens.dart';
 
 class TokenReportScreen extends StatefulWidget {
   final String activeTab;
@@ -324,21 +324,15 @@ class _TokenReportScreenState extends State<TokenReportScreen> {
           children: [
             _navItem(
               context,
-              'Details',
-              activeTab == 'Details',
-              const TokenDetailsPage(activeTab: 'Details'),
-            ),
-            _navItem(
-              context,
               'Report',
               activeTab == 'Report',
               const TokenReportScreen(activeTab: 'Report'),
             ),
             _navItem(
               context,
-              'Summary',
-              activeTab == 'Summary',
-              const TokenSummaryScreen(activeTab: 'Summary'),
+              'All Tokens',
+              activeTab == 'All Tokens',
+              const AllTokens(),
             ),
           ],
         ),

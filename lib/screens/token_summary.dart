@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
+import 'package:learning2/screens/All_Tokens.dart';
 import '../services/token_database.dart';
-import 'token_details.dart';
 import 'token_summary_model.dart';
 import 'token_scan.dart';
 
@@ -30,7 +30,7 @@ class _TokenSummaryScreenState extends State<TokenSummaryScreen> {
     Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(builder: (context) => const TokenScanPage()),
-      (Route<dynamic> route) => false,
+          (Route<dynamic> route) => false,
     );
   }
 
@@ -94,7 +94,7 @@ class _TokenSummaryScreenState extends State<TokenSummaryScreen> {
       // Navigate to token details page
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => const TokenDetailsPage(activeTab: 'Details')),
+        MaterialPageRoute(builder: (_) => const AllTokens()),
       );
     } catch (e) {
       if (!mounted) return;
@@ -160,19 +160,19 @@ class _TokenSummaryScreenState extends State<TokenSummaryScreen> {
                       ), // Changed to navigate to TokenScanPage
                       _isSaving
                           ? Container(
-                            width: 120,
-                            height: 48,
-                            decoration: BoxDecoration(
-                              color: Colors.blue.withAlpha(179), // 0.7 * 255 = 179
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: const Center(
-                              child: CircularProgressIndicator(color: Colors.white, strokeWidth: 3),
-                            ),
-                          )
+                        width: 120,
+                        height: 48,
+                        decoration: BoxDecoration(
+                          color: Colors.blue.withAlpha(179), // 0.7 * 255 = 179
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: const Center(
+                          child: CircularProgressIndicator(color: Colors.white, strokeWidth: 3),
+                        ),
+                      )
                           : _buildButton("Save", Colors.blue, Colors.white, () {
-                            _saveTokens();
-                          }),
+                        _saveTokens();
+                      }),
                     ],
                   ),
                   const SizedBox(width: 10),
@@ -240,60 +240,7 @@ class _TokenSummaryScreenState extends State<TokenSummaryScreen> {
           border: Border.all(color: Colors.grey.shade300, width: 1.0),
           borderRadius: BorderRadius.circular(8.0),
         ),
-        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            _navItem(
-              context,
-              'Details',
-              activeTab == 'Details',
-              () => Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => TokenDetailsPage(activeTab: 'Details', tokens: widget.tokens),
-                ),
-              ),
-            ),
-            _navItem(
-              context,
-              'Summary',
-              activeTab == 'Summary',
-              () => Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => TokenSummaryScreen(activeTab: 'Summary', tokens: widget.tokens),
-                ),
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }
-
-  Widget _navItem(BuildContext context, String label, bool isActive, VoidCallback onTap) {
-    return GestureDetector(
-      onTap: () {
-        if (!isActive) {
-          onTap();
-        }
-      },
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        decoration: BoxDecoration(
-          color: isActive ? const Color.fromRGBO(0, 112, 183, 1) : Colors.transparent,
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Text(
-          label,
-          style: TextStyle(
-            color: isActive ? Colors.white : Colors.black,
-            fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
-            fontSize: 16,
-          ),
-        ),
-      ),
-    );
   }
-}

@@ -2,9 +2,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:mobile_scanner/mobile_scanner.dart';
-import 'token_summary_model.dart';
-import 'token_details.dart';
-import 'token_summary.dart';
+import '../services/token_database.dart';
+import 'All_Tokens.dart';
 
 class TokenScanPage extends StatefulWidget {
   const TokenScanPage({super.key});
@@ -33,8 +32,14 @@ class _TokenScanPageState extends State<TokenScanPage> {
   // Map to track last scan time for each token
   final Map<String, DateTime> _lastScanTimeMap = {};
 
+  // Map to track when we last showed an error message for a token
+  final Map<String, DateTime> _lastErrorMessageTimeMap = {};
+
   // Set to store tokens that have reached maximum PIN attempts
   final Set<String> _maxAttemptsReachedTokens = {};
+
+  // Set to store tokens that have been successfully validated
+  final Set<String> _validatedTokens = {};
 
   final List<TokenCard> _attemptedCards = [];
   String? _apiAutoPin;
@@ -87,21 +92,61 @@ class _TokenScanPageState extends State<TokenScanPage> {
 
     // Check if this token has reached maximum PIN attempts
     if (_maxAttemptsReachedTokens.contains(cleanValue)) {
-      // Show a message to the user
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'This token has reached maximum PIN attempts. Please contact IT or Company Officer.',
+      // Check if we've shown an error message for this token recently
+      final now = DateTime.now();
+      final lastErrorTime = _lastErrorMessageTimeMap[cleanValue];
+
+      // Only show the error message if we haven't shown it in the last 5 seconds
+      if (lastErrorTime == null || now.difference(lastErrorTime) > const Duration(seconds: 5)) {
+        // Show a message to the user
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'This token has reached maximum PIN attempts. Please contact IT or Company Officer.',
+            ),
+            duration: Duration(seconds: 3),
+            backgroundColor: Colors.red,
           ),
-          duration: Duration(seconds: 3),
-          backgroundColor: Colors.red,
-        ),
-      );
+        );
+
+        // Update the last error time for this token
+        _lastErrorMessageTimeMap[cleanValue] = now;
+      }
+
+      // Don't process this token
+      return;
+    }
+
+    // Check if this token has already been successfully validated
+    if (_validatedTokens.contains(cleanValue)) {
+      // Check if we've shown an error message for this token recently
+      final now = DateTime.now();
+      final lastErrorTime = _lastErrorMessageTimeMap[cleanValue];
+
+      // Only show the error message if we haven't shown it in the last 5 seconds
+      if (lastErrorTime == null || now.difference(lastErrorTime) > const Duration(seconds: 5)) {
+        // Show a message to the user
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'This token has already been validated and cannot be scanned again.',
+            ),
+            duration: Duration(seconds: 3),
+            backgroundColor: Colors.red,
+          ),
+        );
+
+        // Update the last error time for this token
+        _lastErrorMessageTimeMap[cleanValue] = now;
+      }
+
+      // Don't process this token
       return;
     }
 
     // Check if this token was recently scanned
     // If it was scanned more than 2 seconds ago, allow it to be scanned again
+    // Reuse the now variable if it's already defined, otherwise create it
     final now = DateTime.now();
     if (_recentlyScannedTokens.contains(cleanValue) &&
         _lastScanTimeMap.containsKey(cleanValue)) {
@@ -595,6 +640,15 @@ class _TokenScanPageState extends State<TokenScanPage> {
                 ? '✅ Token Processed Successfully!'
                 : '✅ PIN $value is Correct!';
         _isTokenValid = true;
+
+        // Keep the token in the tracking sets to prevent it from being scanned again
+        // Add the token to the set of validated tokens
+        // This will prevent it from being scanned again
+        if (_scannedValue != null) {
+          _validatedTokens.add(_scannedValue!);
+          print('Added valid token to validated tokens set: $_scannedValue');
+        }
+
         _addAttemptedToken(isDirectProcess ? 'N/A' : value, true, detail);
       });
 
@@ -694,22 +748,13 @@ class _TokenScanPageState extends State<TokenScanPage> {
       );
     });
 
-    final summary = TokenSummaryModel();
-    summary.addScan(
-      isValid: isValid,
-      value:
-          isValid
-              ? int.tryParse(detail['paramAd1']?.toString() ?? '0') ?? 0
-              : 0,
-      tokenDetail: detail,
-    );
+    // Token has been added to the list
   }
 
   void _restartScan() {
     setState(() {
-      // Don't remove the token from recently scanned tokens
-      // Instead, we'll check the time since last scan in _validateToken
-      // This allows the same token to be scanned again after 2 seconds
+      // Don't remove the token from recently scanned tokens or max attempts tokens
+      // This ensures that valid tokens cannot be scanned again
 
       _scannedValue = null;
       _isTokenValid = false;
@@ -722,6 +767,204 @@ class _TokenScanPageState extends State<TokenScanPage> {
       }
       pinFocusNodes[0].requestFocus();
     });
+  }
+
+  // Method to submit all tokens to the AllTokens screen
+  void _submitAllTokens() {
+    // Check if there are any valid tokens to submit
+    final validTokens = _attemptedCards.where((card) => card.isValid).toList();
+
+    if (validTokens.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('No valid tokens to submit'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+
+    // Prepare token data for all valid tokens
+    List<Map<String, dynamic>> allTokenData = [];
+
+    // Calculate summary statistics
+    int totalScan = _attemptedCards.length;
+    int validScan = validTokens.length;
+    int expiredScan = 0;
+    int alreadyScanned = 0;
+    int invalidScan = _attemptedCards.length - validTokens.length;
+    int totalAmount = 0;
+
+    for (var tokenCard in validTokens) {
+      // Create token data map
+      final Map<String, dynamic> tokenData = {
+        'token': tokenCard.token,
+        'tokenIdn': tokenCard.id,
+        'isActive': 'Y',  // Mark as valid
+        'paramAd1': tokenCard.value,
+        'paramAd2': tokenCard.handling,
+        'ValidDate': tokenCard.date,
+      };
+
+      // Add additional details if available
+      if (tokenCard.additionalDetails != null) {
+        tokenData.addAll(tokenCard.additionalDetails!);
+      }
+
+      // Calculate total amount
+      try {
+        totalAmount += int.parse(tokenCard.value);
+      } catch (e) {
+        // Ignore parsing errors
+      }
+
+      allTokenData.add(tokenData);
+    }
+
+    // Show token summary popup
+    _showTokenSummaryPopup(allTokenData, totalScan, validScan, expiredScan, alreadyScanned, invalidScan, totalAmount);
+  }
+
+  // Method to show summary popup for all tokens
+  void _showTokenSummaryPopup(List<Map<String, dynamic>> allTokenData, int totalScan, int validScan,
+      int expiredScan, int alreadyScanned, int invalidScan, int totalAmount) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          contentPadding: const EdgeInsets.all(0),
+          content: Container(
+            width: double.maxFinite,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Table(
+                  border: TableBorder.all(color: Colors.grey.shade400),
+                  children: [
+                    _buildTableRow('Total Scan', totalScan.toString(), Colors.blue),
+                    _buildTableRow('Valid Scan', validScan.toString(), Colors.green),
+                    _buildTableRow('Expired Scan', expiredScan.toString(), Colors.orange),
+                    _buildTableRow('Already Scanned', alreadyScanned.toString(), Colors.deepPurple),
+                    _buildTableRow('Invalid Scan', invalidScan.toString(), Colors.red),
+                    _buildTableRow('Total Amount', totalAmount.toString(), Colors.black),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    ElevatedButton.icon(
+                      onPressed: () => Navigator.of(context).pop(),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.grey,
+                        foregroundColor: Colors.black,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                        padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
+                      ),
+                      icon: const Icon(Icons.close),
+                      label: const Text('Close', style: TextStyle(fontSize: 16)),
+                    ),
+                    ElevatedButton.icon(
+                      onPressed: () async {
+                        Navigator.of(context).pop(); // Close the dialog
+
+                        try {
+                          // Create a TokenDatabase instance
+                          final TokenDatabase tokenDatabase = TokenDatabase();
+                          int successCount = 0;
+
+                          // Save each token to the database
+                          for (var tokenData in allTokenData) {
+                            await tokenDatabase.insertToken(tokenData['token'], tokenData);
+                            successCount++;
+                          }
+
+                          // Show success message
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('$successCount tokens saved successfully'),
+                              backgroundColor: Colors.green,
+                              duration: const Duration(seconds: 2),
+                            ),
+                          );
+
+                          // Navigate to AllTokens screen
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const AllTokens()),
+                          );
+                        } catch (e) {
+                          // Show error message
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Error saving tokens: $e'),
+                              backgroundColor: Colors.red,
+                              duration: const Duration(seconds: 3),
+                            ),
+                          );
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                        padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
+                      ),
+                      icon: const Icon(Icons.save),
+                      label: const Text('Save', style: TextStyle(fontSize: 16)),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  // Helper method to build summary rows
+  Widget _buildSummaryRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 80,
+            child: Text(
+              '$label:',
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+          ),
+          Expanded(
+            child: Text(value),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Helper method to build table rows for the summary popup
+  TableRow _buildTableRow(String label, String value, Color valueColor) {
+    return TableRow(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: Text(label, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: Center(
+            child: Text(
+              value,
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: valueColor),
+            ),
+          ),
+        ),
+      ],
+    );
   }
 
   @override
@@ -1036,6 +1279,28 @@ class _TokenScanPageState extends State<TokenScanPage> {
                       ),
                     ),
                   ..._attemptedCards,
+
+                  // Only show the submit button if there are token cards
+                  if (_attemptedCards.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 16.0),
+                      child: ElevatedButton.icon(
+                        onPressed: _submitAllTokens,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        icon: const Icon(Icons.save),
+                        label: const Text(
+                          'Submit All Tokens',
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
                 ],
               ),
             ),
@@ -1061,13 +1326,13 @@ class _TokenScanPageState extends State<TokenScanPage> {
               context,
               'Details',
               activeTab == 'Details',
-              const TokenDetailsPage(activeTab: 'Details'),
+              const Text('Details'),
             ),
             _navItem(
               context,
-              'Summary',
-              activeTab == 'Summary',
-              const TokenSummaryScreen(activeTab: 'Summary'),
+              'All Tokens',
+              activeTab == 'All Tokens',
+              const AllTokens(),
             ),
           ],
         ),
@@ -1083,11 +1348,22 @@ class _TokenScanPageState extends State<TokenScanPage> {
   ) {
     return GestureDetector(
       onTap: () {
+        print('Tapped on $label tab, isActive: $isActive');
         if (!isActive) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => targetPage),
-          );
+          print('Navigating to $label screen');
+          if (label == 'All Tokens') {
+            // Explicitly navigate to AllTokens
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const AllTokens()),
+            );
+          } else {
+            // Navigate to the target page
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => targetPage),
+            );
+          }
         }
       },
       child: Container(
@@ -1149,6 +1425,65 @@ class _TokenCardState extends State<TokenCard> {
     // Initialize expansion state from widget property
     // Always expand valid tokens by default
     isExpanded = widget.initiallyExpanded || widget.isValid;
+  }
+
+  // Method to submit token to AllTokens screen
+  void _submitTokenToAllTokens(BuildContext context) async {
+    if (!widget.isValid) {
+      // Only valid tokens can be submitted
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Only valid tokens can be submitted'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    try {
+      // Create a token data map
+      final Map<String, dynamic> tokenData = {
+        'token': widget.token,
+        'tokenIdn': widget.id,
+        'isActive': 'Y',  // Mark as valid
+        'paramAd1': widget.value,
+        'paramAd2': widget.handling,
+        'ValidDate': widget.date,
+      };
+
+      // Add all additional details
+      if (widget.additionalDetails != null) {
+        tokenData.addAll(widget.additionalDetails!);
+      }
+
+      // Save to database
+      final TokenDatabase tokenDatabase = TokenDatabase();
+      await tokenDatabase.insertToken(widget.token, tokenData);
+
+      // Show a success message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Token ${widget.token} submitted successfully'),
+          backgroundColor: Colors.green,
+          duration: const Duration(seconds: 2),
+        ),
+      );
+
+      // Navigate to AllTokens screen
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const AllTokens()),
+      );
+    } catch (e) {
+      // Show error message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error submitting token: $e'),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 3),
+        ),
+      );
+    }
   }
 
   // Helper method to build a section of details
@@ -1478,6 +1813,38 @@ class _TokenCardState extends State<TokenCard> {
                                         color: Colors.white,
                                         fontWeight: FontWeight.bold,
                                       ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+
+                          // Submit button
+                          const SizedBox(height: 16),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              ElevatedButton(
+                                onPressed: () {
+                                  _submitTokenToAllTokens(context);
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.blue,
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                                child: const Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(Icons.send, size: 18),
+                                    SizedBox(width: 8),
+                                    Text(
+                                      'Submit Token',
+                                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                                     ),
                                   ],
                                 ),

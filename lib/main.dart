@@ -20,11 +20,11 @@ void main() async {
   await FirebaseApi().initNotification(notificationProvider);
 
   // Initialize background location service
-  final backgroundService = BackgroundLocationService();
+  // final backgroundService = BackgroundLocationService();
 
   // Initialize the service but don't auto-start it
   // This ensures the user must manually start the service
-  await backgroundService.initializeService(autoStart: false);
+  // await backgroundService.initializeService(autoStart: false);
 
   print('Background service initialized but not started - user must start it manually');
 
