@@ -1,8 +1,8 @@
 import 'dart:io'; // Import for File
-import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:image_picker/image_picker.dart'; // Import the image_picker package
+import '../theme/app_theme.dart'; // Import AppTheme
 
 // Ensure these imports are correct based on your project structure
 import 'Meeting_with_new_purchaser.dart';
@@ -276,7 +276,7 @@ class _PhoneCallWithBuilderState extends State<PhoneCallWithBuilder> {
           // Apply a custom theme for the date picker
           data: ThemeData.light().copyWith(
             colorScheme: const ColorScheme.light(
-              primary: Colors.blueAccent, // Header background color
+              primary: AppTheme.primaryColor, // Header background color
               onPrimary: Colors.white, // Header text color
               onSurface: Colors.black87, // Body text color
             ),
@@ -311,7 +311,7 @@ class _PhoneCallWithBuilderState extends State<PhoneCallWithBuilder> {
           // Apply a custom theme for the date picker
           data: ThemeData.light().copyWith(
             colorScheme: const ColorScheme.light(
-              primary: Colors.blueAccent, // Header background color
+              primary: AppTheme.primaryColor, // Header background color
               onPrimary: Colors.white, // Header text color
               onSurface: Colors.black87, // Body text color
             ),
@@ -354,32 +354,32 @@ class _PhoneCallWithBuilderState extends State<PhoneCallWithBuilder> {
       context: context,
       builder:
           (BuildContext context) => AlertDialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        title: const Text('Select Image Source'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const CircleAvatar(
+                backgroundColor: Colors.blue,
+                child: Icon(Icons.camera_alt, color: Colors.white),
+              ),
+              title: const Text('Camera'),
+              onTap: () => Navigator.pop(context, ImageSource.camera),
             ),
-            title: const Text('Select Image Source'),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ListTile(
-                  leading: const CircleAvatar(
-                    backgroundColor: Colors.blue,
-                    child: Icon(Icons.camera_alt, color: Colors.white),
-                  ),
-                  title: const Text('Camera'),
-                  onTap: () => Navigator.pop(context, ImageSource.camera),
-                ),
-                ListTile(
-                  leading: const CircleAvatar(
-                    backgroundColor: Colors.green,
-                    child: Icon(Icons.photo_library, color: Colors.white),
-                  ),
-                  title: const Text('Gallery'),
-                  onTap: () => Navigator.pop(context, ImageSource.gallery),
-                ),
-              ],
+            ListTile(
+              leading: const CircleAvatar(
+                backgroundColor: Colors.green,
+                child: Icon(Icons.photo_library, color: Colors.white),
+              ),
+              title: const Text('Gallery'),
+              onTap: () => Navigator.pop(context, ImageSource.gallery),
             ),
-          ),
+          ],
+        ),
+      ),
     );
 
     if (source == null) return;
@@ -409,53 +409,53 @@ class _PhoneCallWithBuilderState extends State<PhoneCallWithBuilder> {
       context: context,
       builder:
           (context) => Dialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                AppBar(
-                  backgroundColor: Colors.transparent,
-                  elevation: 0,
-                  leading: IconButton(
-                    icon: const Icon(Icons.close, color: Colors.black87),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                  title: const Text(
-                    'Document Preview',
-                    style: TextStyle(
-                      color: Colors.black87,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  centerTitle: true,
-                  actions: [
-                    IconButton(
-                      icon: const Icon(Icons.share, color: Colors.blueAccent),
-                      onPressed: () {
-                        // TODO: Implement share functionality
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text(
-                              'Share functionality not implemented',
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ],
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            AppBar(
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              leading: IconButton(
+                icon: const Icon(Icons.close, color: Colors.black87),
+                onPressed: () => Navigator.pop(context),
+              ),
+              title: const Text(
+                'Document Preview',
+                style: TextStyle(
+                  color: Colors.black87,
+                  fontWeight: FontWeight.bold,
                 ),
-                ClipRRect(
-                  borderRadius: const BorderRadius.only(
-                    bottomLeft: Radius.circular(16),
-                    bottomRight: Radius.circular(16),
-                  ),
-                  child: Image.file(image, fit: BoxFit.contain),
+              ),
+              centerTitle: true,
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.share, color: Colors.blueAccent),
+                  onPressed: () {
+                    // TODO: Implement share functionality
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                          'Share functionality not implemented',
+                        ),
+                      ),
+                    );
+                  },
                 ),
               ],
             ),
-          ),
+            ClipRRect(
+              borderRadius: const BorderRadius.only(
+                bottomLeft: Radius.circular(16),
+                bottomRight: Radius.circular(16),
+              ),
+              child: Image.file(image, fit: BoxFit.contain),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -470,15 +470,15 @@ class _PhoneCallWithBuilderState extends State<PhoneCallWithBuilder> {
       context: context,
       builder:
           (context) => AlertDialog(
-            title: const Text('Success'),
-            content: Text(message),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: const Text('OK'),
-              ),
-            ],
+        title: const Text('Success'),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('OK'),
           ),
+        ],
+      ),
     );
   }
 
@@ -486,7 +486,7 @@ class _PhoneCallWithBuilderState extends State<PhoneCallWithBuilder> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        backgroundColor: Colors.grey[100], // Light grey background for the body
+        backgroundColor: AppTheme.scaffoldBackgroundColor, // Light grey background for the body
         appBar: AppBar(
           leading: IconButton(
             onPressed: () {
@@ -512,7 +512,7 @@ class _PhoneCallWithBuilderState extends State<PhoneCallWithBuilder> {
             ),
           ),
           backgroundColor:
-              Colors.blueAccent, // A slightly brighter blue for AppBar
+              AppTheme.primaryColor, // A slightly brighter blue for AppBar
           elevation: 4.0, // Add shadow to AppBar
         ),
         body: Padding(
@@ -527,7 +527,7 @@ class _PhoneCallWithBuilderState extends State<PhoneCallWithBuilder> {
                   style: TextStyle(
                     fontSize: 24, // Adjusted font size
                     fontWeight: FontWeight.bold,
-                    color: Colors.blueAccent, // Match AppBar color
+                    color: AppTheme.primaryColor, // Match AppBar color
                   ),
                 ),
                 const SizedBox(height: 24), // Increased spacing
@@ -784,7 +784,7 @@ class _PhoneCallWithBuilderState extends State<PhoneCallWithBuilder> {
                           children: [
                             const Icon(
                               Icons.photo_library_rounded,
-                              color: Colors.blueAccent,
+                              color: AppTheme.primaryColor,
                               size: 24,
                             ),
                             const SizedBox(width: 8),
@@ -793,7 +793,7 @@ class _PhoneCallWithBuilderState extends State<PhoneCallWithBuilder> {
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.blueAccent.shade700,
+                                color: AppTheme.primaryColor,
                               ),
                             ),
                           ],
@@ -835,7 +835,7 @@ class _PhoneCallWithBuilderState extends State<PhoneCallWithBuilder> {
                                         vertical: 4,
                                       ),
                                       decoration: BoxDecoration(
-                                        color: Colors.blueAccent.withOpacity(
+                                        color: AppTheme.primaryColor.withOpacity(
                                           0.1,
                                         ),
                                         borderRadius: BorderRadius.circular(20),
@@ -844,7 +844,7 @@ class _PhoneCallWithBuilderState extends State<PhoneCallWithBuilder> {
                                         'Document ${index + 1}',
                                         style: const TextStyle(
                                           fontWeight: FontWeight.bold,
-                                          color: Colors.blueAccent,
+                                          color: AppTheme.primaryColor,
                                           fontSize: 14,
                                         ),
                                       ),
@@ -944,7 +944,7 @@ class _PhoneCallWithBuilderState extends State<PhoneCallWithBuilder> {
                                           backgroundColor:
                                               _selectedImages[i] != null
                                                   ? Colors.amber.shade600
-                                                  : Colors.blueAccent,
+                                                  : AppTheme.primaryColor,
                                           elevation: 0,
                                           shape: RoundedRectangleBorder(
                                             borderRadius: BorderRadius.circular(
@@ -975,8 +975,9 @@ class _PhoneCallWithBuilderState extends State<PhoneCallWithBuilder> {
                                             backgroundColor: Colors.green,
                                             elevation: 0,
                                             shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(8),
+                                              borderRadius: BorderRadius.circular(
+                                                8,
+                                              ),
                                             ),
                                             padding: const EdgeInsets.symmetric(
                                               vertical: 12,
@@ -1292,76 +1293,36 @@ class _PhoneCallWithBuilderState extends State<PhoneCallWithBuilder> {
     );
   }
 
-  // Helper to build a searchable dropdown field (using dropdown_search)
+  // Helper to build a searchable dropdown field (using regular dropdown as dropdown_search is not available)
   Widget _buildSearchableDropdownField({
     required String selected,
     required List<String> items,
     required ValueChanged<String?> onChanged,
     String? Function(String?)? validator, // Added validator
-  }) => DropdownSearch<String>(
-    items: items,
-    selectedItem: selected,
+  }) => DropdownButtonFormField<String>(
+    value: selected,
+    items: items.map((String item) {
+      return DropdownMenuItem<String>(
+        value: item,
+        child: Text(item),
+      );
+    }).toList(),
     onChanged: onChanged,
-    validator: validator, // Assign the validator
-    popupProps: PopupProps.menu(
-      showSearchBox: true,
-      // Limit popup height to prevent overflow
-      fit: FlexFit.loose,
-      // Improve search field appearance
-      searchFieldProps: const TextFieldProps(
-        decoration: InputDecoration(
-          hintText: 'Search...',
-          hintStyle: TextStyle(color: Colors.black54), // Darker hint text
-          fillColor: Colors.white,
-          filled: true,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.all(
-              Radius.circular(8.0),
-            ), // Rounded corners
-            borderSide: BorderSide(color: Colors.blueAccent), // Blue border
-          ),
-          isDense: true,
-          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-          // Handle error text overflow
-          errorStyle: TextStyle(overflow: TextOverflow.ellipsis),
-        ),
+    validator: validator,
+    decoration: InputDecoration(
+      filled: true,
+      fillColor: Colors.grey[100],
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+        borderSide: BorderSide.none,
       ),
-      // Improve item appearance with overflow handling
-      itemBuilder:
-          (context, item, isSelected) => Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            child: Text(
-              item,
-              style: const TextStyle(
-                color: Colors.black87,
-                overflow: TextOverflow.ellipsis, // Handle text overflow
-              ),
-              overflow: TextOverflow.ellipsis, // Handle text overflow
-              maxLines: 1, // Limit to one line
-            ),
-          ),
-    ),
-    // Improve dropdown appearance
-    dropdownDecoratorProps: DropDownDecoratorProps(
-      dropdownSearchDecoration: InputDecoration(
-        hintText: 'Select',
-        filled: true,
-        fillColor: Colors.white,
-        isDense: true,
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 12,
-          vertical: 12,
-        ), // Adjusted padding
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10), // Rounded corners
-          borderSide: BorderSide(color: Colors.grey.shade300), // Lighter border
-        ),
-        // Handle error text overflow
-        errorStyle: const TextStyle(overflow: TextOverflow.ellipsis),
+      contentPadding: const EdgeInsets.symmetric(
+        horizontal: 16,
+        vertical: 12,
       ),
-      // Handle selected item text overflow
-      baseStyle: const TextStyle(overflow: TextOverflow.ellipsis),
+      isCollapsed: true,
     ),
+    isExpanded: true,
   );
 
   // Helper to build an icon button (e.g., search icon)

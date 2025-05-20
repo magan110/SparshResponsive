@@ -8,6 +8,7 @@ import 'package:learning2/screens/splash_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:learning2/services/background_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:learning2/theme/app_theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -44,7 +45,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'SPARSH',
-      theme: ThemeData(primarySwatch: Colors.blue),
+      theme: AppTheme.lightTheme,
       home: const HomeScreen(),
     );
   }

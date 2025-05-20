@@ -2,6 +2,7 @@ import 'dart:io'; // Import for File
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:image_picker/image_picker.dart'; // Import the image_picker package
+import '../theme/app_theme.dart'; // Import AppTheme
 
 // Ensure these imports are correct based on your project structure
 import 'Meeting_with_new_purchaser.dart';
@@ -91,7 +92,7 @@ class _OnLeaveState extends State<OnLeave> {
           // Apply a custom theme for the date picker
           data: ThemeData.light().copyWith(
             colorScheme: const ColorScheme.light(
-              primary: Colors.blueAccent, // Header background color
+              primary: AppTheme.primaryColor, // Header background color
               onPrimary: Colors.white, // Header text color
               onSurface: Colors.black87, // Body text color
             ),
@@ -126,7 +127,7 @@ class _OnLeaveState extends State<OnLeave> {
           // Apply a custom theme for the date picker
           data: ThemeData.light().copyWith(
             colorScheme: const ColorScheme.light(
-              primary: Colors.blueAccent, // Header background color
+              primary: AppTheme.primaryColor, // Header background color
               onPrimary: Colors.white, // Header text color
               onSurface: Colors.black87, // Body text color
             ),
@@ -228,7 +229,7 @@ class _OnLeaveState extends State<OnLeave> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        backgroundColor: const Color(0xFFF5F7FA), // Match dsr_entry background
+        backgroundColor: AppTheme.scaffoldBackgroundColor, // Match dsr_entry background
         appBar: AppBar(
           leading: IconButton(
             onPressed: () {
@@ -252,12 +253,7 @@ class _OnLeaveState extends State<OnLeave> {
               letterSpacing: 0.5, // Match dsr_entry style
             ),
           ),
-          backgroundColor: const Color.fromARGB(
-            255,
-            33,
-            150,
-            243,
-          ), // Match dsr_entry color
+          backgroundColor: AppTheme.primaryColor,
           elevation: 0, // Flat design
           shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.only(

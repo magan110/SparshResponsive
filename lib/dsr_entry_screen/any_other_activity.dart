@@ -14,6 +14,7 @@ import 'dsr_retailer_in_out.dart';
 import 'internal_team_meeting.dart';
 import 'office_work.dart';
 import 'on_leave.dart';
+import '../theme/app_theme.dart';
 
 class AnyOtherActivity extends StatefulWidget {
   const AnyOtherActivity({super.key});
@@ -200,10 +201,9 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        backgroundColor: const Color(0xFFF5F7FA), // Modern light background
+        backgroundColor: AppTheme.scaffoldBackgroundColor,
         appBar: AppBar(
           leading: IconButton(
-            color: Colors.white,
             onPressed: () {
               // Navigate back to the DsrEntry screen
               Navigator.push(
@@ -212,27 +212,26 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
               );
             },
             icon: const Icon(
-              Icons.arrow_back_ios_new, // More modern back icon
+              Icons.arrow_back_ios_new,
               color: Colors.white,
+              size: 22,
             ),
           ),
-          title: const Row(
+          title: Row(
             children: [
-              Icon(Icons.assignment_outlined, size: 28), // Add an icon
-              SizedBox(width: 10),
+              const Icon(Icons.assignment_outlined, size: 28),
+              const SizedBox(width: 10),
               Text(
                 'Any Other Activity',
-                style: TextStyle(
+                style: Theme.of(context).textTheme.displaySmall?.copyWith(
                   color: Colors.white,
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 0.5, // Slight letter spacing for modern look
+                  letterSpacing: 0.5,
                 ),
               ),
             ],
           ),
-          backgroundColor: const Color(0xFF3F51B5), // Rich indigo color
-          elevation: 0, // Flat design
+          backgroundColor: AppTheme.primaryColor,
+          elevation: 0,
           shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.only(
               bottomLeft: Radius.circular(15),
@@ -245,7 +244,7 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
-              colors: [const Color(0xFFF5F7FA), Colors.grey.shade100],
+              colors: [AppTheme.scaffoldBackgroundColor, Colors.grey.shade100],
               stops: const [0.0, 1.0],
             ),
           ),
@@ -256,318 +255,177 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
               child: ListView(
                 children: [
                   // Enhanced Instructions Section
-                  Container(
-                    margin: const EdgeInsets.only(bottom: 24),
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [Colors.blue.shade50, Colors.blue.shade100],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
+                  AppTheme.buildSectionCard(
+                    title: 'Activity Information',
+                    icon: Icons.info_outline,
+                    children: [
+                      // Process Type Dropdown with enhanced styling
+                      AppTheme.buildLabel('Process Type'),
+                      const SizedBox(height: 8),
+                      DropdownButtonFormField<String>(
+                        value: _processItem,
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: Colors.grey[100],
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide.none,
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
+                          isCollapsed: true,
+                        ),
+                        isExpanded: true,
+                        items:
+                            _processdropdownItems
+                                .map(
+                                  (item) => DropdownMenuItem<String>(
+                                    value: item,
+                                    child: Container(
+                                      constraints: const BoxConstraints(
+                                        maxWidth: 250,
+                                      ),
+                                      child: Text(
+                                        item,
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 1,
+                                        style: const TextStyle(fontSize: 14),
+                                      ),
+                                    ),
+                                  ),
+                                )
+                                .toList(),
+                        onChanged: (val) {
+                          if (val != null) {
+                            setState(() => _processItem = val);
+                          }
+                        },
+                        validator: (value) {
+                          if (value == null || value == 'Select') {
+                            return 'Please select a process';
+                          }
+                          return null;
+                        },
                       ),
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey.withOpacity(0.1),
-                          spreadRadius: 1,
-                          blurRadius: 5,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(12),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.blue.withOpacity(0.1),
-                                    spreadRadius: 1,
-                                    blurRadius: 3,
-                                    offset: const Offset(0, 1),
-                                  ),
-                                ],
-                              ),
-                              child: const Icon(
-                                Icons.info_outline,
-                                color: Colors.blueAccent,
-                                size: 24,
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            const Text(
-                              'Activity Information',
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.blueAccent,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 16),
 
-                        // Process Type Dropdown with enhanced styling
-                        Container(
-                          margin: const EdgeInsets.only(bottom: 16),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  const Icon(
-                                    Icons.settings_outlined,
-                                    size: 18,
-                                    color: Colors.blueAccent,
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Text(
-                                    'Process Type',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600,
-                                      color: Colors.blueAccent.shade700,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 8),
-                              Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(12),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.grey.withOpacity(0.1),
-                                      spreadRadius: 1,
-                                      blurRadius: 3,
-                                      offset: const Offset(0, 1),
-                                    ),
-                                  ],
-                                ),
-                                child: _buildDropdownField(
-                                  value: _processItem,
-                                  items: _processdropdownItems,
-                                  onChanged: (newValue) {
-                                    if (newValue != null) {
-                                      setState(() => _processItem = newValue);
-                                    }
-                                  },
-                                ),
-                              ),
-                            ],
+                      // Activity Type Dropdown with enhanced styling
+                      const SizedBox(height: 16),
+                      AppTheme.buildLabel('Activity Type'),
+                      const SizedBox(height: 8),
+                      DropdownButtonFormField<String>(
+                        value: _activityItem,
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: Colors.grey[100],
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide.none,
                           ),
-                        ),
-
-                        // Activity Type Dropdown with enhanced styling
-                        Container(
-                          margin: const EdgeInsets.only(bottom: 16),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  const Icon(
-                                    Icons.category_outlined,
-                                    size: 18,
-                                    color: Colors.blueAccent,
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Text(
-                                    'Activity Type',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600,
-                                      color: Colors.blueAccent.shade700,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 8),
-                              Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(12),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.grey.withOpacity(0.1),
-                                      spreadRadius: 1,
-                                      blurRadius: 3,
-                                      offset: const Offset(0, 1),
-                                    ),
-                                  ],
-                                ),
-                                child: _buildDropdownField(
-                                  value: _activityItem,
-                                  items: _activityDropDownItems,
-                                  onChanged: (newValue) {
-                                    if (newValue != null) {
-                                      setState(() => _activityItem = newValue);
-
-                                      // Navigation logic based on selected activity
-                                      if (newValue == 'Personal Visit') {
-                                        _navigateTo(const DsrRetailerInOut());
-                                      } else if (newValue ==
-                                          'Phone Call with Builder/Stockist') {
-                                        _navigateTo(
-                                          const PhoneCallWithBuilder(),
-                                        );
-                                      } else if (newValue ==
-                                          'Meetings With Contractor / Stockist') {
-                                        _navigateTo(
-                                          const MeetingsWithContractor(),
-                                        );
-                                      } else if (newValue ==
-                                          'Visit to Get / Check Sampling at Site') {
-                                        _navigateTo(
-                                          const CheckSamplingAtSite(),
-                                        );
-                                      } else if (newValue ==
-                                          'Meeting with New Purchaser(Trade Purchaser)/Retailer') {
-                                        _navigateTo(
-                                          const MeetingWithNewPurchaser(),
-                                        );
-                                      } else if (newValue == 'BTL Activities') {
-                                        _navigateTo(const BtlActivites());
-                                      } else if (newValue ==
-                                          'Internal Team Meetings / Review Meetings') {
-                                        _navigateTo(
-                                          const InternalTeamMeeting(),
-                                        );
-                                      } else if (newValue == 'Office Work') {
-                                        _navigateTo(const OfficeWork());
-                                      } else if (newValue ==
-                                          'On Leave / Holiday / Off Day') {
-                                        _navigateTo(const OnLeave());
-                                      } else if (newValue == 'Work From Home') {
-                                        _navigateTo(const WorkFromHome());
-                                      } else if (newValue ==
-                                          'Phone call with Unregistered Purchasers') {
-                                        _navigateTo(
-                                          const PhoneCallWithUnregisterdPurchaser(),
-                                        );
-                                      }
-                                      // No navigation needed for 'Any Other Activity' as it's the current page
-                                    }
-                                  },
-                                ),
-                              ),
-                            ],
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
                           ),
+                          isCollapsed: true,
                         ),
+                        isExpanded: true,
+                        items:
+                            _activityDropDownItems
+                                .map(
+                                  (item) => DropdownMenuItem<String>(
+                                    value: item,
+                                    child: Container(
+                                      constraints: const BoxConstraints(
+                                        maxWidth: 250,
+                                      ),
+                                      child: Text(
+                                        item,
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 1,
+                                        style: const TextStyle(fontSize: 14),
+                                      ),
+                                    ),
+                                  ),
+                                )
+                                .toList(),
+                        onChanged: (newValue) {
+                          if (newValue != null) {
+                            setState(() => _activityItem = newValue);
 
-                        // Date Fields Row - side by side for better space utilization
-                        Row(
-                          children: [
-                            // Submission Date Field
-                            Expanded(
-                              child: Container(
-                                margin: const EdgeInsets.only(right: 8),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        const Icon(
-                                          Icons.calendar_today_outlined,
-                                          size: 18,
-                                          color: Colors.blueAccent,
-                                        ),
-                                        const SizedBox(width: 8),
-                                        Text(
-                                          'Submission ',
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w600,
-                                            color: Colors.blueAccent.shade700,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 8),
-                                    Container(
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.circular(12),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: Colors.grey.withOpacity(0.1),
-                                            spreadRadius: 1,
-                                            blurRadius: 3,
-                                            offset: const Offset(0, 1),
-                                          ),
-                                        ],
-                                      ),
-                                      child: _buildDateField(
-                                        _dateController,
-                                        _pickDate,
-                                        'Select Date',
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
+                            // Navigation logic based on selected activity
+                            if (newValue == 'Personal Visit') {
+                              _navigateTo(const DsrRetailerInOut());
+                            } else if (newValue ==
+                                'Phone Call with Builder/Stockist') {
+                              _navigateTo(const PhoneCallWithBuilder());
+                            } else if (newValue ==
+                                'Meetings With Contractor / Stockist') {
+                              _navigateTo(const MeetingsWithContractor());
+                            } else if (newValue ==
+                                'Visit to Get / Check Sampling at Site') {
+                              _navigateTo(const CheckSamplingAtSite());
+                            } else if (newValue ==
+                                'Meeting with New Purchaser(Trade Purchaser)/Retailer') {
+                              _navigateTo(const MeetingWithNewPurchaser());
+                            } else if (newValue == 'BTL Activities') {
+                              _navigateTo(const BtlActivites());
+                            } else if (newValue ==
+                                'Internal Team Meetings / Review Meetings') {
+                              _navigateTo(const InternalTeamMeeting());
+                            } else if (newValue == 'Office Work') {
+                              _navigateTo(const OfficeWork());
+                            } else if (newValue ==
+                                'On Leave / Holiday / Off Day') {
+                              _navigateTo(const OnLeave());
+                            } else if (newValue == 'Work From Home') {
+                              _navigateTo(const WorkFromHome());
+                            } else if (newValue ==
+                                'Phone call with Unregistered Purchasers') {
+                              _navigateTo(
+                                const PhoneCallWithUnregisterdPurchaser(),
+                              );
+                            }
+                            // No navigation needed for 'Any Other Activity' as it's the current page
+                          }
+                        },
+                        validator: (value) {
+                          if (value == null || value == 'Select') {
+                            return 'Please select an activity';
+                          }
+                          return null;
+                        },
+                      ),
+                    ],
+                  ),
 
-                            // Report Date Field
-                            Expanded(
-                              child: Container(
-                                margin: const EdgeInsets.only(left: 8),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        const Icon(
-                                          Icons.event_note_outlined,
-                                          size: 18,
-                                          color: Colors.blueAccent,
-                                        ),
-                                        const SizedBox(width: 8),
-                                        Text(
-                                          'Report ',
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w600,
-                                            color: Colors.blueAccent.shade700,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 8),
-                                    Container(
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.circular(12),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: Colors.grey.withOpacity(0.1),
-                                            spreadRadius: 1,
-                                            blurRadius: 3,
-                                            offset: const Offset(0, 1),
-                                          ),
-                                        ],
-                                      ),
-                                      child: _buildDateField(
-                                        _reportDateController,
-                                        _pickReportDate,
-                                        'Select Date',
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
+                  // Date Fields Section
+                  const SizedBox(height: 16),
+                  AppTheme.buildSectionCard(
+                    title: 'Date Information',
+                    icon: Icons.calendar_today,
+                    children: [
+                      // Submission Date Field
+                      AppTheme.buildLabel('Submission Date'),
+                      const SizedBox(height: 8),
+                      AppTheme.buildDateField(
+                        context,
+                        _dateController,
+                        _pickDate,
+                        'Select Date',
+                      ),
+
+                      // Report Date Field
+                      const SizedBox(height: 16),
+                      AppTheme.buildLabel('Report Date'),
+                      const SizedBox(height: 8),
+                      AppTheme.buildDateField(
+                        context,
+                        _reportDateController,
+                        _pickReportDate,
+                        'Select Date',
+                      ),
+                    ],
                   ),
 
                   // Activity Details Section Header
@@ -796,11 +654,11 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
                                           backgroundColor:
                                               _selectedImages[i] != null
                                                   ? Colors.amber.shade600
-                                                  : Colors.blueAccent,
+                                                  : AppTheme.primaryColor,
                                           elevation: 0,
                                           shape: RoundedRectangleBorder(
                                             borderRadius: BorderRadius.circular(
-                                              8,
+                                              10,
                                             ),
                                           ),
                                           padding: const EdgeInsets.symmetric(
@@ -824,11 +682,12 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
                                           label: const Text('View'),
                                           style: ElevatedButton.styleFrom(
                                             foregroundColor: Colors.white,
-                                            backgroundColor: Colors.green,
+                                            backgroundColor:
+                                                AppTheme.successColor,
                                             elevation: 0,
                                             shape: RoundedRectangleBorder(
                                               borderRadius:
-                                                  BorderRadius.circular(8),
+                                                  BorderRadius.circular(10),
                                             ),
                                             padding: const EdgeInsets.symmetric(
                                               vertical: 12,
@@ -854,18 +713,8 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
                                 size: 20,
                               ),
                               label: const Text('Document'),
-                              style: ElevatedButton.styleFrom(
-                                foregroundColor: Colors.white,
-                                backgroundColor: Colors.blueAccent,
-                                elevation: 0,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 12,
-                                ),
-                              ),
+                              style:
+                                  Theme.of(context).elevatedButtonTheme.style,
                             ),
                             const SizedBox(width: 12),
                             if (_uploadRows.length > 1)
@@ -878,10 +727,10 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
                                 label: const Text('Remove'),
                                 style: ElevatedButton.styleFrom(
                                   foregroundColor: Colors.white,
-                                  backgroundColor: Colors.redAccent,
+                                  backgroundColor: AppTheme.dangerButtonColor,
                                   elevation: 0,
                                   shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
+                                    borderRadius: BorderRadius.circular(10),
                                   ),
                                   padding: const EdgeInsets.symmetric(
                                     horizontal: 16,
@@ -899,20 +748,8 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
                   ), // Increased spacing before buttons
                   // Submit Buttons - Enhanced UI
                   Container(
-                    margin: const EdgeInsets.only(bottom: 20),
                     padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey.withOpacity(0.1),
-                          spreadRadius: 1,
-                          blurRadius: 5,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                    ),
+                    decoration: AppTheme.cardDecoration,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
@@ -921,127 +758,63 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
                           children: [
                             const Icon(
                               Icons.save_alt_rounded,
-                              color: Colors.blueAccent,
+                              color: AppTheme.primaryColor,
                               size: 24,
                             ),
                             const SizedBox(width: 8),
                             Text(
                               'Submit Your Activity',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.blueAccent.shade700,
-                              ),
+                              style: Theme.of(context).textTheme.headlineMedium,
                             ),
                           ],
                         ),
                         const SizedBox(height: 4),
                         Text(
                           'Save your activity details and continue',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey.shade600,
-                          ),
+                          style: Theme.of(context).textTheme.bodyMedium,
                         ),
                         const SizedBox(height: 20),
 
                         // Submit & New Button
-                        Container(
-                          height: 54,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            gradient: LinearGradient(
-                              colors: [
-                                Colors.blue.shade600,
-                                Colors.blue.shade800,
-                              ],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.blue.withOpacity(0.3),
-                                spreadRadius: 1,
-                                blurRadius: 4,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
-                          ),
-                          child: ElevatedButton.icon(
-                            onPressed: () {
-                              // TODO: implement submit and new logic
-                              if (_formKey.currentState!.validate()) {
-                                // Process form data
-                                print('Form is valid. Submit and New.');
-                              }
-                            },
-                            icon: const Icon(Icons.save_outlined, size: 20),
-                            label: const Text('Submit & New'),
-                            style: ElevatedButton.styleFrom(
-                              foregroundColor: Colors.white,
-                              backgroundColor: Colors.transparent,
-                              elevation: 0,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              textStyle: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: 0.5,
-                              ),
-                            ),
-                          ),
+                        ElevatedButton.icon(
+                          onPressed: () {
+                            // TODO: implement submit and new logic
+                            if (_formKey.currentState!.validate()) {
+                              // Process form data
+                              print('Form is valid. Submit and New.');
+                            }
+                          },
+                          icon: const Icon(Icons.save_outlined, size: 20),
+                          label: const Text('Submit & New'),
+                          style: Theme.of(context).elevatedButtonTheme.style,
                         ),
 
                         const SizedBox(height: 16),
 
                         // Submit & Exit Button
-                        Container(
-                          height: 54,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            gradient: LinearGradient(
-                              colors: [
-                                Colors.green.shade500,
-                                Colors.green.shade700,
-                              ],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.green.withOpacity(0.3),
-                                spreadRadius: 1,
-                                blurRadius: 4,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
+                        ElevatedButton.icon(
+                          onPressed: () {
+                            // TODO: implement submit and exit logic
+                            if (_formKey.currentState!.validate()) {
+                              // Process form data
+                              print('Form is valid. Submit and Exit.');
+                            }
+                          },
+                          icon: const Icon(
+                            Icons.check_circle_outline,
+                            size: 20,
                           ),
-                          child: ElevatedButton.icon(
-                            onPressed: () {
-                              // TODO: implement submit and exit logic
-                              if (_formKey.currentState!.validate()) {
-                                // Process form data
-                                print('Form is valid. Submit and Exit.');
-                              }
-                            },
-                            icon: const Icon(
-                              Icons.check_circle_outline,
-                              size: 20,
+                          label: const Text('Submit & Exit'),
+                          style: ElevatedButton.styleFrom(
+                            foregroundColor: Colors.white,
+                            backgroundColor: AppTheme.successColor,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
                             ),
-                            label: const Text('Submit & Exit'),
-                            style: ElevatedButton.styleFrom(
-                              foregroundColor: Colors.white,
-                              backgroundColor: Colors.transparent,
-                              elevation: 0,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              textStyle: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: 0.5,
-                              ),
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 16,
+                              horizontal: 16,
                             ),
                           ),
                         ),
@@ -1049,53 +822,19 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
                         const SizedBox(height: 16),
 
                         // View Submitted Data Button
-                        Container(
-                          height: 54,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: Colors.white,
-                            border: Border.all(
-                              color: Colors.blueAccent,
-                              width: 1.5,
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.1),
-                                spreadRadius: 1,
-                                blurRadius: 3,
-                                offset: const Offset(0, 1),
-                              ),
-                            ],
-                          ),
-                          child: ElevatedButton.icon(
-                            onPressed: () {
-                              // TODO: implement view submitted data logic
-                              print('View Submitted Data button pressed');
-                            },
-                            icon: const Icon(
-                              Icons.visibility_outlined,
-                              size: 20,
-                              color: Colors.blueAccent,
-                            ),
-                            label: const Text('View Submitted Data'),
-                            style: ElevatedButton.styleFrom(
-                              foregroundColor: Colors.blueAccent,
-                              backgroundColor: Colors.transparent,
-                              elevation: 0,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              textStyle: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
+                        OutlinedButton.icon(
+                          onPressed: () {
+                            // TODO: implement view submitted data logic
+                            print('View Submitted Data button pressed');
+                          },
+                          icon: const Icon(Icons.visibility_outlined, size: 20),
+                          label: const Text('View Submitted Data'),
+                          style: Theme.of(context).outlinedButtonTheme.style,
                         ),
                       ],
                     ),
                   ),
-                  const SizedBox(height: 20), // Spacing at the
+                  const SizedBox(height: 20), // Spacing at the bottom
                 ],
               ),
             ),
@@ -1197,70 +936,11 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
     VoidCallback onTap,
     String hintText,
   ) {
-    return TextFormField(
-      controller: controller,
-      readOnly: true, // Make the text field read-only
-      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-      decoration: InputDecoration(
-        hintText: hintText,
-        hintStyle: TextStyle(
-          color: Colors.grey[400],
-          fontSize: 16,
-          fontStyle: FontStyle.italic,
-        ),
-        suffixIcon: Container(
-          margin: const EdgeInsets.all(4),
-          decoration: BoxDecoration(
-            color: Colors.blue.shade50,
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: IconButton(
-            icon: const Icon(
-              Icons.calendar_today,
-              color: Colors.blueAccent,
-              size: 20,
-            ),
-            onPressed: onTap,
-          ),
-        ),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide.none,
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Colors.grey.shade200, width: 1),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Colors.blueAccent, width: 1.5),
-        ),
-        filled: true,
-        fillColor: Colors.white,
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 14,
-        ),
-      ),
-      onTap: onTap, // Allow tapping the field itself to open date picker
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Please select a date';
-        }
-        return null;
-      },
-    );
+    return AppTheme.buildDateField(context, controller, onTap, hintText);
   }
 
   // Helper to build a standard text label
-  Widget _buildLabel(String text) => Text(
-    text,
-    style: const TextStyle(
-      fontSize: 16, // Slightly smaller label font size
-      fontWeight: FontWeight.w600, // Slightly bolder
-      color: Colors.black87, // Darker text color
-    ),
-  );
+  Widget _buildLabel(String text) => AppTheme.buildLabel(text);
 
   // Helper to build a standard dropdown field with enhanced styling
   Widget _buildDropdownField({
@@ -1268,72 +948,40 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
     required List<String> items,
     required ValueChanged<String?> onChanged,
   }) {
-    return Container(
-      height: 56, // Increased height for better touch target
-      padding: const EdgeInsets.symmetric(horizontal: 16), // Increased padding
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12), // Rounded corners
-        border: Border.all(
-          color: Colors.grey.shade200,
-          width: 1,
-        ), // Lighter border
-        color: Colors.white, // White background
+    return DropdownButtonFormField<String>(
+      value: value,
+      decoration: InputDecoration(
+        filled: true,
+        fillColor: Colors.grey[100],
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide.none,
+        ),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 12,
+        ),
+        isCollapsed: true,
       ),
-      child: Row(
-        children: [
-          Expanded(
-            child: DropdownButtonHideUnderline(
-              child: DropdownButton<String>(
-                dropdownColor: Colors.white,
-                isExpanded: true, // Expand to fill the container
-                icon: const SizedBox.shrink(), // Hide the default dropdown icon
-                value: value,
-                onChanged: onChanged,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.black87,
+      isExpanded: true,
+      items:
+          items
+              .map(
+                (item) => DropdownMenuItem<String>(
+                  value: item,
+                  child: Container(
+                    constraints: const BoxConstraints(maxWidth: 250),
+                    child: Text(
+                      item,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                      style: const TextStyle(fontSize: 14),
+                    ),
+                  ),
                 ),
-                items:
-                    items
-                        .map(
-                          (item) => DropdownMenuItem(
-                            value: item,
-                            child: Text(
-                              item,
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight:
-                                    item == value
-                                        ? FontWeight.w600
-                                        : FontWeight.normal,
-                                color:
-                                    item == value
-                                        ? Colors.blueAccent
-                                        : Colors.black87,
-                              ),
-                            ),
-                          ),
-                        )
-                        .toList(),
-              ),
-            ),
-          ),
-          // Custom dropdown icon with animation
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: Colors.blue.shade50,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: const Icon(
-              Icons.arrow_drop_down,
-              color: Colors.blueAccent,
-              size: 24,
-            ),
-          ),
-        ],
-      ),
+              )
+              .toList(),
+      onChanged: onChanged,
     );
   }
 

@@ -2,6 +2,7 @@ import 'dart:io'; // Import for File
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:image_picker/image_picker.dart'; // Import the image_picker package
+import '../theme/app_theme.dart'; // Import AppTheme
 
 // Ensure these imports are correct based on your project structure
 import 'Meeting_with_new_purchaser.dart';
@@ -96,7 +97,7 @@ class _PhoneCallWithUnregisterdPurchaserState
           // Apply a custom theme for the date picker
           data: ThemeData.light().copyWith(
             colorScheme: const ColorScheme.light(
-              primary: Colors.blueAccent, // Header background color
+              primary: AppTheme.primaryColor, // Header background color
               onPrimary: Colors.white, // Header text color
               onSurface: Colors.black87, // Body text color
             ),
@@ -131,7 +132,7 @@ class _PhoneCallWithUnregisterdPurchaserState
           // Apply a custom theme for the date picker
           data: ThemeData.light().copyWith(
             colorScheme: const ColorScheme.light(
-              primary: Colors.blueAccent, // Header background color
+              primary: AppTheme.primaryColor, // Header background color
               onPrimary: Colors.white, // Header text color
               onSurface: Colors.black87, // Body text color
             ),
@@ -233,7 +234,7 @@ class _PhoneCallWithUnregisterdPurchaserState
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        backgroundColor: Colors.grey[100], // Light grey background for the body
+        backgroundColor: AppTheme.scaffoldBackgroundColor, // Light grey background for the body
         appBar: AppBar(
           leading: IconButton(
             onPressed: () {
@@ -259,7 +260,7 @@ class _PhoneCallWithUnregisterdPurchaserState
             ),
           ),
           backgroundColor:
-              Colors.blueAccent, // A slightly brighter blue for AppBar
+              AppTheme.primaryColor, // A slightly brighter blue for AppBar
           elevation: 4.0, // Add shadow to AppBar
         ),
         body: Padding(
@@ -274,7 +275,7 @@ class _PhoneCallWithUnregisterdPurchaserState
                   style: TextStyle(
                     fontSize: 24, // Adjusted font size
                     fontWeight: FontWeight.bold,
-                    color: Colors.blueAccent, // Match AppBar color
+                    color: AppTheme.primaryColor, // Match AppBar color
                   ),
                 ),
                 const SizedBox(height: 24), // Increased spacing
@@ -412,7 +413,7 @@ class _PhoneCallWithUnregisterdPurchaserState
                         children: [
                           Icon(
                             Icons.photo_library_rounded,
-                            color: Color.fromARGB(255, 33, 150, 243),
+                            color: AppTheme.primaryColor,
                             size: 24,
                           ),
                           SizedBox(width: 8),
@@ -421,7 +422,7 @@ class _PhoneCallWithUnregisterdPurchaserState
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
-                              color: Color.fromARGB(255, 33, 150, 243),
+                              color: AppTheme.primaryColor,
                             ),
                           ),
                         ],
@@ -464,19 +465,14 @@ class _PhoneCallWithUnregisterdPurchaserState
                                       vertical: 4,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: Colors.blueAccent.withOpacity(0.1),
+                                      color: AppTheme.primaryColor.withOpacity(0.1),
                                       borderRadius: BorderRadius.circular(20),
                                     ),
                                     child: Text(
                                       'Document ${index + 1}',
                                       style: const TextStyle(
                                         fontWeight: FontWeight.bold,
-                                        color: Color.fromARGB(
-                                          255,
-                                          33,
-                                          150,
-                                          243,
-                                        ),
+                                        color: AppTheme.primaryColor,
                                         fontSize: 14,
                                       ),
                                     ),

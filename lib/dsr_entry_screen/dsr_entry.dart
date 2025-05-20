@@ -17,6 +17,7 @@ import 'phone_call_with_builder.dart';
 import 'phone_call_with_unregisterd_purchaser.dart';
 import 'work_from_home.dart';
 import 'package:learning2/screens/Home_screen.dart'; // Assuming HomeScreen is in this path
+import 'package:learning2/theme/app_theme.dart';
 
 class DsrEntry extends StatefulWidget {
   const DsrEntry({super.key});
@@ -119,14 +120,12 @@ class _DsrEntryState extends State<DsrEntry> {
         return Theme(
           // Apply a custom theme for the date picker
           data: ThemeData.light().copyWith(
-            colorScheme: const ColorScheme.light(
-              primary: Colors.blueAccent, // Header background color
+            colorScheme: ColorScheme.light(
+              primary: AppTheme.primaryColor, // Header background color
               onPrimary: Colors.white, // Header text color
-              onSurface: Colors.black87, // Body text color
+              onSurface: AppTheme.primaryTextColor, // Body text color
             ),
-            dialogTheme: const DialogThemeData(
-              backgroundColor: Colors.white,
-            ), // Dialog background
+            dialogTheme: AppTheme.dialogTheme, // Dialog background
           ),
           child: child!,
         );
@@ -208,7 +207,7 @@ class _DsrEntryState extends State<DsrEntry> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        backgroundColor: const Color(0xFFF5F7FA), // Modern light background
+        backgroundColor: AppTheme.scaffoldBackgroundColor,
         appBar: AppBar(
           leading: IconButton(
             onPressed: () {
@@ -219,27 +218,25 @@ class _DsrEntryState extends State<DsrEntry> {
               );
             },
             icon: const Icon(
-              Icons.arrow_back_ios_new, // More modern back icon
+              Icons.arrow_back_ios_new,
               color: Colors.white,
             ),
           ),
-          title: const Row(
+          title: Row(
             children: [
-              Icon(Icons.assignment_outlined, size: 28), // Add an icon
-              SizedBox(width: 10),
+              const Icon(Icons.assignment_outlined, size: 28),
+              const SizedBox(width: 10),
               Text(
                 'DSR Entry',
-                style: TextStyle(
+                style: Theme.of(context).textTheme.displaySmall?.copyWith(
                   color: Colors.white,
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 0.5, // Slight letter spacing for modern look
+                  letterSpacing: 0.5,
                 ),
               ),
             ],
           ),
-          backgroundColor: const Color.fromARGB(255, 33, 150, 243),
-          elevation: 0, // Flat design
+          backgroundColor: AppTheme.primaryColor,
+          elevation: 0,
           shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.only(
               bottomLeft: Radius.circular(15),
@@ -252,7 +249,7 @@ class _DsrEntryState extends State<DsrEntry> {
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
-              colors: [const Color(0xFFF5F7FA), Colors.grey.shade100],
+              colors: [AppTheme.scaffoldBackgroundColor, Colors.grey.shade100],
               stops: const [0.0, 1.0],
             ),
           ),
@@ -266,7 +263,7 @@ class _DsrEntryState extends State<DsrEntry> {
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: const Color.fromARGB(255, 33, 150, 243),
+                      color: AppTheme.primaryColor,
                       borderRadius: BorderRadius.circular(15),
                       boxShadow: [
                         BoxShadow(
@@ -288,12 +285,11 @@ class _DsrEntryState extends State<DsrEntry> {
                               size: 24,
                             ),
                             const SizedBox(width: 10),
-                            const Text(
+                            Text(
                               'Instructions',
-                              style: TextStyle(
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
+                              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                                 color: Colors.white,
+                                fontSize: 22,
                               ),
                             ),
                             const Spacer(),
@@ -718,18 +714,7 @@ class _DsrEntryState extends State<DsrEntry> {
                                 size: 20,
                               ),
                               label: const Text('Document'),
-                              style: ElevatedButton.styleFrom(
-                                foregroundColor: Colors.white,
-                                backgroundColor: Colors.blueAccent,
-                                elevation: 0,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 12,
-                                ),
-                              ),
+                              style: Theme.of(context).elevatedButtonTheme.style,
                             ),
                             const SizedBox(width: 12),
                             if (_uploadRows.length > 1)
@@ -742,10 +727,10 @@ class _DsrEntryState extends State<DsrEntry> {
                                 label: const Text('Remove'),
                                 style: ElevatedButton.styleFrom(
                                   foregroundColor: Colors.white,
-                                  backgroundColor: Colors.redAccent,
+                                  backgroundColor: AppTheme.dangerButtonColor,
                                   elevation: 0,
                                   shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
+                                    borderRadius: BorderRadius.circular(10),
                                   ),
                                   padding: const EdgeInsets.symmetric(
                                     horizontal: 16,
@@ -882,64 +867,10 @@ class _DsrEntryState extends State<DsrEntry> {
     required IconData icon,
     required List<Widget> children,
   }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(15),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.2),
-            spreadRadius: 1,
-            blurRadius: 5,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Section header
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: const Color(0xFFF5F7FA),
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(15),
-                topRight: Radius.circular(15),
-              ),
-              border: Border(
-                bottom: BorderSide(color: Colors.grey.shade200, width: 1),
-              ),
-            ),
-            child: Row(
-              children: [
-                Icon(
-                  icon,
-                  color: const Color.fromARGB(255, 33, 150, 243),
-                  size: 24,
-                ),
-                const SizedBox(width: 10),
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Color.fromARGB(255, 33, 150, 243),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          // Section content
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: children,
-            ),
-          ),
-        ],
-      ),
+    return AppTheme.buildSectionCard(
+      title: title,
+      icon: icon,
+      children: children,
     );
   }
 
@@ -953,48 +884,11 @@ class _DsrEntryState extends State<DsrEntry> {
     int maxLines = 1, // Default to single line
     String? Function(String?)? validator,
   }) {
-    return TextFormField(
+    return AppTheme.buildTextField(
+      hintText,
       controller: controller,
       keyboardType: keyboardType,
       maxLines: maxLines,
-      style: const TextStyle(fontSize: 16, color: Color(0xFF333333)),
-      decoration: InputDecoration(
-        hintText: hintText,
-        hintStyle: TextStyle(
-          color: Colors.grey[400],
-          fontSize: 16,
-          fontWeight: FontWeight.w400,
-        ),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide(color: Colors.grey.shade300, width: 1),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide(color: Colors.grey.shade300, width: 1),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: Color(0xFF3F51B5), width: 2),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: Colors.redAccent, width: 1),
-        ),
-        filled: true,
-        fillColor: Colors.white,
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 16,
-        ),
-        suffixIcon:
-            maxLines > 1
-                ? const Icon(
-                  Icons.edit_note,
-                  color: Color.fromARGB(255, 33, 150, 243),
-                )
-                : null,
-      ),
       validator: validator,
     );
   }
@@ -1005,65 +899,11 @@ class _DsrEntryState extends State<DsrEntry> {
     VoidCallback onTap,
     String hintText,
   ) {
-    return TextFormField(
-      controller: controller,
-      readOnly: true, // Make the text field read-only
-      style: const TextStyle(fontSize: 16, color: Color(0xFF333333)),
-      decoration: InputDecoration(
-        hintText: hintText,
-        hintStyle: TextStyle(
-          color: Colors.grey[400],
-          fontSize: 16,
-          fontWeight: FontWeight.w400,
-        ),
-        suffixIcon: Container(
-          margin: const EdgeInsets.all(4),
-          decoration: BoxDecoration(
-            color: const Color(0xFFEEF2FF),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: IconButton(
-            icon: const Icon(
-              Icons.calendar_month_rounded,
-              color: Color.fromARGB(255, 33, 150, 243),
-              size: 22,
-            ),
-            onPressed: onTap,
-          ),
-        ),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide(color: Colors.grey.shade300, width: 1),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide(color: Colors.grey.shade300, width: 1),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(
-            color: Color.fromARGB(255, 33, 150, 243),
-            width: 2,
-          ),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: Colors.redAccent, width: 1),
-        ),
-        filled: true,
-        fillColor: Colors.white,
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 16,
-        ),
-      ),
-      onTap: onTap, // Allow tapping the field itself to open date picker
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Please select a date';
-        }
-        return null;
-      },
+    return AppTheme.buildDateField(
+      context,
+      controller,
+      onTap,
+      hintText,
     );
   }
 

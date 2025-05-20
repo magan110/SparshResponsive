@@ -17,6 +17,7 @@ import 'on_leave.dart';
 import 'phone_call_with_builder.dart';
 import 'phone_call_with_unregisterd_purchaser.dart';
 import 'work_from_home.dart';
+import '../theme/app_theme.dart';
 
 class BtlActivites extends StatefulWidget {
   const BtlActivites({super.key});
@@ -219,7 +220,7 @@ class _BtlActivitesState extends State<BtlActivites> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[100], // Light grey background for the body
+      backgroundColor: AppTheme.scaffoldBackgroundColor,
       appBar: AppBar(
         leading: IconButton(
           onPressed: () {
@@ -231,27 +232,23 @@ class _BtlActivitesState extends State<BtlActivites> {
           },
           icon: const Icon(
             Icons.arrow_back_ios_new,
-            color: Colors.white, // White back arrow icon
+            color: Colors.white,
             size: 22,
           ),
         ),
-        title: const Column(
+        title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               'BTL Activities',
-              style: TextStyle(
-                color: Colors.white, // White title text
-                fontSize: 20, // Slightly smaller font size for a cleaner look
-                fontWeight: FontWeight.bold,
+              style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                color: Colors.white,
               ),
             ),
             Text(
               'Daily Sales Report Entry',
-              style: TextStyle(
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: Colors.white70,
-                fontSize: 14,
-                fontWeight: FontWeight.normal,
               ),
             ),
           ],
@@ -270,216 +267,305 @@ class _BtlActivitesState extends State<BtlActivites> {
             },
           ),
         ],
-        flexibleSpace: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Colors.blue.shade700, Colors.blue.shade900],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-          ),
-        ),
+        backgroundColor: AppTheme.primaryColor,
         elevation: 0, // Remove shadow for a more modern look
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0), // Reduced padding slightly
+        padding: const EdgeInsets.all(16.0),
         child: Form(
-          key: _formKey, // Assign the form key
+          key: _formKey,
           child: ListView(
             children: [
-              // Instructions Section
-              const Text(
-                'Instructions',
-                style: TextStyle(
-                  fontSize: 24, // Adjusted font size
-                  fontWeight: FontWeight.bold,
-                  color: Colors.blueAccent, // Match AppBar color
-                ),
+              // Process Section
+              AppTheme.buildSectionCard(
+                title: 'Process',
+                icon: Icons.settings_outlined,
+                children: [
+                  AppTheme.buildLabel('Process Type'),
+                  const SizedBox(height: 8),
+                  DropdownButtonFormField<String>(
+                    value: _processItem,
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor: Colors.grey[100],
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide.none,
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
+                      isCollapsed: true,
+                    ),
+                    isExpanded: true,
+                    items: _processdropdownItems
+                        .map(
+                          (item) => DropdownMenuItem<String>(
+                            value: item,
+                            child: Container(
+                              constraints: const BoxConstraints(maxWidth: 250),
+                              child: Text(
+                                item,
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                                style: const TextStyle(fontSize: 14),
+                              ),
+                            ),
+                          ),
+                        )
+                        .toList(),
+                    onChanged: (newValue) {
+                      if (newValue != null) {
+                        setState(() => _processItem = newValue);
+                      }
+                    },
+                    validator: (value) {
+                      if (value == null || value == 'Select') {
+                        return 'Please select a process';
+                      }
+                      return null;
+                    },
+                  ),
+                ],
               ),
-              const SizedBox(height: 24), // Increased spacing
-              // Process Type Dropdown
-              _buildLabel('Process type'),
-              const SizedBox(height: 8), // Reduced spacing below label
-              _buildDropdownField(
-                value: _processItem,
-                items: _processdropdownItems,
-                onChanged: (newValue) {
-                  if (newValue != null) {
-                    setState(() => _processItem = newValue);
-                  }
-                },
-              ),
-              const SizedBox(height: 24), // Increased spacing
-              // Activity Type Dropdown (for navigation)
-              _buildLabel('Activity Type'),
-              const SizedBox(height: 8), // Reduced spacing below label
-              _buildDropdownField(
-                value: _activityItem,
-                items: _activityDropDownItems,
-                onChanged: (newValue) {
-                  if (newValue != null) {
-                    setState(() => _activityItem = newValue);
 
-                    // Navigation logic based on selected activity
-                    if (newValue == 'Personal Visit') {
-                      _navigateTo(const DsrRetailerInOut());
-                    } else if (newValue == 'Phone Call with Builder/Stockist') {
-                      _navigateTo(const PhoneCallWithBuilder());
-                    } else if (newValue ==
-                        'Meetings With Contractor / Stockist') {
-                      _navigateTo(const MeetingsWithContractor());
-                    } else if (newValue ==
-                        'Visit to Get / Check Sampling at Site') {
-                      _navigateTo(const CheckSamplingAtSite());
-                    } else if (newValue ==
-                        'Meeting with New Purchaser(Trade Purchaser)/Retailer') {
-                      _navigateTo(const MeetingWithNewPurchaser());
-                    } else if (newValue == 'BTL Activities') {
-                      // This is the current page, no navigation needed
-                    } else if (newValue ==
-                        'Internal Team Meetings / Review Meetings') {
-                      _navigateTo(const InternalTeamMeeting());
-                    } else if (newValue == 'Office Work') {
-                      _navigateTo(const OfficeWork());
-                    } else if (newValue == 'On Leave / Holiday / Off Day') {
-                      _navigateTo(const OnLeave());
-                    } else if (newValue == 'Work From Home') {
-                      _navigateTo(const WorkFromHome());
-                    } else if (newValue == 'Any Other Activity') {
-                      _navigateTo(const AnyOtherActivity());
-                    } else if (newValue ==
-                        'Phone call with Unregistered Purchasers') {
-                      _navigateTo(const PhoneCallWithUnregisterdPurchaser());
-                    }
-                  }
-                },
-              ),
-              const SizedBox(height: 24), // Increased spacing
-              // Submission Date Field
-              _buildLabel('Submission'),
-              const SizedBox(height: 8), // Reduced spacing below label
-              _buildDateField(_dateController, _pickDate, 'Select Date'),
-              const SizedBox(height: 24), // Increased spacing
-              // Report Date Field
-              _buildLabel('Report Date'),
-              const SizedBox(height: 8), // Reduced spacing below label
-              _buildDateField(
-                _reportDateController,
-                _pickReportDate,
-                'Select Date',
-              ),
-              const SizedBox(height: 24), // Increased spacing
-              // Type Of Activity Dropdown (Specific to BTL)
-              _buildLabel('Type Of Activity'),
-              const SizedBox(height: 8),
-              _buildDropdownField(
-                value: _activityTypeItem,
-                items: _activityTypedropdownItems,
-                onChanged: (newValue) {
-                  if (newValue != null) {
-                    setState(() => _activityTypeItem = newValue);
-                  }
-                },
-              ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
+              // Activity Section
+              AppTheme.buildSectionCard(
+                title: 'Activity',
+                icon: Icons.category_outlined,
+                children: [
+                  AppTheme.buildLabel('Activity Type'),
+                  const SizedBox(height: 8),
+                  DropdownButtonFormField<String>(
+                    value: _activityItem,
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor: Colors.grey[100],
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide.none,
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
+                      isCollapsed: true,
+                    ),
+                    isExpanded: true,
+                    items: _activityDropDownItems
+                        .map(
+                          (item) => DropdownMenuItem<String>(
+                            value: item,
+                            child: Container(
+                              constraints: const BoxConstraints(maxWidth: 250),
+                              child: Text(
+                                item,
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                                style: const TextStyle(fontSize: 14),
+                              ),
+                            ),
+                          ),
+                        )
+                        .toList(),
+                    onChanged: (newValue) {
+                      if (newValue != null) {
+                        setState(() => _activityItem = newValue);
 
-              // No. Of Participants Field
-              _buildLabel('No. Of Participants'),
-              const SizedBox(height: 8),
-              _buildTextField(
-                'Enter number of participants',
-                controller: _noOfParticipantsController,
-                keyboardType: TextInputType.number,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter number of participants';
-                  }
-                  if (int.tryParse(value) == null) {
-                    return 'Invalid number';
-                  }
-                  return null;
-                },
+                        // Navigation logic based on selected activity
+                        if (newValue == 'Personal Visit') {
+                          _navigateTo(const DsrRetailerInOut());
+                        } else if (newValue == 'Phone Call with Builder/Stockist') {
+                          _navigateTo(const PhoneCallWithBuilder());
+                        } else if (newValue ==
+                            'Meetings With Contractor / Stockist') {
+                          _navigateTo(const MeetingsWithContractor());
+                        } else if (newValue ==
+                            'Visit to Get / Check Sampling at Site') {
+                          _navigateTo(const CheckSamplingAtSite());
+                        } else if (newValue ==
+                            'Meeting with New Purchaser(Trade Purchaser)/Retailer') {
+                          _navigateTo(const MeetingWithNewPurchaser());
+                        } else if (newValue == 'BTL Activities') {
+                          // This is the current page, no navigation needed
+                        } else if (newValue ==
+                            'Internal Team Meetings / Review Meetings') {
+                          _navigateTo(const InternalTeamMeeting());
+                        } else if (newValue == 'Office Work') {
+                          _navigateTo(const OfficeWork());
+                        } else if (newValue == 'On Leave / Holiday / Off Day') {
+                          _navigateTo(const OnLeave());
+                        } else if (newValue == 'Work From Home') {
+                          _navigateTo(const WorkFromHome());
+                        } else if (newValue == 'Any Other Activity') {
+                          _navigateTo(const AnyOtherActivity());
+                        } else if (newValue ==
+                            'Phone call with Unregistered Purchasers') {
+                          _navigateTo(const PhoneCallWithUnregisterdPurchaser());
+                        }
+                      }
+                    },
+                    validator: (value) {
+                      if (value == null || value == 'Select') {
+                        return 'Please select an activity';
+                      }
+                      return null;
+                    },
+                  ),
+                ],
               ),
-              const SizedBox(height: 24),
 
-              // Town in Which Activity Conducted Field
-              _buildLabel('Town in Which Activity Conducted'),
-              const SizedBox(height: 8),
-              _buildTextField(
-                'Enter town',
-                controller: _townController,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter town';
-                  }
-                  return null;
-                },
+              // Date Information Section
+              AppTheme.buildSectionCard(
+                title: 'Date Information',
+                icon: Icons.date_range_outlined,
+                children: [
+                  AppTheme.buildLabel('Submission Date'),
+                  const SizedBox(height: 8),
+                  AppTheme.buildDateField(
+                    context,
+                    _dateController,
+                    _pickDate,
+                    'Select Submission Date',
+                  ),
+                  const SizedBox(height: 16),
+                  AppTheme.buildLabel('Report Date'),
+                  const SizedBox(height: 8),
+                  AppTheme.buildDateField(
+                    context,
+                    _reportDateController,
+                    _pickReportDate,
+                    'Select Report Date',
+                  ),
+                ],
               ),
-              const SizedBox(height: 24),
-
-              // Learning's From Activity Field
-              _buildLabel('Learning\'s From Activity'),
-              const SizedBox(height: 8),
-              _buildTextField(
-                'Enter your learnings',
-                controller: _learningsController,
-                maxLines: 3, // Allow multiple lines
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your learnings';
-                  }
-                  return null;
-                },
+              // BTL Activity Details Section
+              AppTheme.buildSectionCard(
+                title: 'BTL Activity Details',
+                icon: Icons.campaign_outlined,
+                children: [
+                  AppTheme.buildLabel('Type Of Activity'),
+                  const SizedBox(height: 8),
+                  DropdownButtonFormField<String>(
+                    value: _activityTypeItem,
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor: Colors.grey[100],
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide.none,
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
+                      isCollapsed: true,
+                    ),
+                    isExpanded: true,
+                    items: _activityTypedropdownItems
+                        .map(
+                          (item) => DropdownMenuItem<String>(
+                            value: item,
+                            child: Container(
+                              constraints: const BoxConstraints(maxWidth: 250),
+                              child: Text(
+                                item,
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                                style: const TextStyle(fontSize: 14),
+                              ),
+                            ),
+                          ),
+                        )
+                        .toList(),
+                    onChanged: (newValue) {
+                      if (newValue != null) {
+                        setState(() => _activityTypeItem = newValue);
+                      }
+                    },
+                    validator: (value) {
+                      if (value == null || value == 'Select') {
+                        return 'Please select a type of activity';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  AppTheme.buildLabel('No. Of Participants'),
+                  const SizedBox(height: 8),
+                  AppTheme.buildTextField(
+                    'Enter number of participants',
+                    controller: _noOfParticipantsController,
+                    keyboardType: TextInputType.number,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter number of participants';
+                      }
+                      if (int.tryParse(value) == null) {
+                        return 'Invalid number';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  AppTheme.buildLabel('Town in Which Activity Conducted'),
+                  const SizedBox(height: 8),
+                  AppTheme.buildTextField(
+                    'Enter town',
+                    controller: _townController,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter town';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  AppTheme.buildLabel('Learning\'s From Activity'),
+                  const SizedBox(height: 8),
+                  AppTheme.buildTextField(
+                    'Enter your learnings',
+                    controller: _learningsController,
+                    maxLines: 3,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter your learnings';
+                      }
+                      return null;
+                    },
+                  ),
+                ],
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
 
               // Image Upload Section
-              _buildLabel('Upload Images'),
-              const SizedBox(height: 8),
               Container(
                 margin: const EdgeInsets.only(top: 8, bottom: 16),
                 padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.1),
-                      spreadRadius: 1,
-                      blurRadius: 5,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                  border: Border.all(color: Colors.grey.shade200),
-                ),
+                decoration: AppTheme.cardDecoration,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Row(
+                    Row(
                       children: [
-                        Icon(
+                        const Icon(
                           Icons.photo_library_rounded,
-                          color: Color.fromARGB(255, 33, 150, 243),
+                          color: AppTheme.primaryColor,
                           size: 24,
                         ),
-                        SizedBox(width: 8),
+                        const SizedBox(width: 8),
                         Text(
                           'Supporting Documents',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Color.fromARGB(255, 33, 150, 243),
-                          ),
+                          style: Theme.of(context).textTheme.headlineMedium,
                         ),
                       ],
                     ),
                     const SizedBox(height: 4),
                     Text(
                       'Upload images related to your activity',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey.shade600,
-                      ),
+                      style: Theme.of(context).textTheme.bodyMedium,
                     ),
                     const SizedBox(height: 16),
                     // Image upload rows with enhanced UI
@@ -808,47 +894,15 @@ class _BtlActivitesState extends State<BtlActivites> {
     String hintText, {
     TextEditingController? controller,
     TextInputType? keyboardType,
-    int maxLines = 1, // Default to single line
+    int maxLines = 1,
     String? Function(String?)? validator,
   }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Label is handled separately before calling this function
-        // _buildLabel(label),
-        // const SizedBox(height: 8),
-        TextFormField(
-          controller: controller,
-          keyboardType: keyboardType,
-          maxLines: maxLines,
-          style: const TextStyle(
-            overflow:
-                TextOverflow.ellipsis, // Handle text overflow with ellipsis
-          ),
-          decoration: InputDecoration(
-            hintText: hintText,
-            hintStyle: TextStyle(
-              color: Colors.grey[500], // Slightly darker grey hint text
-              fontSize: 16,
-            ),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10), // Rounded corners
-              borderSide: BorderSide.none, // No visible border line
-            ),
-            filled: true, // Add a background fill
-            fillColor: Colors.white, // White background for text fields
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 12,
-              vertical: 12,
-            ), // Adjusted padding
-            // Ensure error text doesn't overflow
-            errorStyle: const TextStyle(overflow: TextOverflow.ellipsis),
-            // Allow the input field to expand as needed
-            isCollapsed: false,
-          ),
-          validator: validator, // Assign the validator function
-        ),
-      ],
+    return AppTheme.buildTextField(
+      hintText,
+      controller: controller,
+      keyboardType: keyboardType,
+      maxLines: maxLines,
+      validator: validator,
     );
   }
 
@@ -858,49 +912,16 @@ class _BtlActivitesState extends State<BtlActivites> {
     VoidCallback onTap,
     String hintText,
   ) {
-    return TextFormField(
-      controller: controller,
-      readOnly: true, // Make the text field read-only
-      decoration: InputDecoration(
-        hintText: hintText,
-        hintStyle: TextStyle(color: Colors.grey[500], fontSize: 16),
-        suffixIcon: IconButton(
-          icon: const Icon(
-            Icons.calendar_today,
-            color: Colors.blueAccent,
-          ), // Blue calendar icon
-          onPressed: onTap, // Call the provided onTap function
-        ),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide.none, // No visible border line
-        ),
-        filled: true,
-        fillColor: Colors.white,
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 12,
-          vertical: 12,
-        ),
-      ),
-      onTap: onTap, // Allow tapping the field itself to open date picker
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Please select a date';
-        }
-        return null;
-      },
+    return AppTheme.buildDateField(
+      context,
+      controller,
+      onTap,
+      hintText,
     );
   }
 
   // Helper to build a standard text label
-  Widget _buildLabel(String text) => Text(
-    text,
-    style: const TextStyle(
-      fontSize: 16, // Slightly smaller label font size
-      fontWeight: FontWeight.w600, // Slightly bolder
-      color: Colors.black87, // Darker text color
-    ),
-  );
+  Widget _buildLabel(String text) => AppTheme.buildLabel(text);
 
   // Helper to build a standard dropdown field (not searchable)
   Widget _buildDropdownField({

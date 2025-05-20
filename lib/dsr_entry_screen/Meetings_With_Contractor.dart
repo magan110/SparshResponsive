@@ -12,6 +12,7 @@ import 'check_sampling_at_site.dart';
 import 'dsr_entry.dart'; // Assuming DsrEntry is the main entry point
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:image_picker/image_picker.dart'; // Import the image_picker package
+import '../theme/app_theme.dart'; // Import AppTheme
 
 import 'internal_team_meeting.dart';
 import 'office_work.dart';
@@ -267,12 +268,12 @@ class _MeetingsWithContractorState extends State<MeetingsWithContractor> {
           // Apply a custom theme for the date picker
           data: ThemeData.light().copyWith(
             colorScheme: const ColorScheme.light(
-              primary: Colors.blueAccent, // Header background color
+              primary: AppTheme.primaryColor, // Header background color
               onPrimary: Colors.white, // Header text color
               onSurface: Colors.black87, // Body text color
             ),
             dialogTheme: const DialogThemeData(
-              backgroundColor: Colors.blue,
+              backgroundColor: AppTheme.primaryColor, // Dialog background
             ), // Dialog background
           ),
           child: child!,
@@ -302,12 +303,12 @@ class _MeetingsWithContractorState extends State<MeetingsWithContractor> {
           // Apply a custom theme for the date picker
           data: ThemeData.light().copyWith(
             colorScheme: const ColorScheme.light(
-              primary: Colors.blueAccent, // Header background color
+              primary: AppTheme.primaryColor, // Header background color
               onPrimary: Colors.white, // Header text color
               onSurface: Colors.black87, // Body text color
             ),
             dialogTheme: const DialogThemeData(
-              backgroundColor: Colors.white,
+              backgroundColor: AppTheme.primaryColor, // Dialog background
             ), // Dialog background
           ),
           child: child!,
@@ -386,7 +387,7 @@ class _MeetingsWithContractorState extends State<MeetingsWithContractor> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        backgroundColor: const Color(0xFFF5F7FA), // Modern light background
+        backgroundColor: AppTheme.scaffoldBackgroundColor, // Modern light background
         appBar: AppBar(
           leading: IconButton(
             onPressed: () {
@@ -411,7 +412,7 @@ class _MeetingsWithContractorState extends State<MeetingsWithContractor> {
             ),
             overflow: TextOverflow.ellipsis,
           ),
-          backgroundColor: const Color.fromARGB(255, 33, 150, 243), // Match dsr_entry color
+          backgroundColor: AppTheme.primaryColor, // Match dsr_entry color
           elevation: 0, // Flat design like dsr_entry
           shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.only(
@@ -464,7 +465,7 @@ class _MeetingsWithContractorState extends State<MeetingsWithContractor> {
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
-              colors: [const Color(0xFFF5F7FA), Colors.grey.shade100],
+              colors: [AppTheme.scaffoldBackgroundColor, Colors.grey.shade100],
               stops: const [0.0, 1.0],
             ),
           ),
@@ -506,7 +507,7 @@ class _MeetingsWithContractorState extends State<MeetingsWithContractor> {
                                 borderRadius: BorderRadius.circular(12),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.blue.withOpacity(0.1),
+                                    color: AppTheme.primaryColor.withOpacity(0.1),
                                     spreadRadius: 1,
                                     blurRadius: 3,
                                     offset: const Offset(0, 1),
@@ -515,7 +516,7 @@ class _MeetingsWithContractorState extends State<MeetingsWithContractor> {
                               ),
                               child: const Icon(
                                 Icons.info_outline,
-                                color: Colors.blueAccent,
+                                color: AppTheme.primaryColor,
                                 size: 24,
                               ),
                             ),
@@ -525,7 +526,7 @@ class _MeetingsWithContractorState extends State<MeetingsWithContractor> {
                               style: TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.blueAccent,
+                                color: AppTheme.primaryColor,
                               ),
                             ),
                           ],
@@ -761,7 +762,7 @@ class _MeetingsWithContractorState extends State<MeetingsWithContractor> {
                           children: [
                             const Icon(
                               Icons.photo_library_rounded,
-                              color: Colors.blueAccent,
+                              color: AppTheme.primaryColor,
                               size: 24,
                             ),
                             const SizedBox(width: 8),
@@ -770,7 +771,7 @@ class _MeetingsWithContractorState extends State<MeetingsWithContractor> {
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.blueAccent.shade700,
+                                color: AppTheme.primaryColor,
                               ),
                             ),
                           ],
@@ -812,7 +813,7 @@ class _MeetingsWithContractorState extends State<MeetingsWithContractor> {
                                         vertical: 4,
                                       ),
                                       decoration: BoxDecoration(
-                                        color: Colors.blueAccent.withOpacity(
+                                        color: AppTheme.primaryColor.withOpacity(
                                           0.1,
                                         ),
                                         borderRadius: BorderRadius.circular(20),
@@ -821,7 +822,7 @@ class _MeetingsWithContractorState extends State<MeetingsWithContractor> {
                                         'Document ${index + 1}',
                                         style: const TextStyle(
                                           fontWeight: FontWeight.bold,
-                                          color: Colors.blueAccent,
+                                          color: AppTheme.primaryColor,
                                           fontSize: 14,
                                         ),
                                       ),
@@ -921,7 +922,7 @@ class _MeetingsWithContractorState extends State<MeetingsWithContractor> {
                                           backgroundColor:
                                               _selectedImages[i] != null
                                                   ? Colors.amber.shade600
-                                                  : Colors.blueAccent,
+                                                  : AppTheme.primaryColor,
                                           elevation: 0,
                                           shape: RoundedRectangleBorder(
                                             borderRadius: BorderRadius.circular(

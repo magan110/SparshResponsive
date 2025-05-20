@@ -1,14 +1,14 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:image_picker/image_picker.dart'; // Import the image_picker package
+import 'package:image_picker/image_picker.dart';
+import '../theme/app_theme.dart';
 
-// Ensure these imports are correct based on your project structure
+// Activity imports
 import 'Meeting_with_new_purchaser.dart';
 import 'Meetings_With_Contractor.dart';
 import 'any_other_activity.dart';
 import 'btl_activites.dart';
-// This is the current file, keep it
 import 'dsr_entry.dart';
 import 'dsr_retailer_in_out.dart';
 import 'internal_team_meeting.dart';
@@ -285,35 +285,48 @@ class _CheckSamplingAtSiteState extends State<CheckSamplingAtSite> {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.grey[100], // Light grey background for the body
+
+
+@override
+Widget build(BuildContext context) {
+  return SafeArea(
+    child: Scaffold(
+      backgroundColor: AppTheme.scaffoldBackgroundColor,
       appBar: AppBar(
         leading: IconButton(
           onPressed: () {
-            // Navigate back to the DsrEntry screen
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => const DsrEntry()),
             );
           },
           icon: const Icon(
-            Icons.arrow_back,
-            color: Colors.white, // White back arrow icon
+            Icons.arrow_back_ios_new,
+            color: Colors.white,
+            size: 22,
           ),
         ),
-        title: const Text(
-          'DSR Entry',
-          style: TextStyle(
-            color: Colors.white, // White title text
-            fontSize: 24, // Slightly smaller font size for a cleaner look
-            fontWeight: FontWeight.bold,
+        title: Row(
+          children: [
+            const Icon(Icons.assignment_outlined, size: 28),
+            const SizedBox(width: 10),
+            Text(
+              'Check Sampling at Site',
+              style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                color: Colors.white,
+                letterSpacing: 0.5,
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: AppTheme.primaryColor,
+        elevation: 0,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+            bottomLeft: Radius.circular(15),
+            bottomRight: Radius.circular(15),
           ),
         ),
-        backgroundColor:
-            Colors.blueAccent, // A slightly brighter blue for AppBar
-        elevation: 4.0, // Add shadow to AppBar
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0), // Reduced padding slightly
@@ -845,7 +858,8 @@ class _CheckSamplingAtSiteState extends State<CheckSamplingAtSite> {
           ),
         ),
       ),
-    );
+    ),
+  );
   }
 
   // --- Helper Methods for Building Widgets ---

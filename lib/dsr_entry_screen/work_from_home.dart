@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:image_picker/image_picker.dart';
 
 import 'dsr_entry.dart';
+import '../theme/app_theme.dart';
 
 class WorkFromHome extends StatefulWidget {
   const WorkFromHome({super.key});
@@ -18,6 +19,14 @@ class _WorkFromHomeState extends State<WorkFromHome> {
   final List<String> _processdropdownItems = ['Select', 'Add', 'Update'];
 
   String? _activityItem = 'Work From Home';
+
+  // Shortened version for display
+  String get _activityItemShort {
+    if (_activityItem == null) return 'Select';
+    return (_activityItem!.length > 30)
+      ? '${_activityItem!.substring(0, 27)}...'
+      : _activityItem!;
+  }
   final List<String> _activityDropDownItems = [
     'Select',
     'Personal Visit',
@@ -157,10 +166,26 @@ class _WorkFromHomeState extends State<WorkFromHome> {
             child: Container(
               width: MediaQuery.of(context).size.width * 0.8,
               height: MediaQuery.of(context).size.height * 0.6,
-              decoration: BoxDecoration(
-                image: DecorationImage(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: Image.file(
+                  imageFile,
                   fit: BoxFit.contain,
-                  image: FileImage(imageFile),
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      color: Colors.grey[300],
+                      child: const Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.broken_image, size: 50, color: Colors.grey),
+                            SizedBox(height: 16),
+                            Text('Unable to load image', style: TextStyle(color: Colors.grey)),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
                 ),
               ),
             ),
@@ -194,7 +219,7 @@ class _WorkFromHomeState extends State<WorkFromHome> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[100], // Light grey background for the body
+      backgroundColor: AppTheme.scaffoldBackgroundColor,
       appBar: AppBar(
         leading: IconButton(
           onPressed: () {
@@ -205,27 +230,23 @@ class _WorkFromHomeState extends State<WorkFromHome> {
           },
           icon: const Icon(
             Icons.arrow_back_ios_new,
-            color: Colors.white, // White back arrow icon
+            color: Colors.white,
             size: 22,
           ),
         ),
-        title: const Column(
+        title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               'Work From Home',
-              style: TextStyle(
-                color: Colors.white, // White title text
-                fontSize: 20, // Slightly smaller font size for a cleaner look
-                fontWeight: FontWeight.bold,
+              style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                color: Colors.white,
               ),
             ),
             Text(
               'Daily Sales Report Entry',
-              style: TextStyle(
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: Colors.white70,
-                fontSize: 14,
-                fontWeight: FontWeight.normal,
               ),
             ),
           ],
@@ -252,26 +273,12 @@ class _WorkFromHomeState extends State<WorkFromHome> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               // Process Selection Card
-              Card(
-                elevation: 2,
-                margin: const EdgeInsets.only(bottom: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Process',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black87,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
+              AppTheme.buildSectionCard(
+                title: 'Process',
+                icon: Icons.settings_outlined,
+                children: [
+                  AppTheme.buildLabel('Process Type'),
+                  const SizedBox(height: 8),
                       DropdownButtonFormField<String>(
                         value: _processItem,
                         decoration: InputDecoration(
@@ -285,13 +292,23 @@ class _WorkFromHomeState extends State<WorkFromHome> {
                             horizontal: 16,
                             vertical: 12,
                           ),
+                          isCollapsed: true,
                         ),
+                        isExpanded: true,
                         items:
                             _processdropdownItems
                                 .map(
-                                  (item) => DropdownMenuItem(
+                                  (item) => DropdownMenuItem<String>(
                                     value: item,
-                                    child: Text(item),
+                                    child: Container(
+                                      constraints: const BoxConstraints(maxWidth: 250),
+                                      child: Text(
+                                        item,
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 1,
+                                        style: const TextStyle(fontSize: 14),
+                                      ),
+                                    ),
                                   ),
                                 )
                                 .toList(),
@@ -307,34 +324,29 @@ class _WorkFromHomeState extends State<WorkFromHome> {
                           return null;
                         },
                       ),
-                    ],
-                  ),
-                ),
+                ],
               ),
 
+              const SizedBox(height: 20),
+
               // Activity Selection Card
-              Card(
-                elevation: 2,
-                margin: const EdgeInsets.only(bottom: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Activity',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black87,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
+              AppTheme.buildSectionCard(
+                title: 'Activity',
+                icon: Icons.category_outlined,
+                children: [
+                  AppTheme.buildLabel('Activity Type'),
+                  const SizedBox(height: 8),
                       DropdownButtonFormField<String>(
                         value: _activityItem,
+                        selectedItemBuilder: (BuildContext context) {
+                          return _activityDropDownItems.map<Widget>((String item) {
+                            return Text(
+                              _activityItemShort,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(color: Colors.black87),
+                            );
+                          }).toList();
+                        },
                         decoration: InputDecoration(
                           filled: true,
                           fillColor: Colors.grey[100],
@@ -346,13 +358,23 @@ class _WorkFromHomeState extends State<WorkFromHome> {
                             horizontal: 16,
                             vertical: 12,
                           ),
+                          isCollapsed: true,
                         ),
+                        isExpanded: true,
                         items:
                             _activityDropDownItems
                                 .map(
-                                  (item) => DropdownMenuItem(
+                                  (item) => DropdownMenuItem<String>(
                                     value: item,
-                                    child: Text(item),
+                                    child: Container(
+                                      constraints: const BoxConstraints(maxWidth: 250),
+                                      child: Text(
+                                        item,
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 1,
+                                        style: const TextStyle(fontSize: 14),
+                                      ),
+                                    ),
                                   ),
                                 )
                                 .toList(),
@@ -368,131 +390,62 @@ class _WorkFromHomeState extends State<WorkFromHome> {
                           return null;
                         },
                       ),
-                    ],
-                  ),
-                ),
+                ],
               ),
 
+              const SizedBox(height: 20),
+
               // Date Selection Card
-              Card(
-                elevation: 2,
-                margin: const EdgeInsets.only(bottom: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Dates',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black87,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      // Submission Date
-                      TextFormField(
-                        controller: _submissionDateController,
-                        readOnly: true,
-                        decoration: InputDecoration(
-                          labelText: 'Submission Date',
-                          filled: true,
-                          fillColor: Colors.grey[100],
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: BorderSide.none,
-                          ),
-                          suffixIcon: IconButton(
-                            icon: const Icon(Icons.calendar_today),
-                            onPressed: _pickSubmissionDate,
-                          ),
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please select submission date';
-                          }
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: 16),
-                      // Report Date
-                      TextFormField(
-                        controller: _reportDateController,
-                        readOnly: true,
-                        decoration: InputDecoration(
-                          labelText: 'Report Date',
-                          filled: true,
-                          fillColor: Colors.grey[100],
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: BorderSide.none,
-                          ),
-                          suffixIcon: IconButton(
-                            icon: const Icon(Icons.calendar_today),
-                            onPressed: _pickReportDate,
-                          ),
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please select report date';
-                          }
-                          return null;
-                        },
-                      ),
-                    ],
+              AppTheme.buildSectionCard(
+                title: 'Date Information',
+                icon: Icons.date_range_outlined,
+                children: [
+                  AppTheme.buildLabel('Submission Date'),
+                  const SizedBox(height: 8),
+                  AppTheme.buildDateField(
+                    context,
+                    _submissionDateController,
+                    _pickSubmissionDate,
+                    'Select Submission Date',
                   ),
-                ),
+                  const SizedBox(height: 16),
+                  AppTheme.buildLabel('Report Date'),
+                  const SizedBox(height: 8),
+                  AppTheme.buildDateField(
+                    context,
+                    _reportDateController,
+                    _pickReportDate,
+                    'Select Report Date',
+                  ),
+                ],
               ),
 
               // Image Upload Card
               Container(
-                margin: const EdgeInsets.only(top: 8, bottom: 16),
+                margin: const EdgeInsets.only(top: 20, bottom: 16),
                 padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.1),
-                      spreadRadius: 1,
-                      blurRadius: 5,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                  border: Border.all(color: Colors.grey.shade200),
-                ),
+                decoration: AppTheme.cardDecoration,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Row(
+                    Row(
                       children: [
-                        Icon(
+                        const Icon(
                           Icons.photo_library_rounded,
-                          color: Color.fromARGB(255, 33, 150, 243),
+                          color: AppTheme.primaryColor,
                           size: 24,
                         ),
-                        SizedBox(width: 8),
+                        const SizedBox(width: 8),
                         Text(
                           'Supporting Documents',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Color.fromARGB(255, 33, 150, 243),
-                          ),
+                          style: Theme.of(context).textTheme.headlineMedium,
                         ),
                       ],
                     ),
                     const SizedBox(height: 4),
                     Text(
                       'Upload images related to your activity',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey.shade600,
-                      ),
+                      style: Theme.of(context).textTheme.bodyMedium,
                     ),
                     const SizedBox(height: 16),
                     // Image upload rows with enhanced UI
@@ -586,12 +539,30 @@ class _WorkFromHomeState extends State<WorkFromHome> {
                                   margin: const EdgeInsets.only(bottom: 16),
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(8),
-                                    image: DecorationImage(
-                                      image: FileImage(_selectedImages[i]!),
-                                      fit: BoxFit.cover,
-                                    ),
                                   ),
-                                  child: Align(
+                                  clipBehavior: Clip.antiAlias,
+                                  child: Stack(
+                                    children: [
+                                      ClipRRect(
+                                        borderRadius: BorderRadius.circular(8),
+                                        child: Image.file(
+                                          _selectedImages[i]!,
+                                          fit: BoxFit.cover,
+                                          width: double.infinity,
+                                          height: 120,
+                                          errorBuilder: (context, error, stackTrace) {
+                                            return Container(
+                                              height: 120,
+                                              width: double.infinity,
+                                              color: Colors.grey[300],
+                                              child: const Center(
+                                                child: Icon(Icons.broken_image, size: 40),
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                      Align(
                                     alignment: Alignment.topRight,
                                     child: Container(
                                       margin: const EdgeInsets.all(8),
@@ -606,6 +577,8 @@ class _WorkFromHomeState extends State<WorkFromHome> {
                                         size: 20,
                                       ),
                                     ),
+                                  ),
+                                    ],
                                   ),
                                 ),
                               ),
@@ -685,18 +658,7 @@ class _WorkFromHomeState extends State<WorkFromHome> {
                           onPressed: _addRow,
                           icon: const Icon(Icons.add_photo_alternate, size: 20),
                           label: const Text('Document'),
-                          style: ElevatedButton.styleFrom(
-                            foregroundColor: Colors.white,
-                            backgroundColor: Colors.blueAccent,
-                            elevation: 0,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 12,
-                            ),
-                          ),
+                          style: Theme.of(context).elevatedButtonTheme.style,
                         ),
                         const SizedBox(width: 12),
                         if (_uploadRows.length > 1)
@@ -709,10 +671,10 @@ class _WorkFromHomeState extends State<WorkFromHome> {
                             label: const Text('Remove'),
                             style: ElevatedButton.styleFrom(
                               foregroundColor: Colors.white,
-                              backgroundColor: Colors.redAccent,
+                              backgroundColor: AppTheme.dangerButtonColor,
                               elevation: 0,
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
+                                borderRadius: BorderRadius.circular(10),
                               ),
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 16,
@@ -727,24 +689,39 @@ class _WorkFromHomeState extends State<WorkFromHome> {
               ),
 
               // Submit Button
-              ElevatedButton(
-                onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    // Handle form submission
-                    _showSuccessDialog('Form submitted successfully');
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-                child: const Text(
-                  'Submit',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: AppTheme.cardDecoration,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        if (_formKey.currentState!.validate()) {
+                          // Handle form submission
+                          _showSuccessDialog('Form submitted successfully');
+                        }
+                      },
+                      icon: const Icon(Icons.check_circle_outline),
+                      label: const Text('Submit'),
+                      style: Theme.of(context).elevatedButtonTheme.style,
+                    ),
+                    const SizedBox(height: 16),
+                    OutlinedButton.icon(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const DsrEntry()),
+                        );
+                      },
+                      icon: const Icon(Icons.arrow_back),
+                      label: const Text('Back to DSR Entry'),
+                      style: Theme.of(context).outlinedButtonTheme.style,
+                    ),
+                  ],
                 ),
               ),
+              const SizedBox(height: 30),
             ],
           ),
         ),
