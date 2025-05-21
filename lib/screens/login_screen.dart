@@ -5,8 +5,10 @@ import 'package:flutter/services.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/io_client.dart';
+import 'package:learning2/WorkerScreen/Worker_Home_Screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'Home_screen.dart';
+// Import your worker screen here
 import 'log_in_otp.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -22,7 +24,7 @@ class _LoginScreenState extends State<LoginScreen>
     with SingleTickerProviderStateMixin {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final String apiUrl = "https://qa.birlawhite.com:55232/api/Auth/execute";
+  final String apiUrl = "https://192.168.55.182:7023/api/Auth/login";
   bool _obscurePassword = true;
   bool _isLoading = false;
   final bool _rememberMe = false;
@@ -121,12 +123,28 @@ class _LoginScreenState extends State<LoginScreen>
         if (responseData['msg'] == 'Authentication successful') {
           final prefs = await SharedPreferences.getInstance();
           await prefs.setBool('isLoggedIn', true);
+
+          final String role = responseData['role'] ?? '';
+
+          // Navigate based on role
+          Widget nextScreen;
+          switch (role) {
+            case 'Worker':
+              nextScreen = const WorkerHomeScreen();
+              break;
+            case 'Customer':
+              nextScreen = const HomeScreen();
+              break;
+            default:
+              nextScreen = const HomeScreen();
+          }
+
           if (mounted) {
             Navigator.pushReplacement(
               context,
               PageRouteBuilder(
                 transitionDuration: const Duration(milliseconds: 500),
-                pageBuilder: (_, __, ___) => const HomeScreen(),
+                pageBuilder: (_, __, ___) => nextScreen,
                 transitionsBuilder: (_, animation, __, child) {
                   return FadeTransition(opacity: animation, child: child);
                 },
@@ -158,18 +176,18 @@ class _LoginScreenState extends State<LoginScreen>
       context: context,
       builder:
           (context) => AlertDialog(
-            title: const Text('Error', style: TextStyle(color: Colors.red)),
-            content: Text(message),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('OK', style: TextStyle(color: Colors.blue)),
-              ),
-            ],
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(15),
-            ),
+        title: const Text('Error', style: TextStyle(color: Colors.red)),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('OK', style: TextStyle(color: Colors.blue)),
           ),
+        ],
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15),
+        ),
+      ),
     );
   }
 
@@ -274,13 +292,13 @@ class _LoginScreenState extends State<LoginScreen>
                       ShaderMask(
                         shaderCallback:
                             (bounds) => LinearGradient(
-                              colors: [
-                                Colors.white,
-                                Colors.white.withOpacity(0.8),
-                              ],
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                            ).createShader(bounds),
+                          colors: [
+                            Colors.white,
+                            Colors.white.withOpacity(0.8),
+                          ],
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                        ).createShader(bounds),
                         child: const Text(
                           'SPARSH',
                           style: TextStyle(
@@ -363,10 +381,10 @@ class _LoginScreenState extends State<LoginScreen>
                                       filled: true,
                                       fillColor: Colors.grey.shade50,
                                       contentPadding:
-                                          const EdgeInsets.symmetric(
-                                            vertical: 16,
-                                            horizontal: 20,
-                                          ),
+                                      const EdgeInsets.symmetric(
+                                        vertical: 16,
+                                        horizontal: 20,
+                                      ),
                                     ),
                                     validator: (value) {
                                       if (value == null || value.isEmpty) {
@@ -418,7 +436,7 @@ class _LoginScreenState extends State<LoginScreen>
                                         onPressed: () {
                                           setState(() {
                                             _obscurePassword =
-                                                !_obscurePassword;
+                                            !_obscurePassword;
                                           });
                                         },
                                       ),
@@ -429,10 +447,10 @@ class _LoginScreenState extends State<LoginScreen>
                                       filled: true,
                                       fillColor: Colors.grey.shade50,
                                       contentPadding:
-                                          const EdgeInsets.symmetric(
-                                            vertical: 16,
-                                            horizontal: 20,
-                                          ),
+                                      const EdgeInsets.symmetric(
+                                        vertical: 16,
+                                        horizontal: 20,
+                                      ),
                                     ),
                                     validator: (value) {
                                       if (value == null || value.isEmpty) {
@@ -450,7 +468,7 @@ class _LoginScreenState extends State<LoginScreen>
                                 // Remember me checkbox and Forgot Password
                                 Row(
                                   mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
+                                  MainAxisAlignment.spaceBetween,
                                   children: [
                                     TextButton(
                                       onPressed: () {
@@ -462,7 +480,7 @@ class _LoginScreenState extends State<LoginScreen>
                                         ),
                                         minimumSize: Size.zero,
                                         tapTargetSize:
-                                            MaterialTapTargetSize.shrinkWrap,
+                                        MaterialTapTargetSize.shrinkWrap,
                                       ),
                                       child: Text(
                                         'Forgot Password?',
@@ -504,20 +522,20 @@ class _LoginScreenState extends State<LoginScreen>
                                       elevation: 0,
                                     ),
                                     child:
-                                        _isLoading
-                                            ? const CircularProgressIndicator(
-                                              color: Colors.white,
-                                              strokeWidth: 2,
-                                            )
-                                            : const Text(
-                                              'LOGIN',
-                                              style: TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 18,
-                                                fontWeight: FontWeight.bold,
-                                                letterSpacing: 1.2,
-                                              ),
-                                            ),
+                                    _isLoading
+                                        ? const CircularProgressIndicator(
+                                      color: Colors.white,
+                                      strokeWidth: 2,
+                                    )
+                                        : const Text(
+                                      'LOGIN',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        letterSpacing: 1.2,
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ],

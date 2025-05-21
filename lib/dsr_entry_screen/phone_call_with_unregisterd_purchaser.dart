@@ -38,23 +38,6 @@ class _PhoneCallWithUnregisterdPurchaserState
   String? _processItem = 'Select';
   final List<String> _processdropdownItems = ['Select', 'Add', 'Update'];
 
-  String? _activityItem =
-      'Phone call with Unregistered Purchasers'; // Default to this activity
-  final List<String> _activityDropDownItems = [
-    'Select',
-    'Personal Visit',
-    'Phone Call with Builder/Stockist',
-    'Meetings With Contractor / Stockist',
-    'Visit to Get / Check Sampling at Site',
-    'Meeting with New Purchaser(Trade Purchaser)/Retailer',
-    'BTL Activities',
-    'Internal Team Meetings / Review Meetings',
-    'Office Work',
-    'On Leave / Holiday / Off Day',
-    'Work From Home',
-    'Any Other Activity',
-    'Phone call with Unregistered Purchasers',
-  ];
 
   // Controllers for date text fields
   final TextEditingController _submissionDateController =
@@ -321,114 +304,6 @@ class _PhoneCallWithUnregisterdPurchaserState
                   validator: (value) {
                     if (value == null || value == 'Select') {
                       return 'Please select a process';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 24), // Increased spacing
-                // Activity Type Dropdown (for navigation)
-                _buildLabel('Activity Type'),
-                const SizedBox(height: 8), // Reduced spacing below label
-                DropdownButtonFormField<String>(
-                  value: _activityItem,
-                  isExpanded: true, // Ensure dropdown expands to full width
-                  menuMaxHeight: 400, // Set maximum height for dropdown menu
-                  // Add custom button style to handle long text in the selected item
-                  selectedItemBuilder: (BuildContext context) {
-                    return _activityDropDownItems.map<Widget>((String item) {
-                      return Container(
-                        alignment: Alignment.centerLeft,
-                        constraints: const BoxConstraints(minHeight: 48),
-                        child: Text(
-                          item,
-                          style: const TextStyle(fontSize: 14, color: Colors.black87),
-                          overflow: TextOverflow.ellipsis, // Use ellipsis for selected item
-                          maxLines: 2, // Allow up to 2 lines for selected item
-                        ),
-                      );
-                    }).toList();
-                  },
-                  decoration: InputDecoration(
-                    filled: true,
-                    fillColor: Colors.white,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide(color: Colors.grey.shade300),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide(color: Colors.grey.shade300),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide(color: AppTheme.primaryColor),
-                    ),
-                    // Increase vertical padding to accommodate wrapped text
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 16, // Increased padding
-                    ),
-                    // Ensure the input field is tall enough
-                    constraints: const BoxConstraints(minHeight: 60),
-                  ),
-                  items: _activityDropDownItems
-                      .map(
-                        (item) => DropdownMenuItem<String>(
-                          value: item,
-                          // Add more height for items with longer text
-                          child: Container(
-                            constraints: const BoxConstraints(
-                              minWidth: 200, // Ensure minimum width
-                              minHeight: 40, // Ensure minimum height for wrapped text
-                            ),
-                            padding: const EdgeInsets.symmetric(vertical: 8.0),
-                            child: Text(
-                              item,
-                              style: const TextStyle(fontSize: 14),
-                              overflow: TextOverflow.visible, // Allow text to wrap
-                              softWrap: true, // Enable text wrapping
-                            ),
-                          ),
-                        ),
-                      )
-                      .toList(),
-                  onChanged: (newValue) {
-                    if (newValue != null) {
-                      setState(() => _activityItem = newValue);
-
-                      // Navigation logic based on selected activity
-                      if (newValue == 'Select') {
-                        // No navigation for 'Select' option
-                      } else if (newValue == 'Personal Visit') {
-                        _navigateTo(const DsrRetailerInOut());
-                      } else if (newValue == 'Phone Call with Builder/Stockist') {
-                        _navigateTo(const PhoneCallWithBuilder());
-                      } else if (newValue == 'Meetings With Contractor / Stockist') {
-                        _navigateTo(const MeetingsWithContractor());
-                      } else if (newValue == 'Visit to Get / Check Sampling at Site') {
-                        _navigateTo(const CheckSamplingAtSite());
-                      } else if (newValue == 'Meeting with New Purchaser(Trade Purchaser)/Retailer') {
-                        _navigateTo(const MeetingWithNewPurchaser());
-                      } else if (newValue == 'BTL Activities') {
-                        _navigateTo(const BtlActivites());
-                      } else if (newValue == 'Internal Team Meetings / Review Meetings') {
-                        _navigateTo(const InternalTeamMeeting());
-                      } else if (newValue == 'Office Work') {
-                        _navigateTo(const OfficeWork());
-                      } else if (newValue == 'On Leave / Holiday / Off Day') {
-                        _navigateTo(const OnLeave());
-                      } else if (newValue == 'Work From Home') {
-                        _navigateTo(const WorkFromHome());
-                      } else if (newValue == 'Any Other Activity') {
-                        _navigateTo(const AnyOtherActivity());
-                      } else if (newValue == 'Phone call with Unregistered Purchasers') {
-                        // This is the current page, no navigation needed
-                      }
-                    }
-                  },
-                  validator: (value) {
-                    if (value == null || value == 'Select') {
-                      return 'Please select an activity';
                     }
                     return null;
                   },

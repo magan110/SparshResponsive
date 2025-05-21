@@ -30,23 +30,6 @@ class _MeetingWithNewPurchaserState extends State<MeetingWithNewPurchaser> {
   String? _processItem = 'Select';
   final List<String> _processdropdownItems = ['Select', 'Add', 'Update'];
 
-  String? _activityItem =
-      'Meeting with New Purchaser(Trade Purchaser)/Retailer';
-  final List<String> _activityDropDownItems = [
-    'Select',
-    'Personal Visit',
-    'Phone Call with Builder/Stockist',
-    'Meetings With Contractor / Stockist',
-    'Visit to Get / Check Sampling at Site',
-    'Meeting with New Purchaser(Trade Purchaser)/Retailer',
-    'BTL Activities',
-    'Internal Team Meetings / Review Meetings',
-    'Office Work',
-    'On Leave / Holiday / Off Day',
-    'Work From Home',
-    'Any Other Activity',
-    'Phone call with Unregistered Purchasers',
-  ];
 
   final TextEditingController _submissionDateController =
   TextEditingController();
@@ -357,108 +340,6 @@ class _MeetingWithNewPurchaserState extends State<MeetingWithNewPurchaser> {
                 ),
               ),
 
-              // Activity Selection Card
-              Card(
-                margin: const EdgeInsets.only(bottom: 16),
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Icon(Icons.category_outlined, color: Colors.blue),
-                          const SizedBox(width: 8),
-                          Text(
-                            'Activity',
-                            style: Theme.of(context).textTheme.titleLarge,
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      DropdownButtonFormField<String>(
-                        value: _activityItem,
-                        decoration: InputDecoration(
-                          filled: true,
-                          fillColor: Colors.grey[100],
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: BorderSide.none,
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 12,
-                          ),
-                          isCollapsed: true,
-                        ),
-                        isExpanded: true,
-                        items: _activityDropDownItems
-                            .map(
-                              (item) => DropdownMenuItem<String>(
-                            value: item,
-                            child: Container(
-                              constraints:
-                              const BoxConstraints(maxWidth: 250),
-                              child: Text(
-                                item,
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 1,
-                                style: const TextStyle(fontSize: 14),
-                              ),
-                            ),
-                          ),
-                        )
-                            .toList(),
-                        onChanged: (String? selectedValue) {
-                          if (selectedValue == null) return;
-                          setState(() => _activityItem = selectedValue);
-
-                          // Navigation logic based on selected activity
-                          if (selectedValue == 'Personal Visit') {
-                            _navigateTo(const DsrRetailerInOut());
-                          } else if (selectedValue ==
-                              'Phone Call with Builder/Stockist') {
-                            _navigateTo(const PhoneCallWithBuilder());
-                          } else if (selectedValue ==
-                              'Meetings With Contractor / Stockist') {
-                            _navigateTo(const MeetingsWithContractor());
-                          } else if (selectedValue ==
-                              'Visit to Get / Check Sampling at Site') {
-                            _navigateTo(const CheckSamplingAtSite());
-                          } else if (selectedValue ==
-                              'Meeting with New Purchaser(Trade Purchaser)/Retailer') {
-                            // This is the current page, no navigation needed
-                          } else if (selectedValue == 'BTL Activities') {
-                            _navigateTo(const BtlActivites());
-                          } else if (selectedValue ==
-                              'Internal Team Meetings / Review Meetings') {
-                            _navigateTo(const InternalTeamMeeting());
-                          } else if (selectedValue == 'Office Work') {
-                            _navigateTo(const OfficeWork());
-                          } else if (selectedValue ==
-                              'On Leave / Holiday / Off Day') {
-                            _navigateTo(const OnLeave());
-                          } else if (selectedValue == 'Work From Home') {
-                            _navigateTo(const WorkFromHome());
-                          } else if (selectedValue == 'Any Other Activity') {
-                            _navigateTo(const AnyOtherActivity());
-                          } else if (selectedValue ==
-                              'Phone call with Unregistered Purchasers') {
-                            _navigateTo(
-                                const PhoneCallWithUnregisterdPurchaser());
-                          }
-                        },
-                        validator: (value) {
-                          if (value == null || value == 'Select') {
-                            return 'Please select an activity';
-                          }
-                          return null;
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-              ),
 
               // Date Selection Card
               Card(

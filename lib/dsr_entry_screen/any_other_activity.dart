@@ -29,21 +29,6 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
   final List<String> _processdropdownItems = ['Select', 'Add', 'Update'];
 
   String? _activityItem = 'Any Other Activity';
-  final List<String> _activityDropDownItems = [
-    'Select',
-    'Personal Visit',
-    'Phone Call with Builder/Stockist',
-    'Meetings With Contractor / Stockist',
-    'Visit to Get / Check Sampling at Site',
-    'Meeting with New Purchaser(Trade Purchaser)/Retailer',
-    'BTL Activities',
-    'Internal Team Meetings / Review Meetings',
-    'Office Work',
-    'On Leave / Holiday / Off Day',
-    'Work From Home',
-    'Any Other Activity',
-    'Phone call with Unregistered Purchasers',
-  ];
 
   // Controllers for date text fields
   final TextEditingController _dateController = TextEditingController();
@@ -310,531 +295,462 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
                         },
                       ),
 
-                      // Activity Type Dropdown with enhanced styling
+                      // Date Fields Section
                       const SizedBox(height: 16),
-                      AppTheme.buildLabel('Activity Type'),
-                      const SizedBox(height: 8),
-                      DropdownButtonFormField<String>(
-                        value: _activityItem,
-                        decoration: InputDecoration(
-                          filled: true,
-                          fillColor: Colors.grey[100],
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: BorderSide.none,
+                      AppTheme.buildSectionCard(
+                        title: 'Date Information',
+                        icon: Icons.calendar_today,
+                        children: [
+                          // Submission Date Field
+                          AppTheme.buildLabel('Submission Date'),
+                          const SizedBox(height: 8),
+                          AppTheme.buildDateField(
+                            context,
+                            _dateController,
+                            _pickDate,
+                            'Select Date',
                           ),
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 12,
+
+                          // Report Date Field
+                          const SizedBox(height: 16),
+                          AppTheme.buildLabel('Report Date'),
+                          const SizedBox(height: 8),
+                          AppTheme.buildDateField(
+                            context,
+                            _reportDateController,
+                            _pickReportDate,
+                            'Select Date',
                           ),
-                          isCollapsed: true,
-                        ),
-                        isExpanded: true,
-                        items:
-                            _activityDropDownItems
-                                .map(
-                                  (item) => DropdownMenuItem<String>(
-                                    value: item,
-                                    child: Container(
-                                      constraints: const BoxConstraints(
-                                        maxWidth: 250,
-                                      ),
-                                      child: Text(
-                                        item,
-                                        overflow: TextOverflow.ellipsis,
-                                        maxLines: 1,
-                                        style: const TextStyle(fontSize: 14),
-                                      ),
-                                    ),
-                                  ),
-                                )
-                                .toList(),
-                        onChanged: (newValue) {
-                          if (newValue != null) {
-                            setState(() => _activityItem = newValue);
-
-                            // Navigation logic based on selected activity
-                            if (newValue == 'Personal Visit') {
-                              _navigateTo(const DsrRetailerInOut());
-                            } else if (newValue ==
-                                'Phone Call with Builder/Stockist') {
-                              _navigateTo(const PhoneCallWithBuilder());
-                            } else if (newValue ==
-                                'Meetings With Contractor / Stockist') {
-                              _navigateTo(const MeetingsWithContractor());
-                            } else if (newValue ==
-                                'Visit to Get / Check Sampling at Site') {
-                              _navigateTo(const CheckSamplingAtSite());
-                            } else if (newValue ==
-                                'Meeting with New Purchaser(Trade Purchaser)/Retailer') {
-                              _navigateTo(const MeetingWithNewPurchaser());
-                            } else if (newValue == 'BTL Activities') {
-                              _navigateTo(const BtlActivites());
-                            } else if (newValue ==
-                                'Internal Team Meetings / Review Meetings') {
-                              _navigateTo(const InternalTeamMeeting());
-                            } else if (newValue == 'Office Work') {
-                              _navigateTo(const OfficeWork());
-                            } else if (newValue ==
-                                'On Leave / Holiday / Off Day') {
-                              _navigateTo(const OnLeave());
-                            } else if (newValue == 'Work From Home') {
-                              _navigateTo(const WorkFromHome());
-                            } else if (newValue ==
-                                'Phone call with Unregistered Purchasers') {
-                              _navigateTo(
-                                const PhoneCallWithUnregisterdPurchaser(),
-                              );
-                            }
-                            // No navigation needed for 'Any Other Activity' as it's the current page
-                          }
-                        },
-                        validator: (value) {
-                          if (value == null || value == 'Select') {
-                            return 'Please select an activity';
-                          }
-                          return null;
-                        },
-                      ),
-                    ],
-                  ),
-
-                  // Date Fields Section
-                  const SizedBox(height: 16),
-                  AppTheme.buildSectionCard(
-                    title: 'Date Information',
-                    icon: Icons.calendar_today,
-                    children: [
-                      // Submission Date Field
-                      AppTheme.buildLabel('Submission Date'),
-                      const SizedBox(height: 8),
-                      AppTheme.buildDateField(
-                        context,
-                        _dateController,
-                        _pickDate,
-                        'Select Date',
+                        ],
                       ),
 
-                      // Report Date Field
-                      const SizedBox(height: 16),
-                      AppTheme.buildLabel('Report Date'),
-                      const SizedBox(height: 8),
-                      AppTheme.buildDateField(
-                        context,
-                        _reportDateController,
-                        _pickReportDate,
-                        'Select Date',
-                      ),
-                    ],
-                  ),
-
-                  // Activity Details Section Header
-                  Container(
-                    margin: const EdgeInsets.only(bottom: 16),
-                    child: Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: Colors.amber.shade100,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Icon(
-                            Icons.description_outlined,
-                            color: Colors.amber.shade800,
-                            size: 24,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Text(
-                          'Activity Details',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.amber.shade800,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  // Activity Details Text Fields
-                  _buildTextField('Activity Details 1'),
-                  const SizedBox(
-                    height: 16,
-                  ), // Consistent spacing between text fields
-                  _buildTextField('Activity Details 2'),
-                  const SizedBox(height: 16),
-                  _buildTextField('Activity Details 3'),
-                  const SizedBox(height: 16),
-                  _buildTextField('Any Other Points'),
-                  const SizedBox(
-                    height: 24,
-                  ), // Increased spacing before image upload
-                  // Image Upload Section - Enhanced UI
-                  Container(
-                    margin: const EdgeInsets.only(top: 8, bottom: 16),
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey.withOpacity(0.1),
-                          spreadRadius: 1,
-                          blurRadius: 5,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                      border: Border.all(color: Colors.grey.shade200),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
+                      // Activity Details Section Header
+                      Container(
+                        margin: const EdgeInsets.only(bottom: 16),
+                        child: Row(
                           children: [
-                            const Icon(
-                              Icons.photo_library_rounded,
-                              color: Colors.blueAccent,
-                              size: 24,
+                            Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: Colors.amber.shade100,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Icon(
+                                Icons.description_outlined,
+                                color: Colors.amber.shade800,
+                                size: 24,
+                              ),
                             ),
-                            const SizedBox(width: 8),
+                            const SizedBox(width: 12),
                             Text(
-                              'Supporting Documents',
+                              'Activity Details',
                               style: TextStyle(
-                                fontSize: 18,
+                                fontSize: 20,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.blueAccent.shade700,
+                                color: Colors.amber.shade800,
                               ),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 4),
-                        Text(
-                          'Upload images related to your activity',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey.shade600,
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        // Image upload rows with enhanced UI
-                        ...List.generate(_uploadRows.length, (index) {
-                          final i = _uploadRows[index];
-                          return Container(
-                            margin: const EdgeInsets.only(bottom: 16),
-                            padding: const EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              color: Colors.grey.shade50,
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(
-                                color:
-                                    _selectedImages[i] != null
-                                        ? Colors.green.shade200
-                                        : Colors.grey.shade200,
-                                width: 1.5,
-                              ),
+                      ),
+                      // Activity Details Text Fields
+                      _buildTextField('Activity Details 1'),
+                      const SizedBox(
+                        height: 16,
+                      ), // Consistent spacing between text fields
+                      _buildTextField('Activity Details 2'),
+                      const SizedBox(height: 16),
+                      _buildTextField('Activity Details 3'),
+                      const SizedBox(height: 16),
+                      _buildTextField('Any Other Points'),
+                      const SizedBox(
+                        height: 24,
+                      ), // Increased spacing before image upload
+                      // Image Upload Section - Enhanced UI
+                      Container(
+                        margin: const EdgeInsets.only(top: 8, bottom: 16),
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.1),
+                              spreadRadius: 1,
+                              blurRadius: 5,
+                              offset: const Offset(0, 2),
                             ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                          ],
+                          border: Border.all(color: Colors.grey.shade200),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
                               children: [
-                                Row(
-                                  children: [
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 10,
-                                        vertical: 4,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: Colors.blueAccent.withOpacity(
-                                          0.1,
-                                        ),
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
-                                      child: Text(
-                                        'Document ${index + 1}',
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.blueAccent,
-                                          fontSize: 14,
-                                        ),
-                                      ),
-                                    ),
-                                    const Spacer(),
-                                    if (_selectedImages[i] != null)
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 10,
-                                          vertical: 4,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: Colors.green.shade100,
-                                          borderRadius: BorderRadius.circular(
-                                            20,
-                                          ),
-                                        ),
-                                        child: const Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Icon(
-                                              Icons.check_circle,
-                                              color: Colors.green,
-                                              size: 16,
-                                            ),
-                                            SizedBox(width: 4),
-                                            Text(
-                                              'Uploaded',
-                                              style: TextStyle(
-                                                color: Colors.green,
-                                                fontWeight: FontWeight.w500,
-                                                fontSize: 14,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                  ],
+                                const Icon(
+                                  Icons.photo_library_rounded,
+                                  color: Colors.blueAccent,
+                                  size: 24,
                                 ),
-                                const SizedBox(height: 16),
-                                // Preview of the image if selected
-                                if (_selectedImages[i] != null)
-                                  GestureDetector(
-                                    onTap:
-                                        () => _showImageDialog(
-                                          _selectedImages[i]!,
-                                        ),
-                                    child: Container(
-                                      height: 120,
-                                      width: double.infinity,
-                                      margin: const EdgeInsets.only(bottom: 16),
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(8),
-                                        image: DecorationImage(
-                                          image: FileImage(_selectedImages[i]!),
-                                          fit: BoxFit.cover,
-                                        ),
-                                      ),
-                                      child: Align(
-                                        alignment: Alignment.topRight,
-                                        child: Container(
-                                          margin: const EdgeInsets.all(8),
-                                          padding: const EdgeInsets.all(4),
-                                          decoration: BoxDecoration(
-                                            color: Colors.black.withOpacity(
-                                              0.6,
-                                            ),
-                                            shape: BoxShape.circle,
-                                          ),
-                                          child: const Icon(
-                                            Icons.zoom_in,
-                                            color: Colors.white,
-                                            size: 20,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  'Supporting Documents',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.blueAccent.shade700,
                                   ),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: ElevatedButton.icon(
-                                        onPressed: () => _pickImage(i),
-                                        icon: Icon(
-                                          _selectedImages[i] != null
-                                              ? Icons.refresh
-                                              : Icons.upload_file,
-                                          size: 18,
-                                        ),
-                                        label: Text(
-                                          _selectedImages[i] != null
-                                              ? 'Replace'
-                                              : 'Upload',
-                                        ),
-                                        style: ElevatedButton.styleFrom(
-                                          foregroundColor: Colors.white,
-                                          backgroundColor:
-                                              _selectedImages[i] != null
-                                                  ? Colors.amber.shade600
-                                                  : AppTheme.primaryColor,
-                                          elevation: 0,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(
-                                              10,
-                                            ),
-                                          ),
-                                          padding: const EdgeInsets.symmetric(
-                                            vertical: 12,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    if (_selectedImages[i] != null) ...[
-                                      const SizedBox(width: 8),
-                                      Expanded(
-                                        child: ElevatedButton.icon(
-                                          onPressed:
-                                              () => _showImageDialog(
-                                                _selectedImages[i]!,
-                                              ),
-                                          icon: const Icon(
-                                            Icons.visibility,
-                                            size: 18,
-                                          ),
-                                          label: const Text('View'),
-                                          style: ElevatedButton.styleFrom(
-                                            foregroundColor: Colors.white,
-                                            backgroundColor:
-                                                AppTheme.successColor,
-                                            elevation: 0,
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
-                                            ),
-                                            padding: const EdgeInsets.symmetric(
-                                              vertical: 12,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ],
                                 ),
                               ],
                             ),
-                          );
-                        }),
-                        // Add/Remove buttons in a row at the bottom
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            ElevatedButton.icon(
-                              onPressed: _addRow,
-                              icon: const Icon(
-                                Icons.add_photo_alternate,
-                                size: 20,
+                            const SizedBox(height: 4),
+                            Text(
+                              'Upload images related to your activity',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey.shade600,
                               ),
-                              label: const Text('Document'),
+                            ),
+                            const SizedBox(height: 16),
+                            // Image upload rows with enhanced UI
+                            ...List.generate(_uploadRows.length, (index) {
+                              final i = _uploadRows[index];
+                              return Container(
+                                margin: const EdgeInsets.only(bottom: 16),
+                                padding: const EdgeInsets.all(16),
+                                decoration: BoxDecoration(
+                                  color: Colors.grey.shade50,
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color:
+                                        _selectedImages[i] != null
+                                            ? Colors.green.shade200
+                                            : Colors.grey.shade200,
+                                    width: 1.5,
+                                  ),
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 10,
+                                            vertical: 4,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: Colors.blueAccent
+                                                .withOpacity(0.1),
+                                            borderRadius: BorderRadius.circular(
+                                              20,
+                                            ),
+                                          ),
+                                          child: Text(
+                                            'Document ${index + 1}',
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.blueAccent,
+                                              fontSize: 14,
+                                            ),
+                                          ),
+                                        ),
+                                        const Spacer(),
+                                        if (_selectedImages[i] != null)
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 10,
+                                              vertical: 4,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: Colors.green.shade100,
+                                              borderRadius:
+                                                  BorderRadius.circular(20),
+                                            ),
+                                            child: const Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                Icon(
+                                                  Icons.check_circle,
+                                                  color: Colors.green,
+                                                  size: 16,
+                                                ),
+                                                SizedBox(width: 4),
+                                                Text(
+                                                  'Uploaded',
+                                                  style: TextStyle(
+                                                    color: Colors.green,
+                                                    fontWeight: FontWeight.w500,
+                                                    fontSize: 14,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 16),
+                                    // Preview of the image if selected
+                                    if (_selectedImages[i] != null)
+                                      GestureDetector(
+                                        onTap:
+                                            () => _showImageDialog(
+                                              _selectedImages[i]!,
+                                            ),
+                                        child: Container(
+                                          height: 120,
+                                          width: double.infinity,
+                                          margin: const EdgeInsets.only(
+                                            bottom: 16,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(
+                                              8,
+                                            ),
+                                            image: DecorationImage(
+                                              image: FileImage(
+                                                _selectedImages[i]!,
+                                              ),
+                                              fit: BoxFit.cover,
+                                            ),
+                                          ),
+                                          child: Align(
+                                            alignment: Alignment.topRight,
+                                            child: Container(
+                                              margin: const EdgeInsets.all(8),
+                                              padding: const EdgeInsets.all(4),
+                                              decoration: BoxDecoration(
+                                                color: Colors.black.withOpacity(
+                                                  0.6,
+                                                ),
+                                                shape: BoxShape.circle,
+                                              ),
+                                              child: const Icon(
+                                                Icons.zoom_in,
+                                                color: Colors.white,
+                                                size: 20,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: ElevatedButton.icon(
+                                            onPressed: () => _pickImage(i),
+                                            icon: Icon(
+                                              _selectedImages[i] != null
+                                                  ? Icons.refresh
+                                                  : Icons.upload_file,
+                                              size: 18,
+                                            ),
+                                            label: Text(
+                                              _selectedImages[i] != null
+                                                  ? 'Replace'
+                                                  : 'Upload',
+                                            ),
+                                            style: ElevatedButton.styleFrom(
+                                              foregroundColor: Colors.white,
+                                              backgroundColor:
+                                                  _selectedImages[i] != null
+                                                      ? Colors.amber.shade600
+                                                      : AppTheme.primaryColor,
+                                              elevation: 0,
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
+                                              ),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                    vertical: 12,
+                                                  ),
+                                            ),
+                                          ),
+                                        ),
+                                        if (_selectedImages[i] != null) ...[
+                                          const SizedBox(width: 8),
+                                          Expanded(
+                                            child: ElevatedButton.icon(
+                                              onPressed:
+                                                  () => _showImageDialog(
+                                                    _selectedImages[i]!,
+                                                  ),
+                                              icon: const Icon(
+                                                Icons.visibility,
+                                                size: 18,
+                                              ),
+                                              label: const Text('View'),
+                                              style: ElevatedButton.styleFrom(
+                                                foregroundColor: Colors.white,
+                                                backgroundColor:
+                                                    AppTheme.successColor,
+                                                elevation: 0,
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                ),
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                      vertical: 12,
+                                                    ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }),
+                            // Add/Remove buttons in a row at the bottom
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                ElevatedButton.icon(
+                                  onPressed: _addRow,
+                                  icon: const Icon(
+                                    Icons.add_photo_alternate,
+                                    size: 20,
+                                  ),
+                                  label: const Text('Document'),
+                                  style:
+                                      Theme.of(
+                                        context,
+                                      ).elevatedButtonTheme.style,
+                                ),
+                                const SizedBox(width: 12),
+                                if (_uploadRows.length > 1)
+                                  ElevatedButton.icon(
+                                    onPressed: _removeRow,
+                                    icon: const Icon(
+                                      Icons.remove_circle_outline,
+                                      size: 20,
+                                    ),
+                                    label: const Text('Remove'),
+                                    style: ElevatedButton.styleFrom(
+                                      foregroundColor: Colors.white,
+                                      backgroundColor:
+                                          AppTheme.dangerButtonColor,
+                                      elevation: 0,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 16,
+                                        vertical: 12,
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 30,
+                      ), // Increased spacing before buttons
+                      // Submit Buttons - Enhanced UI
+                      Container(
+                        padding: const EdgeInsets.all(20),
+                        decoration: AppTheme.cardDecoration,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            // Section title
+                            Row(
+                              children: [
+                                const Icon(
+                                  Icons.save_alt_rounded,
+                                  color: AppTheme.primaryColor,
+                                  size: 24,
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  'Submit Your Activity',
+                                  style:
+                                      Theme.of(
+                                        context,
+                                      ).textTheme.headlineMedium,
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              'Save your activity details and continue',
+                              style: Theme.of(context).textTheme.bodyMedium,
+                            ),
+                            const SizedBox(height: 20),
+
+                            // Submit & New Button
+                            ElevatedButton.icon(
+                              onPressed: () {
+                                // TODO: implement submit and new logic
+                                if (_formKey.currentState!.validate()) {
+                                  // Process form data
+                                  print('Form is valid. Submit and New.');
+                                }
+                              },
+                              icon: const Icon(Icons.save_outlined, size: 20),
+                              label: const Text('Submit & New'),
                               style:
                                   Theme.of(context).elevatedButtonTheme.style,
                             ),
-                            const SizedBox(width: 12),
-                            if (_uploadRows.length > 1)
-                              ElevatedButton.icon(
-                                onPressed: _removeRow,
-                                icon: const Icon(
-                                  Icons.remove_circle_outline,
-                                  size: 20,
+
+                            const SizedBox(height: 16),
+
+                            // Submit & Exit Button
+                            ElevatedButton.icon(
+                              onPressed: () {
+                                // TODO: implement submit and exit logic
+                                if (_formKey.currentState!.validate()) {
+                                  // Process form data
+                                  print('Form is valid. Submit and Exit.');
+                                }
+                              },
+                              icon: const Icon(
+                                Icons.check_circle_outline,
+                                size: 20,
+                              ),
+                              label: const Text('Submit & Exit'),
+                              style: ElevatedButton.styleFrom(
+                                foregroundColor: Colors.white,
+                                backgroundColor: AppTheme.successColor,
+                                elevation: 0,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
                                 ),
-                                label: const Text('Remove'),
-                                style: ElevatedButton.styleFrom(
-                                  foregroundColor: Colors.white,
-                                  backgroundColor: AppTheme.dangerButtonColor,
-                                  elevation: 0,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 16,
-                                    vertical: 12,
-                                  ),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 16,
+                                  horizontal: 16,
                                 ),
                               ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 30,
-                  ), // Increased spacing before buttons
-                  // Submit Buttons - Enhanced UI
-                  Container(
-                    padding: const EdgeInsets.all(20),
-                    decoration: AppTheme.cardDecoration,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        // Section title
-                        Row(
-                          children: [
-                            const Icon(
-                              Icons.save_alt_rounded,
-                              color: AppTheme.primaryColor,
-                              size: 24,
                             ),
-                            const SizedBox(width: 8),
-                            Text(
-                              'Submit Your Activity',
-                              style: Theme.of(context).textTheme.headlineMedium,
+
+                            const SizedBox(height: 16),
+
+                            // View Submitted Data Button
+                            OutlinedButton.icon(
+                              onPressed: () {
+                                // TODO: implement view submitted data logic
+                                print('View Submitted Data button pressed');
+                              },
+                              icon: const Icon(
+                                Icons.visibility_outlined,
+                                size: 20,
+                              ),
+                              label: const Text('View Submitted Data'),
+                              style:
+                                  Theme.of(context).outlinedButtonTheme.style,
                             ),
                           ],
                         ),
-                        const SizedBox(height: 4),
-                        Text(
-                          'Save your activity details and continue',
-                          style: Theme.of(context).textTheme.bodyMedium,
-                        ),
-                        const SizedBox(height: 20),
-
-                        // Submit & New Button
-                        ElevatedButton.icon(
-                          onPressed: () {
-                            // TODO: implement submit and new logic
-                            if (_formKey.currentState!.validate()) {
-                              // Process form data
-                              print('Form is valid. Submit and New.');
-                            }
-                          },
-                          icon: const Icon(Icons.save_outlined, size: 20),
-                          label: const Text('Submit & New'),
-                          style: Theme.of(context).elevatedButtonTheme.style,
-                        ),
-
-                        const SizedBox(height: 16),
-
-                        // Submit & Exit Button
-                        ElevatedButton.icon(
-                          onPressed: () {
-                            // TODO: implement submit and exit logic
-                            if (_formKey.currentState!.validate()) {
-                              // Process form data
-                              print('Form is valid. Submit and Exit.');
-                            }
-                          },
-                          icon: const Icon(
-                            Icons.check_circle_outline,
-                            size: 20,
-                          ),
-                          label: const Text('Submit & Exit'),
-                          style: ElevatedButton.styleFrom(
-                            foregroundColor: Colors.white,
-                            backgroundColor: AppTheme.successColor,
-                            elevation: 0,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            padding: const EdgeInsets.symmetric(
-                              vertical: 16,
-                              horizontal: 16,
-                            ),
-                          ),
-                        ),
-
-                        const SizedBox(height: 16),
-
-                        // View Submitted Data Button
-                        OutlinedButton.icon(
-                          onPressed: () {
-                            // TODO: implement view submitted data logic
-                            print('View Submitted Data button pressed');
-                          },
-                          icon: const Icon(Icons.visibility_outlined, size: 20),
-                          label: const Text('View Submitted Data'),
-                          style: Theme.of(context).outlinedButtonTheme.style,
-                        ),
-                      ],
-                    ),
+                      ),
+                      const SizedBox(height: 20), // Spacing at the bottom
+                    ],
                   ),
-                  const SizedBox(height: 20), // Spacing at the bottom
                 ],
               ),
             ),

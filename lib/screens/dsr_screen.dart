@@ -12,7 +12,7 @@ class DsrScreen extends StatefulWidget {
 class _DsrScreenState extends State<DsrScreen> with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
-  
+
   @override
   void initState() {
     super.initState();
@@ -174,6 +174,78 @@ class _DsrScreenState extends State<DsrScreen> with SingleTickerProviderStateMix
       ),
     );
   }
+
+  Widget _buildActivityCard(String title, IconData icon) {
+    return Expanded(
+      child: Card(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        margin: const EdgeInsets.all(8),
+        elevation: 2,
+        child: InkWell(
+          onTap: () {
+            // Handle selection
+          },
+          borderRadius: BorderRadius.circular(12),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              children: [
+                Icon(icon, size: 36, color: ThemeUtils.getAppTheme().primaryColor),
+                const SizedBox(height: 8),
+                Text(
+                  title,
+                  style: const TextStyle(fontWeight: FontWeight.w600),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildActivitySection() {
+    // You can also change this to Map<String, dynamic> to avoid the casts
+    final List<Map<String, Object>> activities = [
+      {'title': 'Personal Visit',                         'icon': Icons.person},
+      {'title': 'Phone Call with Builder/Stockist',       'icon': Icons.call},
+      {'title': 'Meetings With Contractor / Stockist',    'icon': Icons.group},
+      {'title': 'Visit to Get / Check Sampling at Site',  'icon': Icons.visibility},
+      {'title': 'Meeting with New Purchaser/Retailer',    'icon': Icons.store},
+      {'title': 'BTL Activities',                         'icon': Icons.campaign},
+      {'title': 'Internal Team/Review Meetings',          'icon': Icons.meeting_room},
+      {'title': 'Office Work',                            'icon': Icons.work},
+      {'title': 'On Leave / Off Day',                     'icon': Icons.beach_access},
+      {'title': 'Work From Home',                         'icon': Icons.home},
+      {'title': 'Any Other Activity',                     'icon': Icons.more_horiz},
+      {'title': 'Phone call with Unregistered Purchasers','icon': Icons.phone},
+    ];
+
+    List<Widget> rows = [];
+    for (int i = 0; i < activities.length; i += 2) {
+      // cast Object → String and Object → IconData
+      final title1 = activities[i]['title'] as String;
+      final icon1  = activities[i]['icon']  as IconData;
+
+      Widget first = _buildActivityCard(title1, icon1);
+
+      Widget second;
+      if (i + 1 < activities.length) {
+        final title2 = activities[i + 1]['title'] as String;
+        final icon2  = activities[i + 1]['icon']  as IconData;
+        second = _buildActivityCard(title2, icon2);
+      } else {
+        // fill the gap if odd number of cards
+        second = const Expanded(child: SizedBox());
+      }
+
+      rows.add(Row(children: [ first, second ]));
+    }
+
+    return Column(children: rows);
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -364,6 +436,14 @@ class _DsrScreenState extends State<DsrScreen> with SingleTickerProviderStateMix
                       'Aadhar Card Upload',
                       Icons.credit_card,
                     ),
+                  ],
+                ),
+
+                // Activity Type Section (2 cards per row)
+                _buildSectionCard(
+                  title: 'Activity Type',
+                  children: [
+                    _buildActivitySection(),
                   ],
                 ),
 

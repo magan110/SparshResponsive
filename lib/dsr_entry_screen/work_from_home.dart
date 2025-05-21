@@ -40,21 +40,6 @@ class _WorkFromHomeState extends State<WorkFromHome> {
       ? '${_activityItem!.substring(0, 27)}...'
       : _activityItem!;
   }
-  final List<String> _activityDropDownItems = [
-    'Select',
-    'Personal Visit',
-    'Phone Call with Builder/Stockist',
-    'Meetings With Contractor / Stockist',
-    'Visit to Get / Check Sampling at Site',
-    'Meeting with New Purchaser(Trade Purchaser)/Retailer',
-    'BTL Activities',
-    'Internal Team Meetings / Review Meetings',
-    'Office Work',
-    'On Leave / Holiday / Off Day',
-    'Work From Home',
-    'Any Other Activity',
-    'Phone call with Unregistered Purchasers',
-  ];
 
   // Controllers for date text fields
   final TextEditingController _submissionDateController =
@@ -339,117 +324,6 @@ class _WorkFromHomeState extends State<WorkFromHome> {
                       ),
                 ],
               ),
-
-              const SizedBox(height: 20),
-
-              // Activity Selection Card
-              AppTheme.buildSectionCard(
-                title: 'Activity',
-                icon: Icons.category_outlined,
-                children: [
-                  AppTheme.buildLabel('Activity Type'),
-                  const SizedBox(height: 8),
-                      DropdownButtonFormField<String>(
-                        value: _activityItem,
-                        isExpanded: true, // Ensure dropdown expands to full width
-                        menuMaxHeight: 400, // Set maximum height for dropdown menu
-                        selectedItemBuilder: (BuildContext context) {
-                          return _activityDropDownItems.map<Widget>((String item) {
-                            return Container(
-                              alignment: Alignment.centerLeft,
-                              constraints: const BoxConstraints(minHeight: 48),
-                              child: Text(
-                                _activityItemShort,
-                                style: const TextStyle(fontSize: 14, color: Colors.black87),
-                                overflow: TextOverflow.ellipsis, // Use ellipsis for selected item
-                                maxLines: 2, // Allow up to 2 lines for selected item
-                              ),
-                            );
-                          }).toList();
-                        },
-                        decoration: InputDecoration(
-                          filled: true,
-                          fillColor: Colors.grey[100],
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: BorderSide.none,
-                          ),
-                          // Increase vertical padding to accommodate wrapped text
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 16, // Increased from 12 to 16
-                          ),
-                          // Ensure the input field is tall enough
-                          constraints: const BoxConstraints(minHeight: 60),
-                        ),
-                        items:
-                            _activityDropDownItems
-                                .map(
-                                  (item) => DropdownMenuItem<String>(
-                                    value: item,
-                                    child: Container(
-                                      constraints: const BoxConstraints(
-                                        minWidth: 200, // Ensure minimum width
-                                        minHeight: 40, // Ensure minimum height for wrapped text
-                                      ),
-                                      padding: const EdgeInsets.symmetric(vertical: 8.0),
-                                      child: Text(
-                                        item,
-                                        style: const TextStyle(fontSize: 14),
-                                        overflow: TextOverflow.visible, // Allow text to wrap
-                                        softWrap: true, // Enable text wrapping
-                                      ),
-                                    ),
-                                  ),
-                                )
-                                .toList(),
-                        onChanged: (value) {
-                          if (value != null) {
-                            setState(() {
-                              _activityItem = value;
-                            });
-
-                            // Navigation logic based on selected activity
-                            if (value == 'Select') {
-                              // No navigation for 'Select' option
-                            } else if (value == 'Personal Visit') {
-                              _navigateTo(const DsrRetailerInOut());
-                            } else if (value == 'Phone Call with Builder/Stockist') {
-                              _navigateTo(const PhoneCallWithBuilder());
-                            } else if (value == 'Meetings With Contractor / Stockist') {
-                              _navigateTo(const MeetingsWithContractor());
-                            } else if (value == 'Visit to Get / Check Sampling at Site') {
-                              _navigateTo(const CheckSamplingAtSite());
-                            } else if (value == 'Meeting with New Purchaser(Trade Purchaser)/Retailer') {
-                              _navigateTo(const MeetingWithNewPurchaser());
-                            } else if (value == 'BTL Activities') {
-                              _navigateTo(const BtlActivites());
-                            } else if (value == 'Internal Team Meetings / Review Meetings') {
-                              _navigateTo(const InternalTeamMeeting());
-                            } else if (value == 'Office Work') {
-                              _navigateTo(const OfficeWork());
-                            } else if (value == 'On Leave / Holiday / Off Day') {
-                              _navigateTo(const OnLeave());
-                            } else if (value == 'Work From Home') {
-                              // This is the current page, no navigation needed
-                            } else if (value == 'Any Other Activity') {
-                              _navigateTo(const AnyOtherActivity());
-                            } else if (value == 'Phone call with Unregistered Purchasers') {
-                              _navigateTo(const PhoneCallWithUnregisterdPurchaser());
-                            }
-                          }
-                        },
-                        validator: (value) {
-                          if (value == null || value == 'Select') {
-                            return 'Please select an activity';
-                          }
-                          return null;
-                        },
-                      ),
-                ],
-              ),
-
-              const SizedBox(height: 20),
 
               // Date Selection Card
               AppTheme.buildSectionCard(

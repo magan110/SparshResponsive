@@ -34,21 +34,7 @@ class _OfficeWorkState extends State<OfficeWork> {
   final List<String> _processdropdownItems = ['Select', 'Add', 'Update'];
 
   String? _activityItem = 'Office Work'; // Default to this activity
-  final List<String> _activityDropDownItems = [
-    'Select',
-    'Personal Visit',
-    'Phone Call with Builder/Stockist',
-    'Meetings With Contractor / Stockist',
-    'Visit to Get / Check Sampling at Site',
-    'Meeting with New Purchaser(Trade Purchaser)/Retailer',
-    'BTL Activities',
-    'Internal Team Meetings / Review Meetings',
-    'Office Work',
-    'On Leave / Holiday / Off Day',
-    'Work From Home',
-    'Any Other Activity',
-    'Phone call with Unregistered Purchasers',
-  ];
+
 
   // Controllers for date text fields
   final TextEditingController _submissionDateController =
@@ -282,52 +268,6 @@ class _OfficeWorkState extends State<OfficeWork> {
                   onChanged: (newValue) {
                     if (newValue != null) {
                       setState(() => _processItem = newValue);
-                    }
-                  },
-                ),
-                const SizedBox(height: 24), // Increased spacing
-                // Activity Type Dropdown (for navigation)
-                _buildLabel('Activity Type'),
-                const SizedBox(height: 8), // Reduced spacing below label
-                _buildDropdownField(
-                  value: _activityItem,
-                  items: _activityDropDownItems,
-                  onChanged: (newValue) {
-                    if (newValue != null) {
-                      setState(() => _activityItem = newValue);
-
-                      // Navigation logic based on selected activity
-                      if (newValue == 'Personal Visit') {
-                        _navigateTo(const DsrRetailerInOut());
-                      } else if (newValue ==
-                          'Phone Call with Builder/Stockist') {
-                        _navigateTo(const PhoneCallWithBuilder());
-                      } else if (newValue ==
-                          'Meetings With Contractor / Stockist') {
-                        _navigateTo(const MeetingsWithContractor());
-                      } else if (newValue ==
-                          'Visit to Get / Check Sampling at Site') {
-                        _navigateTo(const CheckSamplingAtSite());
-                      } else if (newValue ==
-                          'Meeting with New Purchaser(Trade Purchaser)/Retailer') {
-                        _navigateTo(const MeetingWithNewPurchaser());
-                      } else if (newValue == 'BTL Activities') {
-                        _navigateTo(const BtlActivites());
-                      } else if (newValue ==
-                          'Internal Team Meetings / Review Meetings') {
-                        _navigateTo(const InternalTeamMeeting());
-                      } else if (newValue == 'Office Work') {
-                        // This is the current page, no navigation needed
-                      } else if (newValue == 'On Leave / Holiday / Off Day') {
-                        _navigateTo(const OnLeave());
-                      } else if (newValue == 'Work From Home') {
-                        _navigateTo(const WorkFromHome());
-                      } else if (newValue == 'Any Other Activity') {
-                        _navigateTo(const AnyOtherActivity());
-                      } else if (newValue ==
-                          'Phone call with Unregistered Purchasers') {
-                        _navigateTo(const PhoneCallWithUnregisterdPurchaser());
-                      }
                     }
                   },
                 ),

@@ -39,7 +39,7 @@ class _DatePickerTextFieldState extends State<DatePickerTextField> {
     super.initState();
     _controller =
         widget.controller ??
-        TextEditingController(); // Initialize with provided or new
+            TextEditingController(); // Initialize with provided or new
   }
 
   @override
@@ -78,8 +78,8 @@ class _DatePickerTextFieldState extends State<DatePickerTextField> {
           },
         );
         _controller.text =
-            "${selectedDate?.toLocal()}".split(' ')[0]; // Format date
-            },
+        "${selectedDate?.toLocal()}".split(' ')[0]; // Format date
+      },
       child: IgnorePointer(
         // Prevents direct text editing, keeps visual
         child: TextField(
@@ -177,15 +177,15 @@ class _SearchableDropdownExampleState extends State<SearchableDropdownExample> {
         widget.onChanged?.call(newValue); // Notify parent widget
       },
       items:
-          widget.items.map<DropdownMenuItem<String>>((String value) {
-            return DropdownMenuItem<String>(
-              value: value,
-              child: Text(
-                value,
-                style: const TextStyle(fontSize: 16),
-              ), // Consistent font size
-            );
-          }).toList(),
+      widget.items.map<DropdownMenuItem<String>>((String value) {
+        return DropdownMenuItem<String>(
+          value: value,
+          child: Text(
+            value,
+            style: const TextStyle(fontSize: 16),
+          ), // Consistent font size
+        );
+      }).toList(),
       decoration: InputDecoration(
         hintText: widget.hintText,
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.0)),
@@ -579,12 +579,12 @@ class _DayWiseSummaryState extends State<DayWiseSummary> {
                                           dummyData
                                               .where(
                                                 (item) => item['Product']
-                                                    .toString()
-                                                    .toLowerCase()
-                                                    .contains(
-                                                      value.toLowerCase(),
-                                                    ),
-                                              )
+                                                .toString()
+                                                .toLowerCase()
+                                                .contains(
+                                              value.toLowerCase(),
+                                            ),
+                                          )
                                               .toList();
                                     }
                                   });
@@ -601,10 +601,10 @@ class _DayWiseSummaryState extends State<DayWiseSummary> {
                     scrollDirection: Axis.horizontal,
                     child: DataTable(
                       headingRowColor: WidgetStateColor.resolveWith(
-                        (states) => Colors.lightBlueAccent.withOpacity(0.2),
+                            (states) => Colors.lightBlueAccent.withOpacity(0.2),
                       ),
                       dataRowColor: WidgetStateColor.resolveWith(
-                        (states) => Colors.grey.withOpacity(0.05),
+                            (states) => Colors.grey.withOpacity(0.05),
                       ),
                       columnSpacing: 20.0,
                       horizontalMargin: 10.0,
@@ -689,74 +689,74 @@ class _DayWiseSummaryState extends State<DayWiseSummary> {
                         ),
                       ],
                       rows:
-                          displayedData.map<DataRow>((data) {
-                            double totalValue =
-                                (data['Bill Value'] ?? 0) +
+                      displayedData.map<DataRow>((data) {
+                        double totalValue =
+                            (data['Bill Value'] ?? 0) +
                                 (data['Excise'] ?? 0) +
                                 (data['Sales Tax'] ?? 0) +
                                 (data['Transit Ins.'] ?? 0) +
                                 (data['Freight'] ?? 0) +
                                 (data['Servc.Tax'] ?? 0) +
                                 (data['Cess on Servc Tax'] ?? 0);
-                            return DataRow(
-                              cells: <DataCell>[
-                                DataCell(Text(data['Product'].toString())),
-                                DataCell(Text(data['Invoice No'].toString())),
-                                DataCell(Text(data['Date'].toString())),
-                                DataCell(Text(data['Qty'].toString())),
-                                DataCell(
-                                  Text(
-                                    (data['Basic Value'] ?? 0.0)
-                                        .toStringAsFixed(2),
-                                  ),
+                        return DataRow(
+                          cells: <DataCell>[
+                            DataCell(Text(data['Product'].toString())),
+                            DataCell(Text(data['Invoice No'].toString())),
+                            DataCell(Text(data['Date'].toString())),
+                            DataCell(Text(data['Qty'].toString())),
+                            DataCell(
+                              Text(
+                                (data['Basic Value'] ?? 0.0)
+                                    .toStringAsFixed(2),
+                              ),
+                            ),
+                            DataCell(
+                              Text(
+                                (data['Bill Value'] ?? 0.0).toStringAsFixed(
+                                  2,
                                 ),
-                                DataCell(
-                                  Text(
-                                    (data['Bill Value'] ?? 0.0).toStringAsFixed(
-                                      2,
-                                    ),
-                                  ),
+                              ),
+                            ),
+                            DataCell(
+                              Text(
+                                (data['Excise'] ?? 0.0).toStringAsFixed(2),
+                              ),
+                            ),
+                            DataCell(
+                              Text(
+                                (data['Sales Tax'] ?? 0.0).toStringAsFixed(
+                                  2,
                                 ),
-                                DataCell(
-                                  Text(
-                                    (data['Excise'] ?? 0.0).toStringAsFixed(2),
-                                  ),
+                              ),
+                            ),
+                            DataCell(
+                              Text(
+                                (data['Transit Ins.'] ?? 0.0)
+                                    .toStringAsFixed(2),
+                              ),
+                            ),
+                            DataCell(
+                              Text(
+                                (data['Freight'] ?? 0.0).toStringAsFixed(2),
+                              ),
+                            ),
+                            DataCell(
+                              Text(
+                                (data['Servc.Tax'] ?? 0.0).toStringAsFixed(
+                                  2,
                                 ),
-                                DataCell(
-                                  Text(
-                                    (data['Sales Tax'] ?? 0.0).toStringAsFixed(
-                                      2,
-                                    ),
-                                  ),
-                                ),
-                                DataCell(
-                                  Text(
-                                    (data['Transit Ins.'] ?? 0.0)
-                                        .toStringAsFixed(2),
-                                  ),
-                                ),
-                                DataCell(
-                                  Text(
-                                    (data['Freight'] ?? 0.0).toStringAsFixed(2),
-                                  ),
-                                ),
-                                DataCell(
-                                  Text(
-                                    (data['Servc.Tax'] ?? 0.0).toStringAsFixed(
-                                      2,
-                                    ),
-                                  ),
-                                ),
-                                DataCell(
-                                  Text(
-                                    (data['Cess on Servc Tax'] ?? 0.0)
-                                        .toStringAsFixed(2),
-                                  ),
-                                ),
-                                DataCell(Text(totalValue.toStringAsFixed(2))),
-                              ],
-                            );
-                          }).toList(),
+                              ),
+                            ),
+                            DataCell(
+                              Text(
+                                (data['Cess on Servc Tax'] ?? 0.0)
+                                    .toStringAsFixed(2),
+                              ),
+                            ),
+                            DataCell(Text(totalValue.toStringAsFixed(2))),
+                          ],
+                        );
+                      }).toList(),
                     ),
                   ),
                   const SizedBox(height: 16),

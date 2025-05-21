@@ -32,21 +32,7 @@ class _BtlActivitesState extends State<BtlActivites> {
   final List<String> _processdropdownItems = ['Select', 'Add', 'Update'];
 
   String? _activityItem = 'BTL Activities'; // Default to BTL Activities
-  final List<String> _activityDropDownItems = [
-    'Select',
-    'Personal Visit',
-    'Phone Call with Builder/Stockist',
-    'Meetings With Contractor / Stockist',
-    'Visit to Get / Check Sampling at Site',
-    'Meeting with New Purchaser(Trade Purchaser)/Retailer',
-    'BTL Activities',
-    'Internal Team Meetings / Review Meetings',
-    'Office Work',
-    'On Leave / Holiday / Off Day',
-    'Work From Home',
-    'Any Other Activity',
-    'Phone call with Unregistered Purchasers',
-  ];
+
 
   String _activityTypeItem = 'Select'; // Specific dropdown for BTL Activities
   final List<String> _activityTypedropdownItems = [
@@ -323,93 +309,6 @@ class _BtlActivitesState extends State<BtlActivites> {
                     validator: (value) {
                       if (value == null || value == 'Select') {
                         return 'Please select a process';
-                      }
-                      return null;
-                    },
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 20),
-              // Activity Section
-              AppTheme.buildSectionCard(
-                title: 'Activity',
-                icon: Icons.category_outlined,
-                children: [
-                  AppTheme.buildLabel('Activity Type'),
-                  const SizedBox(height: 8),
-                  DropdownButtonFormField<String>(
-                    value: _activityItem,
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: Colors.grey[100],
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide.none,
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 12,
-                      ),
-                      isCollapsed: true,
-                    ),
-                    isExpanded: true,
-                    items: _activityDropDownItems
-                        .map(
-                          (item) => DropdownMenuItem<String>(
-                            value: item,
-                            child: Container(
-                              constraints: const BoxConstraints(maxWidth: 250),
-                              child: Text(
-                                item,
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 1,
-                                style: const TextStyle(fontSize: 14),
-                              ),
-                            ),
-                          ),
-                        )
-                        .toList(),
-                    onChanged: (newValue) {
-                      if (newValue != null) {
-                        setState(() => _activityItem = newValue);
-
-                        // Navigation logic based on selected activity
-                        if (newValue == 'Personal Visit') {
-                          _navigateTo(const DsrRetailerInOut());
-                        } else if (newValue == 'Phone Call with Builder/Stockist') {
-                          _navigateTo(const PhoneCallWithBuilder());
-                        } else if (newValue ==
-                            'Meetings With Contractor / Stockist') {
-                          _navigateTo(const MeetingsWithContractor());
-                        } else if (newValue ==
-                            'Visit to Get / Check Sampling at Site') {
-                          _navigateTo(const CheckSamplingAtSite());
-                        } else if (newValue ==
-                            'Meeting with New Purchaser(Trade Purchaser)/Retailer') {
-                          _navigateTo(const MeetingWithNewPurchaser());
-                        } else if (newValue == 'BTL Activities') {
-                          // This is the current page, no navigation needed
-                        } else if (newValue ==
-                            'Internal Team Meetings / Review Meetings') {
-                          _navigateTo(const InternalTeamMeeting());
-                        } else if (newValue == 'Office Work') {
-                          _navigateTo(const OfficeWork());
-                        } else if (newValue == 'On Leave / Holiday / Off Day') {
-                          _navigateTo(const OnLeave());
-                        } else if (newValue == 'Work From Home') {
-                          _navigateTo(const WorkFromHome());
-                        } else if (newValue == 'Any Other Activity') {
-                          _navigateTo(const AnyOtherActivity());
-                        } else if (newValue ==
-                            'Phone call with Unregistered Purchasers') {
-                          _navigateTo(const PhoneCallWithUnregisterdPurchaser());
-                        }
-                      }
-                    },
-                    validator: (value) {
-                      if (value == null || value == 'Select') {
-                        return 'Please select an activity';
                       }
                       return null;
                     },
