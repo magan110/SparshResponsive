@@ -282,45 +282,136 @@ class _PhoneCallWithUnregisterdPurchaserState
                 // Process Type Dropdown
                 _buildLabel('Process type'),
                 const SizedBox(height: 8), // Reduced spacing below label
-                _buildDropdownField(
+                DropdownButtonFormField<String>(
                   value: _processItem,
-                  items: _processdropdownItems,
+                  isExpanded: true,
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide(color: Colors.grey.shade300),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide(color: Colors.grey.shade300),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide(color: AppTheme.primaryColor),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  ),
+                  items: _processdropdownItems
+                      .map(
+                        (item) => DropdownMenuItem<String>(
+                          value: item,
+                          child: Text(
+                            item,
+                            style: const TextStyle(fontSize: 16, color: Colors.black87),
+                          ),
+                        ),
+                      )
+                      .toList(),
                   onChanged: (newValue) {
                     if (newValue != null) {
                       setState(() => _processItem = newValue);
                     }
+                  },
+                  validator: (value) {
+                    if (value == null || value == 'Select') {
+                      return 'Please select a process';
+                    }
+                    return null;
                   },
                 ),
                 const SizedBox(height: 24), // Increased spacing
                 // Activity Type Dropdown (for navigation)
                 _buildLabel('Activity Type'),
                 const SizedBox(height: 8), // Reduced spacing below label
-                _buildDropdownField(
+                DropdownButtonFormField<String>(
                   value: _activityItem,
-                  items: _activityDropDownItems,
+                  isExpanded: true, // Ensure dropdown expands to full width
+                  menuMaxHeight: 400, // Set maximum height for dropdown menu
+                  // Add custom button style to handle long text in the selected item
+                  selectedItemBuilder: (BuildContext context) {
+                    return _activityDropDownItems.map<Widget>((String item) {
+                      return Container(
+                        alignment: Alignment.centerLeft,
+                        constraints: const BoxConstraints(minHeight: 48),
+                        child: Text(
+                          item,
+                          style: const TextStyle(fontSize: 14, color: Colors.black87),
+                          overflow: TextOverflow.ellipsis, // Use ellipsis for selected item
+                          maxLines: 2, // Allow up to 2 lines for selected item
+                        ),
+                      );
+                    }).toList();
+                  },
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide(color: Colors.grey.shade300),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide(color: Colors.grey.shade300),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide(color: AppTheme.primaryColor),
+                    ),
+                    // Increase vertical padding to accommodate wrapped text
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 16, // Increased padding
+                    ),
+                    // Ensure the input field is tall enough
+                    constraints: const BoxConstraints(minHeight: 60),
+                  ),
+                  items: _activityDropDownItems
+                      .map(
+                        (item) => DropdownMenuItem<String>(
+                          value: item,
+                          // Add more height for items with longer text
+                          child: Container(
+                            constraints: const BoxConstraints(
+                              minWidth: 200, // Ensure minimum width
+                              minHeight: 40, // Ensure minimum height for wrapped text
+                            ),
+                            padding: const EdgeInsets.symmetric(vertical: 8.0),
+                            child: Text(
+                              item,
+                              style: const TextStyle(fontSize: 14),
+                              overflow: TextOverflow.visible, // Allow text to wrap
+                              softWrap: true, // Enable text wrapping
+                            ),
+                          ),
+                        ),
+                      )
+                      .toList(),
                   onChanged: (newValue) {
                     if (newValue != null) {
                       setState(() => _activityItem = newValue);
 
                       // Navigation logic based on selected activity
-                      if (newValue == 'Personal Visit') {
+                      if (newValue == 'Select') {
+                        // No navigation for 'Select' option
+                      } else if (newValue == 'Personal Visit') {
                         _navigateTo(const DsrRetailerInOut());
-                      } else if (newValue ==
-                          'Phone Call with Builder/Stockist') {
+                      } else if (newValue == 'Phone Call with Builder/Stockist') {
                         _navigateTo(const PhoneCallWithBuilder());
-                      } else if (newValue ==
-                          'Meetings With Contractor / Stockist') {
+                      } else if (newValue == 'Meetings With Contractor / Stockist') {
                         _navigateTo(const MeetingsWithContractor());
-                      } else if (newValue ==
-                          'Visit to Get / Check Sampling at Site') {
+                      } else if (newValue == 'Visit to Get / Check Sampling at Site') {
                         _navigateTo(const CheckSamplingAtSite());
-                      } else if (newValue ==
-                          'Meeting with New Purchaser(Trade Purchaser)/Retailer') {
+                      } else if (newValue == 'Meeting with New Purchaser(Trade Purchaser)/Retailer') {
                         _navigateTo(const MeetingWithNewPurchaser());
                       } else if (newValue == 'BTL Activities') {
                         _navigateTo(const BtlActivites());
-                      } else if (newValue ==
-                          'Internal Team Meetings / Review Meetings') {
+                      } else if (newValue == 'Internal Team Meetings / Review Meetings') {
                         _navigateTo(const InternalTeamMeeting());
                       } else if (newValue == 'Office Work') {
                         _navigateTo(const OfficeWork());
@@ -330,11 +421,16 @@ class _PhoneCallWithUnregisterdPurchaserState
                         _navigateTo(const WorkFromHome());
                       } else if (newValue == 'Any Other Activity') {
                         _navigateTo(const AnyOtherActivity());
-                      } else if (newValue ==
-                          'Phone call with Unregistered Purchasers') {
+                      } else if (newValue == 'Phone call with Unregistered Purchasers') {
                         // This is the current page, no navigation needed
                       }
                     }
+                  },
+                  validator: (value) {
+                    if (value == null || value == 'Select') {
+                      return 'Please select an activity';
+                    }
+                    return null;
                   },
                 ),
                 const SizedBox(height: 24), // Increased spacing
@@ -859,51 +955,50 @@ class _PhoneCallWithUnregisterdPurchaserState
     required ValueChanged<String?> onChanged,
     String? Function(String?)? validator, // Added validator
   }) {
-    return Container(
-      height: 50, // Fixed height for consistency
-      padding: const EdgeInsets.symmetric(horizontal: 12), // Adjusted padding
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10), // Rounded corners
-        border: Border.all(
-          color: Colors.grey.shade300,
-          width: 1,
-        ), // Lighter border
-        color: Colors.white, // White background
-      ),
-      child: DropdownButtonFormField<String>(
-        // Changed to DropdownButtonFormField for validation
-        dropdownColor: Colors.white,
-        isExpanded: true, // Expand to fill the container
-        // Remove the default underline
-        value: value,
-        onChanged: onChanged,
-        items:
-            items
-                .map(
-                  (item) => DropdownMenuItem(
-                    value: item,
-                    child: Text(
-                      item,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        color: Colors.black87,
-                      ), // Darker text color
-                    ),
-                  ),
-                )
-                .toList(),
-        decoration: const InputDecoration(
-          // Added decoration for validation border
-          border: OutlineInputBorder(
-            borderRadius:
-                BorderRadius
-                    .zero, // No border line needed here as container has it
-            borderSide: BorderSide.none,
-          ),
-          contentPadding: EdgeInsets.zero, // No padding needed here
+    return DropdownButtonFormField<String>(
+      // Changed to DropdownButtonFormField for validation
+      dropdownColor: Colors.white,
+      isExpanded: true, // Expand to fill the container
+      value: value,
+      onChanged: onChanged,
+      items: items
+          .map(
+            (item) => DropdownMenuItem<String>(
+              value: item,
+              child: Container(
+                constraints: const BoxConstraints(
+                  minWidth: 200, // Ensure minimum width
+                  minHeight: 40, // Ensure minimum height for wrapped text
+                ),
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: Text(
+                  item,
+                  style: const TextStyle(fontSize: 16, color: Colors.black87),
+                  overflow: TextOverflow.visible, // Allow text to wrap
+                  softWrap: true, // Enable text wrapping
+                ),
+              ),
+            ),
+          )
+          .toList(),
+      decoration: InputDecoration(
+        filled: true,
+        fillColor: Colors.white,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(color: Colors.grey.shade300),
         ),
-        validator: validator, // Assign the validator function
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(color: Colors.grey.shade300),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(color: AppTheme.primaryColor),
+        ),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       ),
+      validator: validator, // Assign the validator function
     );
   }
 
