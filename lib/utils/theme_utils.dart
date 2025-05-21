@@ -257,7 +257,7 @@ class ThemeUtils {
       ),
 
       // Card theme
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         elevation: 2,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
@@ -289,11 +289,25 @@ class ThemeUtils {
           if (states.contains(MaterialState.disabled)) {
             return Colors.grey.shade400;
           }
-          return primaryBlue;
+          if (states.contains(MaterialState.selected)) {
+            return primaryBlue;
+          }
+          if (states.contains(MaterialState.focused)) {
+            return primaryBlue.withOpacity(0.8);
+          }
+          if (states.contains(MaterialState.hovered)) {
+            return primaryBlue.withOpacity(0.6);
+          }
+          if (states.contains(MaterialState.pressed)) {
+            return primaryBlue.withOpacity(0.7);
+          }
+          return Colors.transparent; // Default unselected state
         }),
+        checkColor: MaterialStateProperty.all(Colors.white),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(4),
         ),
+        side: BorderSide(color: Colors.grey.shade400),
       ),
 
       // Radio button theme
@@ -302,7 +316,31 @@ class ThemeUtils {
           if (states.contains(MaterialState.disabled)) {
             return Colors.grey.shade400;
           }
-          return primaryBlue;
+          if (states.contains(MaterialState.selected)) {
+            return primaryBlue;
+          }
+          if (states.contains(MaterialState.focused)) {
+            return primaryBlue.withOpacity(0.8);
+          }
+          if (states.contains(MaterialState.hovered)) {
+            return primaryBlue.withOpacity(0.6);
+          }
+          if (states.contains(MaterialState.pressed)) {
+            return primaryBlue.withOpacity(0.7);
+          }
+          return Colors.transparent; // Default unselected state
+        }),
+        overlayColor: MaterialStateProperty.resolveWith<Color>((states) {
+          if (states.contains(MaterialState.pressed)) {
+            return primaryBlue.withOpacity(0.1);
+          }
+          if (states.contains(MaterialState.hovered)) {
+            return primaryBlue.withOpacity(0.05);
+          }
+          if (states.contains(MaterialState.focused)) {
+            return primaryBlue.withOpacity(0.1);
+          }
+          return Colors.transparent;
         }),
       ),
 
@@ -310,24 +348,78 @@ class ThemeUtils {
       switchTheme: SwitchThemeData(
         thumbColor: MaterialStateProperty.resolveWith<Color>((states) {
           if (states.contains(MaterialState.disabled)) {
-            return Colors.grey.shade400;
-          } else if (states.contains(MaterialState.selected)) {
+            return states.contains(MaterialState.selected)
+                ? Colors.grey.shade400
+                : Colors.grey.shade300;
+          }
+          if (states.contains(MaterialState.selected)) {
+            if (states.contains(MaterialState.pressed)) {
+              return primaryBlue.withOpacity(0.9);
+            }
+            if (states.contains(MaterialState.hovered)) {
+              return primaryBlue.withOpacity(0.8);
+            }
+            if (states.contains(MaterialState.focused)) {
+              return primaryBlue.withOpacity(0.9);
+            }
             return primaryBlue;
+          }
+          if (states.contains(MaterialState.pressed)) {
+            return Colors.grey.shade300;
+          }
+          if (states.contains(MaterialState.hovered)) {
+            return Colors.grey.shade200;
+          }
+          if (states.contains(MaterialState.focused)) {
+            return Colors.grey.shade200;
           }
           return Colors.grey.shade50;
         }),
         trackColor: MaterialStateProperty.resolveWith<Color>((states) {
           if (states.contains(MaterialState.disabled)) {
-            return Colors.grey.shade300;
-          } else if (states.contains(MaterialState.selected)) {
+            return states.contains(MaterialState.selected)
+                ? Colors.grey.shade400.withOpacity(0.5)
+                : Colors.grey.shade300;
+          }
+          if (states.contains(MaterialState.selected)) {
+            if (states.contains(MaterialState.pressed)) {
+              return primaryBlue.withOpacity(0.6);
+            }
+            if (states.contains(MaterialState.hovered)) {
+              return primaryBlue.withOpacity(0.5);
+            }
+            if (states.contains(MaterialState.focused)) {
+              return primaryBlue.withOpacity(0.6);
+            }
             return primaryBlue.withOpacity(0.5);
           }
+          if (states.contains(MaterialState.pressed)) {
+            return Colors.grey.shade400;
+          }
+          if (states.contains(MaterialState.hovered)) {
+            return Colors.grey.shade400.withOpacity(0.8);
+          }
+          if (states.contains(MaterialState.focused)) {
+            return Colors.grey.shade400.withOpacity(0.8);
+          }
           return Colors.grey.shade300;
+        }),
+        overlayColor: MaterialStateProperty.resolveWith<Color>((states) {
+          if (states.contains(MaterialState.pressed)) {
+            return primaryBlue.withOpacity(0.1);
+          }
+          if (states.contains(MaterialState.hovered)) {
+            return primaryBlue.withOpacity(0.05);
+          }
+          if (states.contains(MaterialState.focused)) {
+            return primaryBlue.withOpacity(0.1);
+          }
+          return Colors.transparent;
         }),
       ),
 
       // Dialog theme
-      dialogTheme: DialogTheme(
+      dialogTheme: DialogThemeData(
         backgroundColor: lightSurface,
         elevation: 5,
         shape: RoundedRectangleBorder(
@@ -532,7 +624,7 @@ class ThemeUtils {
       ),
 
       // Card theme
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         elevation: 2,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
@@ -564,11 +656,25 @@ class ThemeUtils {
           if (states.contains(MaterialState.disabled)) {
             return Colors.grey.shade700;
           }
-          return primaryBlue;
+          if (states.contains(MaterialState.selected)) {
+            return primaryBlue;
+          }
+          if (states.contains(MaterialState.focused)) {
+            return primaryBlue.withOpacity(0.8);
+          }
+          if (states.contains(MaterialState.hovered)) {
+            return primaryBlue.withOpacity(0.6);
+          }
+          if (states.contains(MaterialState.pressed)) {
+            return primaryBlue.withOpacity(0.7);
+          }
+          return Colors.transparent; // Default unselected state
         }),
+        checkColor: MaterialStateProperty.all(Colors.white),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(4),
         ),
+        side: BorderSide(color: Colors.grey.shade600),
       ),
 
       // Radio button theme
@@ -577,7 +683,31 @@ class ThemeUtils {
           if (states.contains(MaterialState.disabled)) {
             return Colors.grey.shade700;
           }
-          return primaryBlue;
+          if (states.contains(MaterialState.selected)) {
+            return primaryBlue;
+          }
+          if (states.contains(MaterialState.focused)) {
+            return primaryBlue.withOpacity(0.8);
+          }
+          if (states.contains(MaterialState.hovered)) {
+            return primaryBlue.withOpacity(0.6);
+          }
+          if (states.contains(MaterialState.pressed)) {
+            return primaryBlue.withOpacity(0.7);
+          }
+          return Colors.transparent; // Default unselected state
+        }),
+        overlayColor: MaterialStateProperty.resolveWith<Color>((states) {
+          if (states.contains(MaterialState.pressed)) {
+            return primaryBlue.withOpacity(0.1);
+          }
+          if (states.contains(MaterialState.hovered)) {
+            return primaryBlue.withOpacity(0.05);
+          }
+          if (states.contains(MaterialState.focused)) {
+            return primaryBlue.withOpacity(0.1);
+          }
+          return Colors.transparent;
         }),
       ),
 
@@ -585,24 +715,78 @@ class ThemeUtils {
       switchTheme: SwitchThemeData(
         thumbColor: MaterialStateProperty.resolveWith<Color>((states) {
           if (states.contains(MaterialState.disabled)) {
-            return Colors.grey.shade700;
-          } else if (states.contains(MaterialState.selected)) {
+            return states.contains(MaterialState.selected)
+                ? Colors.grey.shade600
+                : Colors.grey.shade700;
+          }
+          if (states.contains(MaterialState.selected)) {
+            if (states.contains(MaterialState.pressed)) {
+              return primaryBlue.withOpacity(0.9);
+            }
+            if (states.contains(MaterialState.hovered)) {
+              return primaryBlue.withOpacity(0.8);
+            }
+            if (states.contains(MaterialState.focused)) {
+              return primaryBlue.withOpacity(0.9);
+            }
             return primaryBlue;
+          }
+          if (states.contains(MaterialState.pressed)) {
+            return Colors.grey.shade500;
+          }
+          if (states.contains(MaterialState.hovered)) {
+            return Colors.grey.shade500;
+          }
+          if (states.contains(MaterialState.focused)) {
+            return Colors.grey.shade500;
           }
           return Colors.grey.shade400;
         }),
         trackColor: MaterialStateProperty.resolveWith<Color>((states) {
           if (states.contains(MaterialState.disabled)) {
-            return Colors.grey.shade800;
-          } else if (states.contains(MaterialState.selected)) {
+            return states.contains(MaterialState.selected)
+                ? Colors.grey.shade700.withOpacity(0.5)
+                : Colors.grey.shade800;
+          }
+          if (states.contains(MaterialState.selected)) {
+            if (states.contains(MaterialState.pressed)) {
+              return primaryBlue.withOpacity(0.6);
+            }
+            if (states.contains(MaterialState.hovered)) {
+              return primaryBlue.withOpacity(0.5);
+            }
+            if (states.contains(MaterialState.focused)) {
+              return primaryBlue.withOpacity(0.6);
+            }
             return primaryBlue.withOpacity(0.5);
           }
+          if (states.contains(MaterialState.pressed)) {
+            return Colors.grey.shade600;
+          }
+          if (states.contains(MaterialState.hovered)) {
+            return Colors.grey.shade600;
+          }
+          if (states.contains(MaterialState.focused)) {
+            return Colors.grey.shade600;
+          }
           return Colors.grey.shade700;
+        }),
+        overlayColor: MaterialStateProperty.resolveWith<Color>((states) {
+          if (states.contains(MaterialState.pressed)) {
+            return primaryBlue.withOpacity(0.1);
+          }
+          if (states.contains(MaterialState.hovered)) {
+            return primaryBlue.withOpacity(0.05);
+          }
+          if (states.contains(MaterialState.focused)) {
+            return primaryBlue.withOpacity(0.1);
+          }
+          return Colors.transparent;
         }),
       ),
 
       // Dialog theme
-      dialogTheme: DialogTheme(
+      dialogTheme: DialogThemeData(
         backgroundColor: darkSurface,
         elevation: 5,
         shape: RoundedRectangleBorder(
