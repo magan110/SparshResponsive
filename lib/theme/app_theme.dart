@@ -197,7 +197,7 @@ class AppTheme {
   );
 
   // Card theme
-  static CardTheme cardTheme = CardTheme(
+  static CardThemeData cardTheme = CardThemeData(
     color: cardColor,
     elevation: 2,
     margin: const EdgeInsets.only(bottom: 16),
@@ -207,7 +207,7 @@ class AppTheme {
   );
 
   // Dialog theme
-  static DialogTheme dialogTheme = DialogTheme(
+  static DialogThemeData dialogTheme = DialogThemeData(
     backgroundColor: cardColor,
     elevation: 5,
     shape: RoundedRectangleBorder(

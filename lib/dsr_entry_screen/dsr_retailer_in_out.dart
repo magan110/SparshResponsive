@@ -14,12 +14,12 @@ class _DsrRetailerInOutState extends State<DsrRetailerInOut>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
-  
+
   // State variables
   String? _purchaserRetailerItem = 'Select';
   String? _areaCode = 'Select';
   DateTime? _selectedDate;
-  
+
   // Controllers
   final TextEditingController _dateController = TextEditingController();
   final TextEditingController _yourLatitudeController = TextEditingController();
@@ -28,9 +28,9 @@ class _DsrRetailerInOutState extends State<DsrRetailerInOut>
   final TextEditingController _custLongitudeController = TextEditingController();
   final TextEditingController _codeSearchController = TextEditingController();
   final TextEditingController _customerNameController = TextEditingController();
-  
+
   final _formKey = GlobalKey<FormState>();
-  
+
   // Color scheme
   final Color _primaryColor = const Color(0xFF2962FF);
   final Color _secondaryColor = const Color(0xFF448AFF);
@@ -51,7 +51,7 @@ class _DsrRetailerInOutState extends State<DsrRetailerInOut>
       CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
     );
     _animationController.forward();
-    
+
     // Set initial date to today
     _selectedDate = DateTime.now();
     _dateController.text = DateFormat('yyyy-MM-dd').format(_selectedDate!);
@@ -286,7 +286,7 @@ class _DsrRetailerInOutState extends State<DsrRetailerInOut>
               onPrimary: Colors.white,
               onSurface: _textColor,
             ),
-            dialogTheme: const DialogTheme(
+            dialogTheme: const DialogThemeData(
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(15)),
               ),
@@ -511,7 +511,7 @@ class _DsrRetailerInOutState extends State<DsrRetailerInOut>
                         onPressed: _captureYourLocation,
                       ),
                       const SizedBox(height: 16),
-                      
+
                       // Customer Location
                       Text(
                         'Customer Location',

@@ -247,23 +247,23 @@ class _SplashScreenState extends State<SplashScreen>
                       child: Transform.rotate(
                         angle: _rotateAnimation.value * 3.14159,
                         child: Container(
-                          width: 120,
-                          height: 120,
+                          width: 250,
+                          height: 100,
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.2),
-                            shape: BoxShape.circle,
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(12),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.white.withOpacity(0.2),
-                                blurRadius: 20,
+                                color: Colors.black.withOpacity(0.2),
+                                blurRadius: 15,
                                 spreadRadius: 5,
                               ),
                             ],
                           ),
-                          child: const Icon(
-                            Icons.auto_awesome,
-                            size: 60,
-                            color: Colors.white,
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          child: Image.asset(
+                            'assets/logo.png',
+                            fit: BoxFit.fill,
                           ),
                         ),
                       ),

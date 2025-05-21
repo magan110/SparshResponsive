@@ -1,7 +1,7 @@
 #!/bin/sh
 # This is a generated file; do not edit or check into version control.
-export "FLUTTER_ROOT=E:\FlutterDev\sdk\flutter"
-export "FLUTTER_APPLICATION_PATH=C:\Users\MAGAN\Desktop\saprsh3\New-Sparsh-minimal-branch"
+export "FLUTTER_ROOT=G:\downloads\flutter_windows_3.32.0-stable\flutter"
+export "FLUTTER_APPLICATION_PATH=G:\Sparsh\sparsh6\SPARSH3"
 export "COCOAPODS_PARALLEL_CODE_SIGN=true"
 export "FLUTTER_BUILD_DIR=build"
 export "FLUTTER_BUILD_NAME=1.0.0"

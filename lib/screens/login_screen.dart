@@ -249,11 +249,11 @@ class _LoginScreenState extends State<LoginScreen>
                     children: [
                       // App Logo/Icon
                       Container(
-                        width: 100,
+                        width: 250,
                         height: 100,
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          shape: BoxShape.circle,
+                          borderRadius: BorderRadius.circular(12),
                           boxShadow: [
                             BoxShadow(
                               color: Colors.black.withOpacity(0.2),
@@ -262,10 +262,10 @@ class _LoginScreenState extends State<LoginScreen>
                             ),
                           ],
                         ),
-                        child: Icon(
-                          Icons.auto_awesome,
-                          size: 50,
-                          color: Colors.blue.shade700,
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        child: Image.asset(
+                          'assets/logo.png',
+                          fit: BoxFit.fill,
                         ),
                       ),
                       const SizedBox(height: 30),
