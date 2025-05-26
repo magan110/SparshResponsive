@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:learning2/StaffScreen/staff_attendence.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../WorkerScreen/Canteen_coupon_details.dart';
@@ -762,6 +763,14 @@ class _HomeContentState extends State<HomeContent> {
                   context,
                   MaterialPageRoute(
                     builder: (context) => const HolidayHouseLock(),
+                  ),
+                );
+              }
+              else if (item['label'] == 'Staff Attendance') {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const StaffAttendence(),
                   ),
                 );
               }
