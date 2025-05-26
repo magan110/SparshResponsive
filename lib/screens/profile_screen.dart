@@ -9,46 +9,48 @@ class ProfilePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            _buildProfileHeader(),
-            const SizedBox(height: 24),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildSectionTitle('Account Info'),
-                  const SizedBox(height: 16),
-                  _buildInfoCard([
-                    _buildTextField('Username*', Icons.person_outline),
-                    _buildTextField('Email Address*', Icons.email_outlined),
-                    _buildTextField('Phone Number*', Icons.phone_outlined),
-                  ]),
-                  const SizedBox(height: 24),
-                  _buildSectionTitle('Dashboard Report'),
-                  const SizedBox(height: 16),
-                  _buildInfoCard([
-                    _buildDropdownField(
-                      'Select Report*',
-                      Icons.assessment_outlined,
-                    ),
-                  ]),
-                  const SizedBox(height: 24),
-                  _buildSectionTitle('Personal Info'),
-                  const SizedBox(height: 16),
-                  _buildInfoCard([
-                    _buildDropdownField('Gender*', Icons.person_outline),
-                    _buildTextField('Address*', Icons.location_on_outlined),
-                  ]),
-                  const SizedBox(height: 32),
-                  _buildLogoutButton(context),
-                  const SizedBox(height: 24),
-                ],
-              ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: 20),
+            child: Column(
+              children: [
+                _buildProfileHeader(),
+                const SizedBox(height: 28),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 18),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildSectionTitle('Account Info'),
+                      const SizedBox(height: 14),
+                      _buildInfoCard([
+                        _buildTextField('Username*', Icons.person_outline),
+                        _buildTextField('Email Address*', Icons.email_outlined),
+                        _buildTextField('Phone Number*', Icons.phone_outlined),
+                      ]),
+                      const SizedBox(height: 22),
+                      _buildSectionTitle('Dashboard Report'),
+                      const SizedBox(height: 14),
+                      _buildInfoCard([
+                        _buildDropdownField('Select Report*', Icons.assessment_outlined),
+                      ]),
+                      const SizedBox(height: 22),
+                      _buildSectionTitle('Personal Info'),
+                      const SizedBox(height: 14),
+                      _buildInfoCard([
+                        _buildDropdownField('Gender*', Icons.person_outline),
+                        _buildTextField('Address*', Icons.location_on_outlined),
+                      ]),
+                      const SizedBox(height: 32),
+                      _buildLogoutButton(context),
+                      const SizedBox(height: 24),
+                    ],
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
@@ -56,7 +58,7 @@ class ProfilePage extends StatelessWidget {
 
   Widget _buildProfileHeader() {
     return Container(
-      padding: const EdgeInsets.only(top: 60, bottom: 30),
+      width: double.infinity,
       decoration: const BoxDecoration(
         gradient: LinearGradient(
           colors: [Color(0xFF1976D2), Color(0xFF2196F3)],
@@ -68,92 +70,93 @@ class ProfilePage extends StatelessWidget {
           bottomRight: Radius.circular(30),
         ),
       ),
-      child: Column(
-        children: [
-          Stack(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(4),
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white, width: 2),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: const CircleAvatar(
-                  radius: 50,
-                  backgroundImage: AssetImage('assets/avatar.png'),
-                ),
-              ),
-              Positioned(
-                bottom: 0,
-                right: 0,
-                child: Container(
-                  padding: const EdgeInsets.all(8),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 40),
+        child: Column(
+          children: [
+            Stack(
+              alignment: Alignment.center,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(4),
                   decoration: BoxDecoration(
-                    color: Colors.white,
                     shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white, width: 2),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 5,
-                        offset: const Offset(0, 2),
+                        color: Colors.black.withOpacity(0.15),
+                        blurRadius: 10,
+                        offset: const Offset(0, 3),
                       ),
                     ],
                   ),
-                  child: const Icon(
-                    Icons.camera_alt,
-                    color: Color(0xFF1976D2),
-                    size: 20,
+                  child: const CircleAvatar(
+                    radius: 48,
+                    backgroundImage: AssetImage('assets/avatar.png'),
                   ),
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-          const Text(
-            'Magan',
-            style: TextStyle(
-              fontSize: 28,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-              letterSpacing: 0.5,
+                Positioned(
+                  bottom: 2,
+                  right: 8,
+                  child: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.11),
+                          blurRadius: 5,
+                          offset: const Offset(0, 1),
+                        ),
+                      ],
+                    ),
+                    child: const Icon(
+                      Icons.camera_alt,
+                      color: Color(0xFF1976D2),
+                      size: 18,
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ),
-          const SizedBox(height: 8),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: const Text(
-              'ID S2948',
+            const SizedBox(height: 16),
+            const Text(
+              'Magan',
               style: TextStyle(
+                fontSize: 26,
+                fontWeight: FontWeight.bold,
                 color: Colors.white,
-                fontSize: 16,
+                letterSpacing: 0.5,
+              ),
+            ),
+            const SizedBox(height: 6),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.23),
+                borderRadius: BorderRadius.circular(18),
+              ),
+              child: const Text(
+                'ID S2948',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+            const SizedBox(height: 6),
+            const Text(
+              'IT Department',
+              style: TextStyle(
+                color: Colors.white70,
+                fontSize: 15,
                 fontWeight: FontWeight.w500,
               ),
             ),
-          ),
-          const SizedBox(height: 8),
-          const Text(
-            'IT Department',
-            style: TextStyle(
-              color: Colors.white70,
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          const SizedBox(height: 20),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Row(
+            const SizedBox(height: 14),
+            Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 _buildStatCard(
@@ -173,59 +176,55 @@ class ProfilePage extends StatelessWidget {
                 ),
               ],
             ),
-          ),
-          const SizedBox(height: 20),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Wrap(
-              spacing: 8,
-              runSpacing: 8,
+            const SizedBox(height: 15),
+            Wrap(
+              spacing: 12,
+              runSpacing: 6,
               alignment: WrapAlignment.center,
               children: [
                 _buildQuickAction(icon: Icons.edit_outlined, label: 'Edit'),
-                _buildQuickAction(
-                  icon: Icons.settings_outlined,
-                  label: 'Settings',
-                ),
-                _buildQuickAction(
-                  icon: Icons.notifications_outlined,
-                  label: 'Alerts',
-                ),
+                _buildQuickAction(icon: Icons.settings_outlined, label: 'Settings'),
+                _buildQuickAction(icon: Icons.notifications_outlined, label: 'Alerts'),
               ],
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildSectionTitle(String title) {
-    return Text(
-      title,
-      style: const TextStyle(
-        fontSize: 18,
-        fontWeight: FontWeight.bold,
-        color: Color(0xFF1976D2),
-        letterSpacing: 0.5,
+    return Padding(
+      padding: const EdgeInsets.only(left: 4),
+      child: Text(
+        title,
+        style: const TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+          color: Color(0xFF1976D2),
+          letterSpacing: 0.5,
+        ),
       ),
     );
   }
 
   Widget _buildInfoCard(List<Widget> children) {
     return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.only(bottom: 6),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(14),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withOpacity(0.04),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
         ],
       ),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 14),
         child: Column(children: children),
       ),
     );
@@ -233,7 +232,7 @@ class ProfilePage extends StatelessWidget {
 
   Widget _buildTextField(String label, IconData icon) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.only(bottom: 14),
       child: TextField(
         decoration: InputDecoration(
           labelText: label,
@@ -275,7 +274,7 @@ class ProfilePage extends StatelessWidget {
     }
 
     return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.only(bottom: 14),
       child: DropdownButtonFormField<String>(
         decoration: InputDecoration(
           labelText: label,
@@ -304,56 +303,41 @@ class ProfilePage extends StatelessWidget {
   }
 
   Widget _buildLogoutButton(context) {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF1976D2), Color(0xFF2196F3)],
-          begin: Alignment.centerLeft,
-          end: Alignment.centerRight,
-        ),
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF1976D2).withOpacity(0.3),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
+    return SizedBox(
+      width: double.infinity,
       child: ElevatedButton(
         onPressed: () async {
           final bool? confirmLogout = await showDialog<bool>(
             context: context,
-            builder:
-                (context) => AlertDialog(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  title: const Text(
-                    'Logout',
-                    style: TextStyle(
-                      color: Color(0xFF1976D2),
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  content: const Text('Are you sure you want to logout?'),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.of(context).pop(false),
-                      child: const Text(
-                        'Cancel',
-                        style: TextStyle(color: Color(0xFF757575)),
-                      ),
-                    ),
-                    TextButton(
-                      onPressed: () => Navigator.of(context).pop(true),
-                      child: const Text(
-                        'Logout',
-                        style: TextStyle(color: Color(0xFF1976D2)),
-                      ),
-                    ),
-                  ],
+            builder: (context) => AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              title: const Text(
+                'Logout',
+                style: TextStyle(
+                  color: Color(0xFF1976D2),
+                  fontWeight: FontWeight.bold,
                 ),
+              ),
+              content: const Text('Are you sure you want to logout?'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(false),
+                  child: const Text(
+                    'Cancel',
+                    style: TextStyle(color: Color(0xFF757575)),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(true),
+                  child: const Text(
+                    'Logout',
+                    style: TextStyle(color: Color(0xFF1976D2)),
+                  ),
+                ),
+              ],
+            ),
           );
 
           if (confirmLogout == true) {
@@ -367,8 +351,7 @@ class ProfilePage extends StatelessWidget {
         },
         style: ElevatedButton.styleFrom(
           elevation: 0,
-          backgroundColor: Colors.transparent,
-          shadowColor: Colors.transparent,
+          backgroundColor: const Color(0xFF1976D2),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
@@ -376,6 +359,7 @@ class ProfilePage extends StatelessWidget {
         ),
         child: const Row(
           mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
           children: [
             Icon(Icons.logout, color: Colors.white),
             SizedBox(width: 8),
@@ -400,29 +384,31 @@ class ProfilePage extends StatelessWidget {
     required String label,
   }) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      width: 90,
+      margin: const EdgeInsets.symmetric(horizontal: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.1),
+        color: Colors.white.withOpacity(0.11),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.white.withOpacity(0.2), width: 1),
+        border: Border.all(color: Colors.white.withOpacity(0.18), width: 1),
       ),
       child: Column(
         children: [
-          Icon(icon, color: Colors.white, size: 24),
-          const SizedBox(height: 8),
+          Icon(icon, color: Colors.white, size: 22),
+          const SizedBox(height: 7),
           Text(
             value,
             style: const TextStyle(
               color: Colors.white,
-              fontSize: 18,
+              fontSize: 16,
               fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 3),
           Text(
             label,
             style: TextStyle(
-              color: Colors.white.withOpacity(0.8),
+              color: Colors.white.withOpacity(0.82),
               fontSize: 12,
             ),
           ),
@@ -433,17 +419,17 @@ class ProfilePage extends StatelessWidget {
 
   Widget _buildQuickAction({required IconData icon, required String label}) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 7),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.1),
+        color: Colors.white.withOpacity(0.14),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withOpacity(0.2), width: 1),
+        border: Border.all(color: Colors.white.withOpacity(0.18), width: 1),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, color: Colors.white, size: 16),
-          const SizedBox(width: 4),
+          Icon(icon, color: Colors.white, size: 15),
+          const SizedBox(width: 5),
           Text(
             label,
             style: const TextStyle(

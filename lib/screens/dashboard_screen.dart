@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
-
   @override
   State<DashboardScreen> createState() => _DashboardScreenState();
 }
@@ -11,27 +11,25 @@ class DashboardScreen extends StatefulWidget {
 class _DashboardScreenState extends State<DashboardScreen> {
   @override
   Widget build(BuildContext context) {
+    final bgColor = const Color(0xFFF5F6FA);
     return SafeArea(
       child: Scaffold(
-        backgroundColor: const Color(0xFFF5F6FA),
+        backgroundColor: bgColor,
         body: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Column(
-              children: [
-                const SizedBox(height: 20),
-                _buildHeader(),
-                const SizedBox(height: 20),
-                const CreditLimitScreen(),
-                const SizedBox(height: 20),
-                const PrimarySaleScreen(),
-                const SizedBox(height: 20),
-                const SecondarySaleScreen(),
-                const SizedBox(height: 20),
-                const MyNetworkScreen(),
-                const SizedBox(height: 20),
-              ],
-            ),
+          child: Column(
+            children: [
+              const SizedBox(height: 24),
+              _buildHeader(),
+              const SizedBox(height: 24),
+              const CreditLimitScreen(),
+              const SizedBox(height: 16),
+              const PrimarySaleScreen(),
+              const SizedBox(height: 16),
+              const SecondarySaleScreen(),
+              const SizedBox(height: 16),
+              const MyNetworkScreen(),
+              const SizedBox(height: 30),
+            ],
           ),
         ),
       ),
@@ -39,714 +37,119 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Widget _buildHeader() {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF2196F3), Color(0xFF1976D2)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(15),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.blue.withOpacity(0.3),
-            blurRadius: 10,
-            offset: const Offset(0, 5),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 18.0),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 22),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Color(0xFF5F96F3), Color(0xFF1976D2)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
           ),
-        ],
-      ),
-      child: const Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Dashboard',
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-              SizedBox(height: 5),
-              Text(
-                'Welcome back!',
-                style: TextStyle(fontSize: 16, color: Colors.white70),
-              ),
-            ],
-          ),
-          CircleAvatar(
-            radius: 25,
-            backgroundColor: Colors.white,
-            child: Icon(Icons.person, size: 30, color: Color(0xFF1976D2)),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class SecondarySaleScreen extends StatefulWidget {
-  const SecondarySaleScreen({super.key});
-
-  @override
-  SecondarySaleScreenState createState() => SecondarySaleScreenState();
-}
-
-class SecondarySaleScreenState extends State<SecondarySaleScreen> {
-  final List<ChartData> _chartData = [
-    ChartData('WC', 0.4),
-    ChartData('WCP', 0.5),
-    ChartData('VAP', 0.3),
-    ChartData('Primer', 0.6),
-    ChartData('Water Proofing', 0.2),
-    ChartData('Distemper', 0.7),
-  ];
-
-  final List<String> _productNames = [
-    'WC',
-    'WCP',
-    'VAP',
-    'Primer',
-    'Water Proofing Compound',
-    'Distemper',
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(15),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 1,
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: const BoxDecoration(
-              color: Color(0xFF2196F3),
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(15),
-                topRight: Radius.circular(15),
-              ),
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.blue.withOpacity(0.15),
+              blurRadius: 20,
+              offset: const Offset(0, 7),
             ),
-            child: const Row(
+          ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(Icons.show_chart, color: Colors.white, size: 24),
-                SizedBox(width: 10),
                 Text(
-                  'Secondary Sale',
-                  style: TextStyle(
-                    fontSize: 20.0,
-                    fontWeight: FontWeight.bold,
+                  'Dashboard',
+                  style: GoogleFonts.poppins(
+                    fontSize: 28,
+                    fontWeight: FontWeight.w700,
                     color: Colors.white,
                   ),
                 ),
+                const SizedBox(height: 6),
+                Text(
+                  'Welcome back!',
+                  style: GoogleFonts.poppins(
+                      fontSize: 16, color: Colors.white.withOpacity(0.82)),
+                ),
               ],
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Column(
+            Stack(
               children: [
-                SizedBox(
-                  height: 200,
-                  child: LineChart(
-                    LineChartData(
-                      gridData: FlGridData(
-                        show: true,
-                        drawVerticalLine: true,
-                        horizontalInterval: 0.2,
-                        verticalInterval: 1,
-                        getDrawingHorizontalLine: (value) {
-                          return FlLine(
-                            color: Colors.grey.withOpacity(0.2),
-                            strokeWidth: 1,
-                          );
-                        },
-                        getDrawingVerticalLine: (value) {
-                          return FlLine(
-                            color: Colors.grey.withOpacity(0.2),
-                            strokeWidth: 1,
-                          );
-                        },
-                      ),
-                      titlesData: FlTitlesData(
-                        show: true,
-                        rightTitles: const AxisTitles(
-                          sideTitles: SideTitles(showTitles: false),
-                        ),
-                        topTitles: const AxisTitles(
-                          sideTitles: SideTitles(showTitles: false),
-                        ),
-                        bottomTitles: AxisTitles(
-                          sideTitles: SideTitles(
-                            showTitles: true,
-                            reservedSize: 25,
-                            getTitlesWidget: (value, meta) {
-                              if (value.toInt() >= 0 &&
-                                  value.toInt() < _chartData.length) {
-                                return Padding(
-                                  padding: const EdgeInsets.only(top: 4.0),
-                                  child: Text(
-                                    _chartData[value.toInt()].x,
-                                    style: const TextStyle(
-                                      color: Color(0xFF2196F3),
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 10,
-                                    ),
-                                  ),
-                                );
-                              }
-                              return const Text('');
-                            },
-                          ),
-                        ),
-                        leftTitles: AxisTitles(
-                          sideTitles: SideTitles(
-                            showTitles: true,
-                            interval: 0.2,
-                            getTitlesWidget: (value, meta) {
-                              return Text(
-                                value.toStringAsFixed(1),
-                                style: const TextStyle(
-                                  color: Color(0xFF2196F3),
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 10,
-                                ),
-                              );
-                            },
-                            reservedSize: 35,
-                          ),
-                        ),
-                      ),
-                      borderData: FlBorderData(
-                        show: true,
-                        border: Border.all(color: Colors.grey.withOpacity(0.2)),
-                      ),
-                      minX: 0,
-                      maxX: (_chartData.length - 1).toDouble(),
-                      minY: 0,
-                      maxY: 1,
-                      lineBarsData: [
-                        LineChartBarData(
-                          spots:
-                              _chartData.asMap().entries.map((entry) {
-                                return FlSpot(
-                                  entry.key.toDouble(),
-                                  entry.value.y,
-                                );
-                              }).toList(),
-                          isCurved: true,
-                          gradient: LinearGradient(
-                            colors: [
-                              const Color(0xFF2196F3).withOpacity(0.5),
-                              const Color(0xFF2196F3),
-                            ],
-                          ),
-                          barWidth: 3,
-                          isStrokeCapRound: true,
-                          dotData: FlDotData(
-                            show: true,
-                            getDotPainter: (spot, percent, barData, index) {
-                              return FlDotCirclePainter(
-                                radius: 6,
-                                color: Colors.white,
-                                strokeWidth: 2,
-                                strokeColor: const Color(0xFF2196F3),
-                              );
-                            },
-                          ),
-                          belowBarData: BarAreaData(
-                            show: true,
-                            gradient: LinearGradient(
-                              colors: [
-                                const Color(0xFF2196F3).withOpacity(0.3),
-                                const Color(0xFF2196F3).withOpacity(0.0),
-                              ],
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                            ),
-                          ),
-                        ),
-                      ],
+                Container(
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFF64B5F6), Color(0xFF1976D2)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
                     ),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const CircleAvatar(
+                    radius: 32,
+                    backgroundColor: Colors.transparent,
+                    child: Icon(Icons.person_rounded, size: 40, color: Colors.white),
                   ),
                 ),
-                const SizedBox(height: 20),
-                ..._productNames.map((productName) {
-                  double dataValue =
-                      _chartData
-                          .firstWhere(
-                            (data) => data.x == productName,
-                            orElse: () => ChartData(productName, 0.0),
-                          )
-                          .y;
-
-                  return Container(
-                    margin: const EdgeInsets.only(bottom: 10),
-                    padding: const EdgeInsets.all(15),
+                Positioned(
+                  right: 4,
+                  bottom: 4,
+                  child: Container(
+                    width: 13, height: 13,
                     decoration: BoxDecoration(
-                      color: Colors.grey.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          productName,
-                          style: const TextStyle(
-                            fontSize: 14.0,
-                            color: Colors.black87,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 6,
-                          ),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF2196F3).withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Text(
-                            dataValue.toStringAsFixed(3),
-                            style: const TextStyle(
-                              fontSize: 14.0,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF2196F3),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                }),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// Represents the data for the chart
-class ChartData {
-  ChartData(this.x, this.y);
-
-  final String x;
-  final double y;
-}
-
-class PrimarySaleScreen extends StatefulWidget {
-  const PrimarySaleScreen({super.key});
-
-  @override
-  PrimarySaleScreenState createState() => PrimarySaleScreenState();
-}
-
-class PrimarySaleScreenState extends State<PrimarySaleScreen> {
-  // Sample data for the chart.  In a real app, this would come from your data source.
-  final List<ChartData> _chartData = [
-    ChartData('WC', 0.4),
-    ChartData('WCP', 0.5),
-    ChartData('VAP', 0.3),
-    ChartData('Primer', 0.6),
-    ChartData('Water Proofing', 0.2),
-    ChartData('Distemper', 0.7),
-  ];
-
-  // List of product names
-  final List<String> _productNames = [
-    'WC',
-    'WCP',
-    'VAP',
-    'Primer',
-    'Water /n Proofing /n Compound',
-    'Distemper',
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Primary Sale', // Changed title
-            style: TextStyle(
-              fontSize: 20.0,
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
-            ),
-          ),
-          const SizedBox(height: 20.0),
-          Container(
-            padding: const EdgeInsets.all(16.0),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(10.0),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.3),
-                  spreadRadius: 2,
-                  blurRadius: 5,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: Column(
-              children: [
-                // Top side: Scatter Chart
-                SizedBox(
-                  height: 200,
-                  child: ScatterChart(
-                    ScatterChartData(
-                      scatterSpots:
-                          _chartData.asMap().entries.map((entry) {
-                            return ScatterSpot(
-                              entry.key.toDouble(),
-                              entry.value.y,
-                            );
-                          }).toList(),
-                      titlesData: FlTitlesData(
-                        show: true,
-                        bottomTitles: AxisTitles(
-                          sideTitles: SideTitles(
-                            showTitles: true,
-                            getTitlesWidget: (value, meta) {
-                              return Text(
-                                value.toInt().toString(),
-                                style: const TextStyle(fontSize: 10),
-                              );
-                            },
-                          ),
-                        ),
-                        leftTitles: AxisTitles(
-                          sideTitles: SideTitles(
-                            showTitles: true,
-                            getTitlesWidget: (value, meta) {
-                              return Text(
-                                value.toInt().toString(),
-                                style: const TextStyle(fontSize: 10),
-                              );
-                            },
-                          ),
-                        ),
-                        topTitles: const AxisTitles(
-                          sideTitles: SideTitles(showTitles: false),
-                        ),
-                        rightTitles: const AxisTitles(
-                          sideTitles: SideTitles(showTitles: false),
-                        ),
-                      ),
-                      borderData: FlBorderData(show: true),
-                      gridData: const FlGridData(show: true),
-                      scatterTouchData: ScatterTouchData(
-                        touchTooltipData: ScatterTouchTooltipData(
-                          tooltipBgColor: Colors.blueGrey,
-                          getTooltipItems: (ScatterSpot spot) {
-                            return ScatterTooltipItem(
-                              'X: ${spot.x.toInt()}\nY: ${spot.y.toInt()}',
-                            );
-                          },
-                        ),
-                      ),
+                      color: Colors.greenAccent.shade400,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white, width: 2),
                     ),
                   ),
-                ),
-                // Space between chart and product names
-                const SizedBox(height: 20),
-                // Bottom side: Product Names and Values
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children:
-                      _productNames.map((productName) {
-                        // Get the corresponding data value from _chartData
-                        double dataValue =
-                            _chartData
-                                .firstWhere(
-                                  (data) => data.x == productName,
-                                  orElse:
-                                      () => ChartData(
-                                        productName,
-                                        0.0,
-                                      ), // Default value if not found
-                                )
-                                .y;
-
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 8.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                productName,
-                                style: const TextStyle(
-                                  fontSize: 14.0,
-                                  color: Colors.black,
-                                ),
-                              ),
-                              Text(
-                                dataValue.toStringAsFixed(3),
-                                style: const TextStyle(
-                                  fontSize: 14.0,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black,
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                      }).toList(),
-                ),
+                )
               ],
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 }
 
-// Represents the data for the chart.
-class ChartData1 {
-  ChartData1(this.x, this.y);
-
-  final String x;
-  final double y;
-}
-
-class MyNetworkScreen extends StatelessWidget {
-  const MyNetworkScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // "My Network" Section
-          const Text(
-            "My Network",
-            style: TextStyle(
-              fontSize: 20.0,
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
-            ),
-          ),
-          const SizedBox(height: 10),
-          // Container for Total Retailer and Billed info
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(10),
-              boxShadow: const [
-                BoxShadow(
-                  color: Colors.grey,
-                  spreadRadius: 2,
-                  blurRadius: 5,
-                  offset: Offset(0, 2),
-                ),
-              ],
-            ),
-            child: const Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Total Retailer",
-                        style: TextStyle(fontSize: 16, color: Colors.black),
-                      ),
-                      SizedBox(height: 5),
-                      Text(
-                        "173",
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Total Unique Billed",
-                        style: TextStyle(fontSize: 16, color: Colors.black),
-                      ),
-                      SizedBox(height: 5),
-                      Text(
-                        "0",
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 20),
-          // Product-wise billing information
-          const Text(
-            "Billing Details", // Added a title for this section
-            style: TextStyle(
-              fontSize: 20.0,
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
-            ),
-          ),
-          const SizedBox(height: 10),
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(10),
-              boxShadow: const [
-                BoxShadow(
-                  color: Colors.grey,
-                  spreadRadius: 2,
-                  blurRadius: 5,
-                  offset: Offset(0, 2),
-                ),
-              ],
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildProductBillingRow("WC", 0),
-                _buildProductBillingRow("WCP", 0),
-                _buildProductBillingRow("VAP", 0),
-                _buildProductBillingRow("Primer", 0),
-                _buildProductBillingRow("Water Proofing Compound", 0),
-                _buildProductBillingRow("Distemper", 0),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // Helper method to build a row for product billing
-  static Widget _buildProductBillingRow(String productName, int billedCount) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            productName,
-            style: const TextStyle(fontSize: 16, color: Colors.black),
-          ),
-          Text(
-            billedCount.toString(),
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
+// --- CREDIT LIMIT ---
 
 class CreditLimitScreen extends StatelessWidget {
   const CreditLimitScreen({super.key});
-
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+    return SectionCard(
+      title: "Credit Limit",
+      child: Row(
         children: [
-          // Credit Limit Section Title
-          const Text(
-            "Credit Limit",
-            style: TextStyle(
-              fontSize: 20.0,
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
-            ),
-          ),
-          const SizedBox(height: 10),
-          // Credit Limit Container
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(10),
-              boxShadow: const [
-                BoxShadow(
-                  color: Colors.grey,
-                  spreadRadius: 2,
-                  blurRadius: 5,
-                  offset: Offset(0, 2),
+          Expanded(
+            flex: 2,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text("Balance Limit", style: GoogleFonts.poppins(fontSize: 15, color: Colors.black87)),
+                const SizedBox(height: 6),
+                Text(
+                  "₹ 0",
+                  style: GoogleFonts.poppins(
+                      fontSize: 30, fontWeight: FontWeight.bold, color: Colors.blue.shade800),
                 ),
               ],
             ),
-            child: Row(
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            flex: 3,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Expanded(
-                  flex: 2,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Balance Limit",
-                        style: TextStyle(fontSize: 16, color: Colors.black),
-                      ),
-                      SizedBox(height: 5),
-                      Text(
-                        "0", // Hardcoded value from image
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Expanded(
-                  flex: 3,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildCreditInfoRow("Credit Limit", 0),
-                      _buildCreditInfoRow("Open Billing", 0),
-                      _buildCreditInfoRow("Open Order", 0),
-                    ],
-                  ),
-                ),
+                _buildCreditInfoRow("Credit Limit", 0),
+                _buildCreditInfoRow("Open Billing", 0),
+                _buildCreditInfoRow("Open Order", 0),
               ],
             ),
           ),
@@ -754,29 +157,457 @@ class CreditLimitScreen extends StatelessWidget {
       ),
     );
   }
-
-  // Helper method to build a row for credit information
   static Widget _buildCreditInfoRow(String title, int value) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      padding: const EdgeInsets.symmetric(vertical: 7.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 16,
-              color: Colors.blueGrey,
-            ), //Using a color that looks close to the image
-          ),
-          Text(
-            value.toString(),
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
+          Text(title, style: GoogleFonts.poppins(fontSize: 14, color: Colors.blueGrey)),
+          Text("₹ $value", style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
+        ],
+      ),
+    );
+  }
+}
+
+// --- PRIMARY SALE ---
+
+class PrimarySaleScreen extends StatelessWidget {
+  const PrimarySaleScreen({super.key});
+
+  static const List<_ProductChartData> _products = [
+    _ProductChartData('Distemper', 0.7, Colors.red), // Distemper FIRST
+    _ProductChartData('WCP', 0.5, Colors.purple),
+    _ProductChartData('VAP', 0.3, Colors.orange),
+    _ProductChartData('Primer', 0.6, Colors.green),
+    _ProductChartData('Water\nProofing', 0.2, Colors.teal),
+    _ProductChartData('WC', 0.4, Colors.blue), // WC LAST
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return SectionCard(
+      title: "Primary Sale",
+      child: Column(
+        children: [
+          SizedBox(
+            height: 120,
+            child: ScatterChart(
+              ScatterChartData(
+                minX: 0,
+                maxX: (_products.length - 1).toDouble(),
+                minY: 0.1,
+                maxY: 0.8,
+                scatterSpots: List.generate(_products.length, (i) {
+                  final prod = _products[i];
+                  return ScatterSpot(i.toDouble(), prod.value, color: prod.color, radius: 6);
+                }),
+                gridData: FlGridData(
+                  show: true,
+                  drawVerticalLine: true,
+                  horizontalInterval: 0.1,
+                  verticalInterval: 1,
+                ),
+                titlesData: FlTitlesData(
+                  leftTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                      showTitles: true,
+                      interval: 0.1,
+                      reservedSize: 32,
+                      getTitlesWidget: (value, meta) => Text(
+                        value.toStringAsFixed(1),
+                        style: GoogleFonts.poppins(fontSize: 10, color: Colors.grey.shade600),
+                      ),
+                    ),
+                  ),
+                  rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  bottomTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                      showTitles: true,
+                      reservedSize: 38,
+                      getTitlesWidget: (value, meta) {
+                        if (value.toInt() >= 0 && value.toInt() < _products.length) {
+                          final prod = _products[value.toInt()];
+                          return Padding(
+                            padding: const EdgeInsets.only(top: 2.0, left: 1, right: 1),
+                            child: Text(
+                              prod.name,
+                              style: GoogleFonts.poppins(
+                                fontSize: 9,
+                                fontWeight: FontWeight.w600,
+                                color: prod.color,
+                              ),
+                              textAlign: TextAlign.center,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          );
+                        }
+                        return const SizedBox();
+                      },
+                    ),
+                  ),
+                ),
+                borderData: FlBorderData(show: false),
+                scatterTouchData: ScatterTouchData(
+                  enabled: true,
+                  touchTooltipData: ScatterTouchTooltipData(
+                    tooltipBgColor: Colors.black87,
+                    getTooltipItems: (spot) {
+                      final prod = _products[spot.x.toInt()];
+                      return ScatterTooltipItem(
+                        "${prod.name.replaceAll('\n', ' ')}: ${prod.value.toStringAsFixed(3)}",
+                        textStyle: GoogleFonts.poppins(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
             ),
           ),
+          const SizedBox(height: 10),
+          ..._products.map((prod) {
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: 3.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(prod.name.replaceAll('\n', ' '), style: GoogleFonts.poppins(fontSize: 13, color: Colors.black)),
+                  Text(
+                    prod.value.toStringAsFixed(3),
+                    style: GoogleFonts.poppins(fontWeight: FontWeight.w600, fontSize: 14, color: prod.color),
+                  ),
+                ],
+              ),
+            );
+          }).toList(),
+        ],
+      ),
+    );
+  }
+}
+
+// --- SECONDARY SALE ---
+
+class SecondarySaleScreen extends StatelessWidget {
+  const SecondarySaleScreen({super.key});
+
+  static const List<_ProductChartData> _products = [
+    _ProductChartData('Distemper', 0.7, Colors.red), // Distemper FIRST
+    _ProductChartData('WCP', 0.5, Colors.purple),
+    _ProductChartData('VAP', 0.3, Colors.orange),
+    _ProductChartData('Primer', 0.6, Colors.green),
+    _ProductChartData('Water\nProofing', 0.2, Colors.teal),
+    _ProductChartData('WC', 0.4, Colors.blue), // WC LAST
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return SectionCard(
+      title: "Secondary Sale",
+      icon: Icons.show_chart_rounded,
+      iconColor: Colors.purple.shade400,
+      child: Column(
+        children: [
+          SizedBox(
+            height: 120,
+            child: LineChart(
+              LineChartData(
+                gridData: FlGridData(
+                  show: true,
+                  drawVerticalLine: true,
+                  horizontalInterval: 0.2,
+                  verticalInterval: 1,
+                  getDrawingHorizontalLine: (value) => FlLine(color: Colors.grey.withOpacity(0.1), strokeWidth: 1),
+                  getDrawingVerticalLine: (value) => FlLine(color: Colors.grey.withOpacity(0.1), strokeWidth: 1),
+                ),
+                titlesData: FlTitlesData(
+                  show: true,
+                  bottomTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                      showTitles: true,
+                      reservedSize: 38,
+                      getTitlesWidget: (value, meta) {
+                        if (value.toInt() >= 0 && value.toInt() < _products.length) {
+                          final prod = _products[value.toInt()];
+                          return Padding(
+                            padding: const EdgeInsets.only(top: 2.0, left: 1, right: 1),
+                            child: Text(
+                              prod.name,
+                              style: GoogleFonts.poppins(
+                                fontSize: 9,
+                                fontWeight: FontWeight.w600,
+                                color: prod.color,
+                              ),
+                              textAlign: TextAlign.center,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          );
+                        }
+                        return const SizedBox();
+                      },
+                    ),
+                  ),
+                  leftTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                      showTitles: true,
+                      interval: 0.2,
+                      getTitlesWidget: (value, meta) => Text(
+                        value.toStringAsFixed(1),
+                        style: GoogleFonts.poppins(
+                          color: Colors.purple.shade700,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 10,
+                        ),
+                      ),
+                      reservedSize: 30,
+                    ),
+                  ),
+                  topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                ),
+                borderData: FlBorderData(show: false),
+                minX: 0,
+                maxX: (_products.length - 1).toDouble(),
+                minY: 0,
+                maxY: 1,
+                lineBarsData: [
+                  LineChartBarData(
+                    spots: List.generate(_products.length, (i) => FlSpot(i.toDouble(), _products[i].value)),
+                    isCurved: true,
+                    gradient: LinearGradient(
+                      colors: [
+                        Colors.purple.shade400.withOpacity(0.7),
+                        Colors.purple.shade700,
+                      ],
+                    ),
+                    barWidth: 2.0,
+                    isStrokeCapRound: true,
+                    dotData: FlDotData(
+                      show: true,
+                      getDotPainter: (spot, percent, barData, index) {
+                        return FlDotCirclePainter(
+                          radius: 5,
+                          color: Colors.white,
+                          strokeWidth: 2.0,
+                          strokeColor: _products[spot.x.toInt()].color,
+                        );
+                      },
+                    ),
+                    belowBarData: BarAreaData(
+                      show: true,
+                      gradient: LinearGradient(
+                        colors: [
+                          Colors.purple.shade200.withOpacity(0.5),
+                          Colors.white.withOpacity(0.01),
+                        ],
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 10),
+          ..._products.map((prod) {
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: 3.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(prod.name.replaceAll('\n', ' '), style: GoogleFonts.poppins(fontSize: 13, color: Colors.black)),
+                  Text(
+                    prod.value.toStringAsFixed(3),
+                    style: GoogleFonts.poppins(
+                        fontWeight: FontWeight.w600, fontSize: 14, color: prod.color),
+                  ),
+                ],
+              ),
+            );
+          }).toList(),
+        ],
+      ),
+    );
+  }
+}
+
+// --- MY NETWORK ---
+
+class MyNetworkScreen extends StatelessWidget {
+  const MyNetworkScreen({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return SectionCard(
+      title: "My Network",
+      icon: Icons.groups_2_rounded,
+      iconColor: Colors.teal,
+      child: Column(
+        children: [
+          _InfoBox(
+            label: "Total Retailer",
+            value: "173",
+            color: Colors.teal.shade400,
+          ),
+          const SizedBox(height: 14),
+          _InfoBox(
+            label: "Total Unique Billed",
+            value: "0",
+            color: Colors.deepOrange.shade400,
+          ),
+          const Divider(height: 32, thickness: 1.2, color: Color(0xFFF2F4F6)),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Text("Billing Details", style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.grey.shade900)),
+          ),
+          const SizedBox(height: 12),
+          ...[
+            "Distemper", // Distemper FIRST
+            "WCP",
+            "VAP",
+            "Primer",
+            "Water Proofing",
+            "WC", // WC LAST
+          ].map((name) => Padding(
+            padding: const EdgeInsets.symmetric(vertical: 5.5),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(name, style: GoogleFonts.poppins(fontSize: 14)),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade200,
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  child: Text(
+                    "0",
+                    style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.teal.shade700),
+                  ),
+                ),
+              ],
+            ),
+          )),
+        ],
+      ),
+    );
+  }
+}
+
+// --- STYLED REUSABLE CARD ---
+
+class SectionCard extends StatelessWidget {
+  final String title;
+  final Widget child;
+  final IconData? icon;
+  final Color? iconColor;
+  const SectionCard({
+    super.key,
+    required this.title,
+    required this.child,
+    this.icon,
+    this.iconColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 18.0, vertical: 3),
+      child: Container(
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(18),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.blueGrey.withOpacity(0.10),
+              blurRadius: 18,
+              offset: const Offset(0, 7),
+            ),
+          ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(18, 18, 18, 18),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  if (icon != null)
+                    Container(
+                      margin: const EdgeInsets.only(right: 10),
+                      decoration: BoxDecoration(
+                        color: iconColor?.withOpacity(0.15) ?? Colors.blue.withOpacity(0.12),
+                        shape: BoxShape.circle,
+                      ),
+                      padding: const EdgeInsets.all(8),
+                      child: Icon(icon, size: 22, color: iconColor ?? Colors.blue),
+                    ),
+                  Text(
+                    title,
+                    style: GoogleFonts.poppins(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 19,
+                      color: Colors.blueGrey.shade900,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              child
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// --- DATA CLASSES AND UTILITIES ---
+
+class ChartData {
+  final String x;
+  final double y;
+  const ChartData(this.x, this.y);
+}
+
+class _ProductChartData {
+  final String name;
+  final double value;
+  final Color color;
+  const _ProductChartData(this.name, this.value, this.color);
+}
+
+class _InfoBox extends StatelessWidget {
+  final String label;
+  final String value;
+  final Color color;
+  const _InfoBox({required this.label, required this.value, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.09),
+        borderRadius: BorderRadius.circular(15),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.circle, color: color, size: 10),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(label, style: GoogleFonts.poppins(fontSize: 15, fontWeight: FontWeight.w500)),
+          ),
+          Text(value, style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 19, color: color)),
         ],
       ),
     );

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:learning2/StaffScreen/staff_home_screen.dart';
 import 'package:learning2/WorkerScreen/Worker_Home_Screen.dart';
 import 'package:learning2/screens/Home_screen.dart';
 import 'package:learning2/screens/firebase_api.dart';
@@ -47,7 +48,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'SPARSH',
       theme: AppTheme.lightTheme,
-      home: const SplashScreen(),
+      home: const StaffHomeScreen(),
     );
   }
 }

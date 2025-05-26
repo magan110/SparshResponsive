@@ -20,6 +20,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       home: const CanteenCouponDetails(),
+      debugShowCheckedModeBanner: false,
     );
   }
 }
@@ -75,7 +76,7 @@ class _CanteenCouponDetailsState extends State<CanteenCouponDetails> {
       'Michael Wilson'
     ];
 
-    for (int i = 0; i < 50; i++) { // Increased to 50 for better scroll testing
+    for (int i = 0; i < 50; i++) {
       _dummyData.add({
         'fNo': 'F${1000 + i}',
         'docDate': DateFormat('dd/MM/yyyy').format(DateTime.now().subtract(Duration(days: i))),
@@ -121,9 +122,7 @@ class _CanteenCouponDetailsState extends State<CanteenCouponDetails> {
 
   @override
   Widget build(BuildContext context) {
-    final dateFormat = DateFormat('dd/MM/yyyy');
-    final textTheme = Theme.of(context).textTheme;
-    final columnWidths = [80.0, 120.0, 120.0, 120.0, 150.0, 120.0, 150.0, 80.0, 80.0, 80.0, 100.0];
+    final columnWidths = [90.0, 130.0, 130.0, 130.0, 160.0, 135.0, 160.0, 85.0, 85.0, 95.0, 115.0];
     final totalWidth = columnWidths.reduce((sum, width) => sum + width);
 
     return Scaffold(
@@ -210,7 +209,7 @@ class _CanteenCouponDetailsState extends State<CanteenCouponDetails> {
                     const SizedBox(width: 8),
                     Text(
                       'As on ${DateFormat('dd/MM/yyyy HH:mm:ss').format(DateTime.now())}',
-                      style: textTheme.bodyMedium,
+                      style: Theme.of(context).textTheme.bodyMedium,
                     ),
                   ],
                 ),
@@ -239,79 +238,65 @@ class _CanteenCouponDetailsState extends State<CanteenCouponDetails> {
                 ),
                 child: Column(
                   children: [
-                    // Table Header
+                    // Table Header (NO Scrollbar)
                     Container(
                       decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.primaryContainer,
+                        color: Theme.of(context).colorScheme.primary.withOpacity(0.85),
                         borderRadius: const BorderRadius.vertical(
                           top: Radius.circular(12),
                         ),
                       ),
                       padding: const EdgeInsets.symmetric(vertical: 12),
-                      child: Scrollbar(
+                      child: SingleChildScrollView(
                         controller: _horizontalHeaderScrollController,
-                        thumbVisibility: true,
-                        interactive: true,
-                        child: SingleChildScrollView(
-                          controller: _horizontalHeaderScrollController,
-                          scrollDirection: Axis.horizontal,
-                          physics: const BouncingScrollPhysics(),
-                          child: Row(
-                            children: [
-                              SizedBox(
-                                width: totalWidth,
-                                child: Row(
-                                  children: [
-                                    _buildHeaderCell('F No', columnWidths[0]),
-                                    _buildHeaderCell('Document Date', columnWidths[1]),
-                                    _buildHeaderCell('Scanned By', columnWidths[2]),
-                                    _buildHeaderCell('Employee Code', columnWidths[3]),
-                                    _buildHeaderCell('Employee Name', columnWidths[4]),
-                                    _buildHeaderCell('Dept/Cont Code', columnWidths[5]),
-                                    _buildHeaderCell('Dept/Cont Name', columnWidths[6]),
-                                    _buildHeaderCell('Food', columnWidths[7]),
-                                    _buildHeaderCell('Tea', columnWidths[8]),
-                                    _buildHeaderCell('Namkeen', columnWidths[9]),
-                                    _buildHeaderCell('Packed Item', columnWidths[10]),
-                                  ],
-                                ),
+                        scrollDirection: Axis.horizontal,
+                        physics: const ClampingScrollPhysics(),
+                        child: Row(
+                          children: [
+                            SizedBox(
+                              width: totalWidth,
+                              child: Row(
+                                children: [
+                                  _buildHeaderCell('F No', columnWidths[0]),
+                                  _buildHeaderCell('Document Date', columnWidths[1]),
+                                  _buildHeaderCell('Scanned By', columnWidths[2]),
+                                  _buildHeaderCell('Employee Code', columnWidths[3]),
+                                  _buildHeaderCell('Employee Name', columnWidths[4]),
+                                  _buildHeaderCell('Dept/Cont Code', columnWidths[5]),
+                                  _buildHeaderCell('Dept/Cont Name', columnWidths[6]),
+                                  _buildHeaderCell('Food', columnWidths[7]),
+                                  _buildHeaderCell('Tea', columnWidths[8]),
+                                  _buildHeaderCell('Namkeen', columnWidths[9]),
+                                  _buildHeaderCell('Packed Item', columnWidths[10], isLast: true),
+                                ],
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
-                    // Table Body
+                    // Table Body (NO Scrollbar)
                     Expanded(
                       child: _dummyData.isEmpty
                           ? _buildEmptyState()
-                          : Scrollbar(
-                              controller: _horizontalBodyScrollController,
-                              thumbVisibility: true,
-                              interactive: true,
-                              child: SingleChildScrollView(
-                                controller: _horizontalBodyScrollController,
-                                scrollDirection: Axis.horizontal,
-                                physics: const BouncingScrollPhysics(),
-                                child: SizedBox(
-                                  width: totalWidth,
-                                  child: Scrollbar(
-                                    controller: _verticalScrollController,
-                                    thumbVisibility: true,
-                                    child: SingleChildScrollView(
-                                      controller: _verticalScrollController,
-                                      scrollDirection: Axis.vertical,
-                                      physics: const BouncingScrollPhysics(),
-                                      child: Column(
-                                        children: [
-                                          ..._dummyData.map((data) => _buildDataRow(data, columnWidths)),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
+                          : SingleChildScrollView(
+                        controller: _horizontalBodyScrollController,
+                        scrollDirection: Axis.horizontal,
+                        physics: const ClampingScrollPhysics(),
+                        child: SizedBox(
+                          width: totalWidth,
+                          child: SingleChildScrollView(
+                            controller: _verticalScrollController,
+                            scrollDirection: Axis.vertical,
+                            physics: const ClampingScrollPhysics(),
+                            child: Column(
+                              children: [
+                                ..._dummyData.map((data) => _buildDataRow(data, columnWidths)),
+                              ],
                             ),
+                          ),
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -345,7 +330,7 @@ class _CanteenCouponDetailsState extends State<CanteenCouponDetails> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(DateFormat('dd/MM/yyyy').format(date)),
-                const Icon(Icons.calendar_today, size: 18),
+                const Icon(Icons.calendar_today, size: 18, color: Colors.blue),
               ],
             ),
           ),
@@ -353,6 +338,7 @@ class _CanteenCouponDetailsState extends State<CanteenCouponDetails> {
       ],
     );
   }
+
 
   Widget _buildDropdownField(
       String label,
@@ -388,24 +374,34 @@ class _CanteenCouponDetailsState extends State<CanteenCouponDetails> {
     );
   }
 
-  Widget _buildHeaderCell(String text, double width) {
-    return SizedBox(
+  Widget _buildHeaderCell(String text, double width, {bool isLast = false}) {
+    return Container(
       width: width,
+      decoration: BoxDecoration(
+        border: Border(
+          right: isLast ? BorderSide.none : const BorderSide(color: Colors.white, width: 1.2),
+        ),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 8),
+      alignment: Alignment.center,
       child: Text(
         text,
-        style: const TextStyle(fontWeight: FontWeight.bold,color: Colors.white),
-        overflow: TextOverflow.ellipsis,
+        style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 14),
+        overflow: TextOverflow.visible,
+        softWrap: true,
+        textAlign: TextAlign.center,
+        maxLines: 2, // Allow header text to wrap if needed
       ),
     );
   }
 
   Widget _buildDataRow(Map<String, dynamic> data, List<double> columnWidths) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 12),
+      height: 48,
       decoration: BoxDecoration(
         border: Border(
           bottom: BorderSide(
-            color: Colors.grey.shade200,
+            color: Colors.grey.shade300,
             width: 1,
           ),
         ),
@@ -422,18 +418,28 @@ class _CanteenCouponDetailsState extends State<CanteenCouponDetails> {
           _buildDataCell(data['food'], columnWidths[7]),
           _buildDataCell(data['tea'], columnWidths[8]),
           _buildDataCell(data['namkeen'], columnWidths[9]),
-          _buildDataCell(data['packed'], columnWidths[10]),
+          _buildDataCell(data['packed'], columnWidths[10], isLast: true),
         ],
       ),
     );
   }
 
-  Widget _buildDataCell(String text, double width) {
-    return SizedBox(
+  Widget _buildDataCell(String text, double width, {bool isLast = false}) {
+    return Container(
       width: width,
+      decoration: BoxDecoration(
+        border: Border(
+          right: isLast ? BorderSide.none : const BorderSide(color: Color(0xFFE0E0E0), width: 1),
+        ),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      alignment: Alignment.center,
       child: Text(
         text,
-        overflow: TextOverflow.ellipsis,
+        overflow: TextOverflow.visible,
+        softWrap: true,
+        textAlign: TextAlign.center,
+        style: const TextStyle(fontSize: 14),
       ),
     );
   }
@@ -454,4 +460,3 @@ class _CanteenCouponDetailsState extends State<CanteenCouponDetails> {
     );
   }
 }
-
