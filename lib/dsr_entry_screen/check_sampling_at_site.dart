@@ -1,22 +1,12 @@
 import 'dart:io';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:image_picker/image_picker.dart';
-import '../theme/app_theme.dart';
+import 'package:http/http.dart' as http;
 
-// Activity imports
-import 'Meeting_with_new_purchaser.dart';
-import 'Meetings_With_Contractor.dart';
-import 'any_other_activity.dart';
-import 'btl_activites.dart';
+import '../theme/app_theme.dart';
 import 'dsr_entry.dart';
-import 'dsr_retailer_in_out.dart';
-import 'internal_team_meeting.dart';
-import 'office_work.dart';
-import 'on_leave.dart';
-import 'phone_call_with_builder.dart';
-import 'phone_call_with_unregisterd_purchaser.dart';
-import 'work_from_home.dart';
 
 class CheckSamplingAtSite extends StatefulWidget {
   const CheckSamplingAtSite({super.key});
@@ -26,75 +16,44 @@ class CheckSamplingAtSite extends StatefulWidget {
 }
 
 class _CheckSamplingAtSiteState extends State<CheckSamplingAtSite> {
-  // State variables for dropdowns and date pickers
   String? _processItem = 'Select';
   final List<String> _processdropdownItems = ['Select', 'Add', 'Update'];
 
-
-  String? _siteItem =
-      'Select'; // Dropdown for Product for which Sample is applied
-  final List<String> _sitedropdownItems = [
-    'Select',
-    'White Cement',
-    'Wall Care putty',
-    'Textura',
-    'Levelplast',
-    'Wall Primer',
-  ];
-
-  String? _qualityItem = 'Select'; // Dropdown for Quality of Sample
-  final List<String> _qualitydropdownItems = [
-    'Select',
-    'Average',
-    'Medium',
-    'Good',
-  ];
-
-  String? _statusItem = 'Select'; // Dropdown for Status of Sample
-  final List<String> _statusDropdownItems = [
-    'Select',
-    'Yet To be Checked By Purchaser',
-    'Approved',
-    'Rejected',
-  ];
-
-  // Controllers for date text fields
   final TextEditingController _dateController = TextEditingController();
   final TextEditingController _reportDateController = TextEditingController();
 
-  // State variables to hold selected dates
   DateTime? _selectedDate;
   DateTime? _selectedReportDate;
 
-  // Lists for image uploads
-  final List<int> _uploadRows = [0]; // Tracks the number of image upload rows
-  final ImagePicker _picker = ImagePicker(); // Initialize ImagePicker
-  // List to hold selected image paths for each row (multiple images per row)
-  List<List<String>> _selectedImagePaths = [
-    [],
-  ]; // Initialize with an empty list for the first row
+  final TextEditingController _siteController = TextEditingController();
+  final TextEditingController _productController = TextEditingController();
+  final TextEditingController _potentialController = TextEditingController();
+  final TextEditingController _applicatorController = TextEditingController();
+  String? _qualityItem = 'Select';
+  final List<String> _qualitydropdownItems = ['Select', 'Average', 'Medium', 'Good'];
+  String? _statusItem = 'Select';
+  final List<String> _statusDropdownItems = ['Select', 'Yet To be Checked By Purchaser', 'Approved', 'Rejected'];
+  final TextEditingController _contactNameController = TextEditingController();
+  final TextEditingController _mobileController = TextEditingController();
 
-  // Global key for the form for validation
+  // Images: start with one, can add up to 3
+  List<File?> _selectedImages = [null];
+
   final _formKey = GlobalKey<FormState>();
 
   @override
-  void initState() {
-    super.initState();
-    // Ensure _selectedImagePaths has an empty list for the initial row
-    if (_selectedImagePaths.isEmpty) {
-      _selectedImagePaths = [[]];
-    }
-  }
-
-  @override
   void dispose() {
-    // Dispose controllers when the widget is removed
     _dateController.dispose();
     _reportDateController.dispose();
+    _siteController.dispose();
+    _productController.dispose();
+    _potentialController.dispose();
+    _applicatorController.dispose();
+    _contactNameController.dispose();
+    _mobileController.dispose();
     super.dispose();
   }
 
-  // Function to pick the submission date
   Future<void> _pickDate() async {
     final now = DateTime.now();
     final picked = await showDatePicker(
@@ -102,22 +61,6 @@ class _CheckSamplingAtSiteState extends State<CheckSamplingAtSite> {
       initialDate: _selectedDate ?? now,
       firstDate: DateTime(1900),
       lastDate: DateTime(now.year + 5),
-      builder: (context, child) {
-        return Theme(
-          // Apply a custom theme for the date picker
-          data: ThemeData.light().copyWith(
-            colorScheme: const ColorScheme.light(
-              primary: Colors.blueAccent, // Header background color
-              onPrimary: Colors.white, // Header text color
-              onSurface: Colors.black87, // Body text color
-            ),
-            dialogTheme: const DialogThemeData(
-              backgroundColor: Colors.white,
-            ), // Dialog background
-          ),
-          child: child!,
-        );
-      },
     );
     if (picked != null) {
       setState(() {
@@ -127,7 +70,6 @@ class _CheckSamplingAtSiteState extends State<CheckSamplingAtSite> {
     }
   }
 
-  // Function to pick the report date
   Future<void> _pickReportDate() async {
     final now = DateTime.now();
     final picked = await showDatePicker(
@@ -135,22 +77,6 @@ class _CheckSamplingAtSiteState extends State<CheckSamplingAtSite> {
       initialDate: _selectedReportDate ?? now,
       firstDate: DateTime(1900),
       lastDate: DateTime(now.year + 5),
-      builder: (context, child) {
-        return Theme(
-          // Apply a custom theme for the date picker
-          data: ThemeData.light().copyWith(
-            colorScheme: const ColorScheme.light(
-              primary: Colors.blueAccent, // Header background color
-              onPrimary: Colors.white, // Header text color
-              onSurface: Colors.black87, // Body text color
-            ),
-            dialogTheme: const DialogThemeData(
-              backgroundColor: Colors.white,
-            ), // Dialog background
-          ),
-          child: child!,
-        );
-      },
     );
     if (picked != null) {
       setState(() {
@@ -160,107 +86,28 @@ class _CheckSamplingAtSiteState extends State<CheckSamplingAtSite> {
     }
   }
 
-  // Function to add a new image upload row
-  void _addRow() {
-    setState(() {
-      _uploadRows.add(_uploadRows.length); // Add a new index
-      _selectedImagePaths.add(
-        [],
-      ); // Add a new empty list for the new row's images
-    });
-  }
-
-  // Function to remove the last image upload row
-  void _removeRow() {
-    if (_uploadRows.length <= 1) return; // Prevent removing the last row
-    setState(() {
-      _uploadRows.removeLast(); // Remove the last index
-      _selectedImagePaths.removeLast(); // Remove the last image path list
-    });
-  }
-
-  // Function to pick multiple images for a specific row
-  Future<void> _pickImages(int rowIndex) async {
-    final picker = ImagePicker();
-    final pickedFiles = await picker.pickMultiImage();
-
-    if (pickedFiles.isNotEmpty) {
+  Future<void> _pickImage(int index) async {
+    final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
       setState(() {
-        // Replace the existing images for this row with the newly picked ones
-        _selectedImagePaths[rowIndex] = pickedFiles.map((e) => e.path).toList();
+        _selectedImages[index] = File(pickedFile.path);
       });
-    } else {
-      // User canceled the image selection.
-      print('No images selected for row $rowIndex.');
     }
   }
 
-  // Function to show a dialog with the selected images for a specific row
-  void _showImagesDialog(int rowIndex) {
-    if (_selectedImagePaths[rowIndex].isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('No images selected for this row to view.'),
-          duration: Duration(seconds: 2),
-        ),
-      );
-      return;
-    }
-
+  void _showImageDialog(File imageFile) {
     showDialog(
       context: context,
       builder: (context) {
         return Dialog(
-          // Use a Dialog widget for a modal popup
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min, // Make column size to fit content
-              children: [
-                const Text(
-                  'Selected Images',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.blueAccent,
-                  ), // Styled title
-                ),
-                const SizedBox(height: 16), // Increased spacing
-                // Use a SizedBox with constrained height and width for the image list
-                SizedBox(
-                  height: 200, // Limit the height of the image list
-                  width: double.maxFinite, // Make it wide
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal, // Horizontal list
-                    itemCount: _selectedImagePaths[rowIndex].length,
-                    itemBuilder: (context, index) {
-                      final imagePath = _selectedImagePaths[rowIndex][index];
-                      return Padding(
-                        padding: const EdgeInsets.only(
-                          right: 8.0,
-                        ), // Spacing between images
-                        child: Image.file(
-                          File(imagePath),
-                          height: 180, // Adjust as needed
-                          width: 180, // Adjust as needed
-                          fit:
-                              BoxFit
-                                  .cover, // Use cover to fill the space nicely
-                        ),
-                      );
-                    },
-                  ),
-                ),
-                const SizedBox(height: 16), // Increased spacing
-                TextButton(
-                  onPressed:
-                      () => Navigator.of(context).pop(), // Close the dialog
-                  style: TextButton.styleFrom(
-                    foregroundColor: Colors.blueAccent,
-                  ), // Styled button
-                  child: const Text('Close'),
-                ),
-              ],
+          child: Container(
+            width: MediaQuery.of(context).size.width * 0.8,
+            height: MediaQuery.of(context).size.height * 0.6,
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                fit: BoxFit.contain,
+                image: FileImage(imageFile),
+              ),
             ),
           ),
         );
@@ -268,742 +115,311 @@ class _CheckSamplingAtSiteState extends State<CheckSamplingAtSite> {
     );
   }
 
+  Future<String> fileToBase64(File? file) async {
+    if (file == null) return "";
+    final bytes = await file.readAsBytes();
+    return base64Encode(bytes);
+  }
 
+  Future<void> _submitForm({bool exitAfter = false}) async {
+    if (!_formKey.currentState!.validate()) return;
 
-@override
-Widget build(BuildContext context) {
-  return SafeArea(
-    child: Scaffold(
+    // Always send three keys; fill with "" if not present
+    final imgfirst = await fileToBase64(_selectedImages.length > 0 ? _selectedImages[0] : null);
+    final imgscndd = await fileToBase64(_selectedImages.length > 1 ? _selectedImages[1] : null);
+    final imgthird = await fileToBase64(_selectedImages.length > 2 ? _selectedImages[2] : null);
+
+    final Map<String, dynamic> payload = {
+      'proctype': _processItem ?? '',
+      'submdate': _dateController.text,
+      'repodate': _reportDateController.text,
+      'sitename': _siteController.text,
+      'prodname': _productController.text,
+      'potentil': _potentialController.text,
+      'applname': _applicatorController.text,
+      'qualsamp': _qualityItem ?? '',
+      'statsamp': _statusItem ?? '',
+      'contname': _contactNameController.text,
+      'mobnumbr': _mobileController.text,
+      'imgfirst': imgfirst,
+      'imgscndd': imgscndd,
+      'imgthird': imgthird,
+    };
+
+    debugPrint("Payload: ${jsonEncode(payload)}");
+
+    try {
+      final response = await http.post(
+        Uri.parse('https://qa.birlawhite.com:55232/api/dsrsampling/submit'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(payload),
+      );
+      debugPrint("Status code: ${response.statusCode}");
+      debugPrint("👉 Response body: ${response.body}");
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Submitted!'), backgroundColor: Colors.green),
+        );
+        if (exitAfter) Navigator.of(context).pop();
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: ${response.body}'), backgroundColor: Colors.red),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Network error: $e'), backgroundColor: Colors.red),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
       backgroundColor: AppTheme.scaffoldBackgroundColor,
       appBar: AppBar(
         leading: IconButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const DsrEntry()),
-            );
-          },
-          icon: const Icon(
-            Icons.arrow_back_ios_new,
-            color: Colors.white,
-            size: 22,
-          ),
+          onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const DsrEntry())),
+          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 22),
         ),
-        title: Row(
-          children: [
-            const Icon(Icons.assignment_outlined, size: 28),
-            const SizedBox(width: 10),
-            Text(
-              'Check Sampling at Site',
-              style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                color: Colors.white,
-                letterSpacing: 0.5,
-              ),
-            ),
-          ],
-        ),
+        title: Text('Check Sampling at Site', style: Theme.of(context).textTheme.displaySmall?.copyWith(color: Colors.white)),
         backgroundColor: AppTheme.primaryColor,
         elevation: 0,
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.only(
-            bottomLeft: Radius.circular(15),
-            bottomRight: Radius.circular(15),
-          ),
-        ),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0), // Reduced padding slightly
+        padding: const EdgeInsets.all(16.0),
         child: Form(
-          key: _formKey, // Assign the form key
+          key: _formKey,
           child: ListView(
             children: [
-              // Instructions Section
-              const Text(
-                'Instructions',
-                style: TextStyle(
-                  fontSize: 24, // Adjusted font size
-                  fontWeight: FontWeight.bold,
-                  color: Colors.blueAccent, // Match AppBar color
-                ),
-              ),
-              const SizedBox(height: 24), // Increased spacing
-              // Process Type Dropdown
               _buildLabel('Process type'),
-              const SizedBox(height: 8), // Reduced spacing below label
               _buildDropdownField(
                 value: _processItem,
                 items: _processdropdownItems,
-                onChanged: (newValue) {
-                  if (newValue != null) {
-                    setState(() => _processItem = newValue);
-                  }
-                },
+                onChanged: (val) => setState(() => _processItem = val),
               ),
-              const SizedBox(height: 24), // Increased spacing
-              // Submission Date Field
+              const SizedBox(height: 10),
+
               _buildLabel('Submission Date'),
-              const SizedBox(height: 8), // Reduced spacing below label
-              _buildDateField(_dateController, _pickDate, 'Select Date'),
-              const SizedBox(height: 24), // Increased spacing
-              // Report Date Field
+              _buildDateField(_dateController, _pickDate, 'Select Submission Date'),
+              const SizedBox(height: 10),
+
               _buildLabel('Report Date'),
-              const SizedBox(height: 8), // Reduced spacing below label
-              _buildDateField(
-                _reportDateController,
-                _pickReportDate,
-                'Select Date',
-              ),
-              const SizedBox(height: 24), // Increased spacing
-              // Site Name Field
+              _buildDateField(_reportDateController, _pickReportDate, 'Select Report Date'),
+              const SizedBox(height: 10),
+
               _buildLabel('Site Name'),
-              const SizedBox(height: 8),
-              _buildTextField('Enter Site Name'),
-              const SizedBox(height: 24),
+              _buildTextField('Enter Site Name', controller: _siteController),
+              const SizedBox(height: 10),
 
-              // Product for which Sample is applied Dropdown
-              _buildLabel('Product for which Sample is applied'),
-              const SizedBox(height: 8),
-              _buildDropdownField(
-                value: _siteItem,
-                items: _sitedropdownItems,
-                onChanged: (newValue) {
-                  if (newValue != null) {
-                    setState(() => _siteItem = newValue);
-                  }
-                },
-              ),
-              const SizedBox(height: 24),
+              _buildLabel('Product Name'),
+              _buildTextField('Enter Product Name', controller: _productController),
+              const SizedBox(height: 10),
 
-              // Approx Potential of Site (MT) Field
-              _buildLabel('Approx Potential of Site (MT)'),
-              const SizedBox(height: 8),
-              _buildTextField(
-                'Enter Potential (MT)',
-                keyboardType: TextInputType.number,
-              ),
-              const SizedBox(height: 24),
+              _buildLabel('Potential (MT)'),
+              _buildTextField('Enter Potential', controller: _potentialController, keyboardType: TextInputType.number),
+              const SizedBox(height: 10),
 
-              // Applicator Name Who Applied Sample Field
-              _buildLabel('Applicator Name Who Applied Sample'),
-              const SizedBox(height: 8),
-              _buildTextField('Enter Applicator Name'),
-              const SizedBox(height: 24),
+              _buildLabel('Applicator Name'),
+              _buildTextField('Enter Applicator Name', controller: _applicatorController),
+              const SizedBox(height: 10),
 
-              // Quality of Sample Dropdown
               _buildLabel('Quality of Sample'),
-              const SizedBox(height: 8),
               _buildDropdownField(
                 value: _qualityItem,
-                items:
-                    _qualitydropdownItems, // Corrected to use _qualitydropdownItems
-                onChanged: (newValue) {
-                  if (newValue != null) {
-                    setState(() => _qualityItem = newValue);
-                  }
-                },
+                items: _qualitydropdownItems,
+                onChanged: (val) => setState(() => _qualityItem = val),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 10),
 
-              // Status of Sample Dropdown
               _buildLabel('Status of Sample'),
-              const SizedBox(height: 8),
               _buildDropdownField(
                 value: _statusItem,
                 items: _statusDropdownItems,
-                onChanged: (newValue) {
-                  if (newValue != null) {
-                    setState(() => _statusItem = newValue);
-                  }
-                },
+                onChanged: (val) => setState(() => _statusItem = val),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 10),
 
-              // Contact Name Field
               _buildLabel('Contact Name'),
-              const SizedBox(height: 8),
-              _buildTextField('Enter Contact Name'),
-              const SizedBox(height: 24),
+              _buildTextField('Enter Contact Name', controller: _contactNameController),
+              const SizedBox(height: 10),
 
-              // Mobile no. Field
-              _buildLabel('Mobile no.'),
-              const SizedBox(height: 8),
-              _buildTextField(
-                'Enter Mobile Number',
-                keyboardType: TextInputType.phone,
-              ),
-              const SizedBox(height: 24),
+              _buildLabel('Mobile Number'),
+              _buildTextField('Enter Mobile Number', controller: _mobileController, keyboardType: TextInputType.phone),
+              const SizedBox(height: 18),
 
-              // Image Upload Section
               _buildLabel('Upload Images'),
               const SizedBox(height: 8),
-              Container(
-                margin: const EdgeInsets.only(top: 8, bottom: 16),
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.1),
-                      spreadRadius: 1,
-                      blurRadius: 5,
-                      offset: const Offset(0, 2),
+              ...List.generate(_selectedImages.length, (i) {
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 16),
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade50,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: _selectedImages[i] != null ? Colors.green.shade200 : Colors.grey.shade200,
+                      width: 1.5,
                     ),
-                  ],
-                  border: Border.all(color: Colors.grey.shade200),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Row(
-                      children: [
-                        Icon(
-                          Icons.photo_library_rounded,
-                          color: Color.fromARGB(255, 33, 150, 243),
-                          size: 24,
-                        ),
-                        SizedBox(width: 8),
-                        Text(
-                          'Supporting Documents',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Color.fromARGB(255, 33, 150, 243),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Upload images related to your activity',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey.shade600,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    // Image upload rows with enhanced UI
-                    ...List.generate(_uploadRows.length, (index) {
-                      final i = _uploadRows[index];
-                      return Container(
-                        margin: const EdgeInsets.only(bottom: 16),
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: Colors.grey.shade50,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color:
-                                _selectedImagePaths[i].isNotEmpty
-                                    ? Colors.green.shade200
-                                    : Colors.grey.shade200,
-                            width: 1.5,
-                          ),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Document header row with status
-                            Row(
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 10,
-                                    vertical: 4,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: Colors.blueAccent.withOpacity(0.1),
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  child: Text(
-                                    'Document ${index + 1}',
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: Color.fromARGB(
-                                        255,
-                                        33,
-                                        150,
-                                        243,
-                                      ),
-                                      fontSize: 14,
-                                    ),
-                                  ),
-                                ),
-                                const Spacer(),
-                                if (_selectedImagePaths[i].isNotEmpty)
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 10,
-                                      vertical: 4,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: Colors.green.shade100,
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                    child: const Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Icon(
-                                          Icons.check_circle,
-                                          color: Colors.green,
-                                          size: 16,
-                                        ),
-                                        SizedBox(width: 4),
-                                        Text(
-                                          'Uploaded',
-                                          style: TextStyle(
-                                            color: Colors.green,
-                                            fontWeight: FontWeight.w500,
-                                            fontSize: 14,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                              ],
-                            ),
-                            const SizedBox(height: 16),
-                            // Image preview if selected
-                            if (_selectedImagePaths[i].isNotEmpty)
-                              GestureDetector(
-                                onTap: () => _showImagesDialog(i),
-                                child: Container(
-                                  height: 120,
-                                  width: double.infinity,
-                                  margin: const EdgeInsets.only(bottom: 16),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(8),
-                                    image: DecorationImage(
-                                      image: FileImage(
-                                        File(_selectedImagePaths[i][0]),
-                                      ),
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
-                                  child: Align(
-                                    alignment: Alignment.topRight,
-                                    child: Container(
-                                      margin: const EdgeInsets.all(8),
-                                      padding: const EdgeInsets.all(4),
-                                      decoration: BoxDecoration(
-                                        color: Colors.black.withOpacity(0.6),
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: const Icon(
-                                        Icons.zoom_in,
-                                        color: Colors.white,
-                                        size: 20,
-                                      ),
-                                    ),
-                                  ),
-                                ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Text('Document ${i + 1}', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                          const Spacer(),
+                          if (_selectedImages[i] != null)
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                              decoration: BoxDecoration(
+                                color: Colors.green.shade100,
+                                borderRadius: BorderRadius.circular(16),
                               ),
-                            // Action buttons
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: ElevatedButton.icon(
-                                    onPressed: () => _pickImages(i),
-                                    icon: Icon(
-                                      _selectedImagePaths[i].isNotEmpty
-                                          ? Icons.refresh
-                                          : Icons.upload_file,
-                                      size: 18,
-                                    ),
-                                    label: Text(
-                                      _selectedImagePaths[i].isNotEmpty
-                                          ? 'Replace'
-                                          : 'Upload',
-                                    ),
-                                    style: ElevatedButton.styleFrom(
-                                      foregroundColor: Colors.white,
-                                      backgroundColor:
-                                          _selectedImagePaths[i].isNotEmpty
-                                              ? Colors.amber.shade600
-                                              : Colors.blueAccent,
-                                      elevation: 0,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                      padding: const EdgeInsets.symmetric(
-                                        vertical: 12,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                if (_selectedImagePaths[i].isNotEmpty) ...[
-                                  const SizedBox(width: 8),
-                                  Expanded(
-                                    child: ElevatedButton.icon(
-                                      onPressed: () => _showImagesDialog(i),
-                                      icon: const Icon(
-                                        Icons.visibility,
-                                        size: 18,
-                                      ),
-                                      label: const Text('View'),
-                                      style: ElevatedButton.styleFrom(
-                                        foregroundColor: Colors.white,
-                                        backgroundColor: Colors.green,
-                                        elevation: 0,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            8,
-                                          ),
-                                        ),
-                                        padding: const EdgeInsets.symmetric(
-                                          vertical: 12,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: const [
+                                  Icon(Icons.check_circle, color: Colors.green, size: 16),
+                                  SizedBox(width: 4),
+                                  Text('Uploaded', style: TextStyle(color: Colors.green, fontWeight: FontWeight.w500, fontSize: 13)),
                                 ],
-                              ],
-                            ),
-                          ],
-                        ),
-                      );
-                    }),
-                    // Add/Remove document buttons
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        ElevatedButton.icon(
-                          onPressed: _addRow,
-                          icon: const Icon(Icons.add_photo_alternate, size: 20),
-                          label: const Text('Document'),
-                          style: ElevatedButton.styleFrom(
-                            foregroundColor: Colors.white,
-                            backgroundColor: Colors.blueAccent,
-                            elevation: 0,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 12,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        if (_uploadRows.length > 1)
-                          ElevatedButton.icon(
-                            onPressed: _removeRow,
-                            icon: const Icon(
-                              Icons.remove_circle_outline,
-                              size: 20,
-                            ),
-                            label: const Text('Remove'),
-                            style: ElevatedButton.styleFrom(
-                              foregroundColor: Colors.white,
-                              backgroundColor: Colors.redAccent,
-                              elevation: 0,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 12,
                               ),
                             ),
+                        ],
+                      ),
+                      const SizedBox(height: 14),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ElevatedButton.icon(
+                              onPressed: () => _pickImage(i),
+                              icon: Icon(_selectedImages[i] != null ? Icons.refresh : Icons.upload_file, size: 18),
+                              label: Text(_selectedImages[i] != null ? 'Replace' : 'Upload'),
+                            ),
                           ),
-                      ],
-                    ),
-                  ],
+                          if (_selectedImages[i] != null) ...[
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: ElevatedButton.icon(
+                                onPressed: () => _showImageDialog(_selectedImages[i]!),
+                                icon: const Icon(Icons.visibility, size: 18),
+                                label: const Text('View'),
+                                style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            IconButton(
+                              onPressed: () {
+                                setState(() {
+                                  _selectedImages.removeAt(i);
+                                });
+                              },
+                              icon: const Icon(Icons.remove_circle_outline, color: Colors.red),
+                            ),
+                          ]
+                        ],
+                      ),
+                    ],
+                  ),
+                );
+              }),
+              // "Add More Image" button if less than 3 images
+              if (_selectedImages.length < 3)
+                Center(
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      setState(() {
+                        _selectedImages.add(null);
+                      });
+                    },
+                    icon: const Icon(Icons.add_photo_alternate),
+                    label: const Text('Add More Image'),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 30), // Increased spacing before buttons
-              // Submit Buttons
-              Column(
-                crossAxisAlignment:
-                    CrossAxisAlignment.stretch, // Stretch buttons to full width
+
+              const SizedBox(height: 24),
+              Row(
                 children: [
-                  ElevatedButton(
-                    onPressed: () {
-                      // TODO: implement submit and new logic
-                      if (_formKey.currentState!.validate()) {
-                        // Process form data
-                        print('Form is valid. Submit and New.');
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      foregroundColor: Colors.white,
-                      backgroundColor: Colors.blueAccent, // Match theme color
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 14,
-                      ), // Increased vertical padding
-                      textStyle: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ), // Larger, bold text
-                      elevation: 3.0, // Add slight elevation
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () => _submitForm(exitAfter: false),
+                      child: const Text('Submit & New'),
                     ),
-                    child: const Text('Submit & New'),
                   ),
-                  const SizedBox(height: 16), // Spacing between buttons
-                  ElevatedButton(
-                    onPressed: () {
-                      // TODO: implement submit and exit logic
-                      if (_formKey.currentState!.validate()) {
-                        // Process form data
-                        print('Form is valid. Submit and Exit.');
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      foregroundColor: Colors.white,
-                      backgroundColor: Colors.blueAccent, // Match theme color
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      textStyle: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      elevation: 3.0,
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () => _submitForm(exitAfter: true),
+                      child: const Text('Submit & Exit'),
                     ),
-                    child: const Text('Submit & Exit'),
-                  ),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () {
-                      // TODO: implement view submitted data logic
-                      print('View Submitted Data button pressed');
-                    },
-                    style: ElevatedButton.styleFrom(
-                      foregroundColor: Colors.blueAccent, // Blue text
-                      backgroundColor: Colors.white, // White background
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        side: const BorderSide(
-                          color: Colors.blueAccent,
-                        ), // Blue border
-                      ),
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      textStyle: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      elevation: 1.0, // Less elevation
-                    ),
-                    child: const Text('Click to see Submitted Data'),
                   ),
                 ],
               ),
-              const SizedBox(height: 20), // Spacing at the
             ],
           ),
         ),
       ),
-    ),
-  );
+    );
   }
 
-  // --- Helper Methods for Building Widgets ---
+  Widget _buildLabel(String text) => Padding(
+    padding: const EdgeInsets.symmetric(vertical: 4),
+    child: Text(
+      text,
+      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.black87),
+    ),
+  );
 
-  // Helper to build a standard text field
   Widget _buildTextField(
-    String hintText, {
-    TextEditingController? controller,
-    TextInputType? keyboardType,
-    int maxLines = 1, // Default to single line
-    String? Function(String?)? validator,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Label is handled separately before calling this function
-        // _buildLabel(label),
-        // const SizedBox(height: 8),
-        TextFormField(
-          controller: controller,
-          keyboardType: keyboardType,
-          maxLines: maxLines,
-          decoration: InputDecoration(
-            hintText: hintText,
-            hintStyle: TextStyle(
-              color: Colors.grey[500], // Slightly darker grey hint text
-              fontSize: 16,
-            ),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10), // Rounded corners
-              borderSide: BorderSide.none, // No visible border line
-            ),
-            filled: true, // Add a background fill
-            fillColor: Colors.white, // White background for text fields
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 12,
-              vertical: 12,
-            ), // Adjusted padding
-          ),
-          validator: validator, // Assign the validator function
+      String hint, {
+        TextEditingController? controller,
+        TextInputType? keyboardType,
+      }) =>
+      TextFormField(
+        controller: controller,
+        keyboardType: keyboardType,
+        decoration: InputDecoration(
+          hintText: hint,
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
         ),
-      ],
-    );
-  }
+        validator: (val) => val == null || val.isEmpty ? 'Required' : null,
+      );
 
-  // Helper to build a date input field
-  Widget _buildDateField(
-    TextEditingController controller,
-    VoidCallback onTap,
-    String hintText,
-  ) {
-    return TextFormField(
-      controller: controller,
-      readOnly: true, // Make the text field read-only
-      decoration: InputDecoration(
-        hintText: hintText,
-        hintStyle: TextStyle(color: Colors.grey[500], fontSize: 16),
-        suffixIcon: IconButton(
-          icon: const Icon(
-            Icons.calendar_today,
-            color: Colors.blueAccent,
-          ), // Blue calendar icon
-          onPressed: onTap, // Call the provided onTap function
-        ),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide.none, // No visible border line
-        ),
-        filled: true,
-        fillColor: Colors.white,
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 12,
-          vertical: 12,
-        ),
-      ),
-      onTap: onTap, // Allow tapping the field itself to open date picker
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Please select a date';
-        }
-        return null;
-      },
-    );
-  }
-
-  // Helper to build a standard text label
-  Widget _buildLabel(String text) => Text(
-    text,
-    style: const TextStyle(
-      fontSize: 16, // Slightly smaller label font size
-      fontWeight: FontWeight.w600, // Slightly bolder
-      color: Colors.black87, // Darker text color
-    ),
-  );
-
-  // Helper to build a standard dropdown field (not searchable)
   Widget _buildDropdownField({
     required String? value,
     required List<String> items,
     required ValueChanged<String?> onChanged,
-  }) {
-    return Container(
-      height: 50, // Fixed height for consistency
-      padding: const EdgeInsets.symmetric(horizontal: 12), // Adjusted padding
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10), // Rounded corners
-        border: Border.all(
-          color: Colors.grey.shade300,
-          width: 1,
-        ), // Lighter border
-        color: Colors.white, // White background
-      ),
-      child: DropdownButton<String>(
-        dropdownColor: Colors.white,
-        isExpanded: true, // Expand to fill the container
-        underline: Container(), // Remove the default underline
-        value: value,
-        onChanged: onChanged,
-        items:
-            items
-                .map(
-                  (item) => DropdownMenuItem(
-                    value: item,
-                    child: Text(
-                      item,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        color: Colors.black87,
-                      ), // Darker text color
-                    ),
-                  ),
-                )
-                .toList(),
-      ),
-    );
-  }
+  }) =>
+      Container(
+        height: 48,
+        padding: const EdgeInsets.symmetric(horizontal: 6),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: Colors.grey.shade300, width: 1),
+          color: Colors.white,
+        ),
+        child: DropdownButton<String>(
+          isExpanded: true,
+          value: value,
+          underline: Container(),
+          items: items.map((item) => DropdownMenuItem(value: item, child: Text(item))).toList(),
+          onChanged: onChanged,
+        ),
+      );
 
-  // Helper for navigation
-  void _navigateTo(Widget screen) {
-    Navigator.of(context).push(MaterialPageRoute(builder: (_) => screen));
-  }
-
-  // The original _searchableDropdownField and _iconButton helpers are not used in the current layout
-  // but are kept here in case they are needed elsewhere or for future reference.
-
-  // Widget _searchableDropdownField({
-  //   required String selected,
-  //   required List<String> items,
-  //   required ValueChanged<String?> onChanged,
-  // }) =>
-  //     DropdownSearch<String>(
-  //       items: items,
-  //       selectedItem: selected,
-  //       onChanged: onChanged,
-  //       popupProps: PopupProps.menu(
-  //         showSearchBox: true,
-  //         searchFieldProps: const TextFieldProps(
-  //           decoration: InputDecoration(
-  //             hintText: 'Search...',
-  //             hintStyle: TextStyle(color: Colors.black),
-  //             fillColor: Colors.white,
-  //             filled: true,
-  //             border: OutlineInputBorder(
-  //               borderSide: BorderSide(color: Colors.white),
-  //             ),
-  //             isDense: true,
-  //             contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-  //           ),
-  //         ),
-  //         itemBuilder: (context, item, isSelected) => Padding(
-  //           padding: const EdgeInsets.all(12),
-  //           child: Text(item, style: const TextStyle(color: Colors.black)),
-  //         ),
-  //       ),
-  //       dropdownDecoratorProps: DropDownDecoratorProps(
-  //         dropdownSearchDecoration: InputDecoration(
-  //           hintText: 'Select',
-  //           filled: true,
-  //           fillColor: Colors.white,
-  //           isDense: true,
-  //           contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-  //           border: OutlineInputBorder(
-  //             borderRadius: BorderRadius.circular(10),
-  //             borderSide: BorderSide(color: Colors.grey.shade400),
-  //           ),
-  //         ),
-  //       ),
-  //     );
-
-  // InputDecoration _inputDecoration(String hint, {IconData? suffix}) =>
-  //     InputDecoration(
-  //       hintText: hint,
-  //       contentPadding:
-  //       const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-  //       border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-  //       suffixIcon: suffix != null
-  //           ? IconButton(icon: Icon(suffix), onPressed: _pickDate)
-  //           : null,
-  //     );
-
-  // Widget _iconButton(IconData icon, VoidCallback onPressed) => Container(
-  //   height: 50,
-  //   width: 50,
-  //   decoration: BoxDecoration(
-  //       color: Colors.blue, borderRadius: BorderRadius.circular(10)),
-  //   child: IconButton(
-  //       icon: Icon(icon, color: Colors.white), onPressed: onPressed),
-  // );
+  Widget _buildDateField(TextEditingController controller, VoidCallback onTap, String hint) =>
+      TextFormField(
+        controller: controller,
+        readOnly: true,
+        decoration: InputDecoration(
+          hintText: hint,
+          suffixIcon: IconButton(icon: const Icon(Icons.calendar_today), onPressed: onTap),
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+        ),
+        onTap: onTap,
+        validator: (val) => val == null || val.isEmpty ? 'Select date' : null,
+      );
 }

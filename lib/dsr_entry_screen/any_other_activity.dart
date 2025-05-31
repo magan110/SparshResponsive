@@ -1,7 +1,10 @@
 import 'dart:io';
+import 'dart:convert';                  // ← For JSON & Base64
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:image_picker/image_picker.dart'; // Import image_picker
+import 'package:image_picker/image_picker.dart';
+import 'package:http/http.dart' as http;
+
 import 'package:learning2/dsr_entry_screen/phone_call_with_builder.dart';
 import 'package:learning2/dsr_entry_screen/phone_call_with_unregisterd_purchaser.dart';
 import 'package:learning2/dsr_entry_screen/work_from_home.dart';
@@ -24,11 +27,15 @@ class AnyOtherActivity extends StatefulWidget {
 }
 
 class _AnyOtherActivityState extends State<AnyOtherActivity> {
-  // State variables for dropdowns and date pickers
+  // 1) CONTROLLERS for dropdowns and dates
   String? _processItem = 'Select';
   final List<String> _processdropdownItems = ['Select', 'Add', 'Update'];
 
-  String? _activityItem = 'Any Other Activity';
+  // 2) CONTROLLERS for text fields
+  final TextEditingController _activity1Controller = TextEditingController();
+  final TextEditingController _activity2Controller = TextEditingController();
+  final TextEditingController _activity3Controller = TextEditingController();
+  final TextEditingController _anyOtherPointsController = TextEditingController();
 
   // Controllers for date text fields
   final TextEditingController _dateController = TextEditingController();
@@ -38,42 +45,44 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
   DateTime? _selectedDate;
   DateTime? _selectedReportDate;
 
-  // State variables for image uploads
-  final List<int> _uploadRows = [0]; // Tracks the number of image upload rows
-  final ImagePicker _picker = ImagePicker(); // Initialize ImagePicker
-  final List<File?> _selectedImages = [
-    null,
-  ]; // To hold selected images for each row
+  // 3) Image‐upload state (up to 3)
+  final List<int> _uploadRows = [0];
+  final ImagePicker _picker = ImagePicker();
+  final List<File?> _selectedImages = [null];
 
-  // Global key for the form for validation
+  // Global key for the form (validation)
   final _formKey = GlobalKey<FormState>();
 
   @override
   void dispose() {
-    // Dispose controllers when the widget is removed
     _dateController.dispose();
     _reportDateController.dispose();
+    _activity1Controller.dispose();
+    _activity2Controller.dispose();
+    _activity3Controller.dispose();
+    _anyOtherPointsController.dispose();
     super.dispose();
   }
 
-  // Function to add a new image upload row
+  // ▶️ Add a new image‐upload row (max 3)
   void _addRow() {
+    if (_uploadRows.length >= 3) return; // up to three images only
     setState(() {
-      _uploadRows.add(_uploadRows.length); // Add a new index
-      _selectedImages.add(null); // Add null for the new row's image
+      _uploadRows.add(_uploadRows.length);
+      _selectedImages.add(null);
     });
   }
 
-  // Function to remove the last image upload row
+  // ▶️ Remove the last image‐upload row
   void _removeRow() {
-    if (_uploadRows.length <= 1) return; // Prevent removing the last row
+    if (_uploadRows.length <= 1) return;
     setState(() {
-      _uploadRows.removeLast(); // Remove the last index
-      _selectedImages.removeLast(); // Remove the last image file
+      _uploadRows.removeLast();
+      _selectedImages.removeLast();
     });
   }
 
-  // Function to pick the submission date
+  // ▶️ Pick the submission date
   Future<void> _pickDate() async {
     final now = DateTime.now();
     final picked = await showDatePicker(
@@ -83,16 +92,15 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
       lastDate: DateTime(now.year + 5),
       builder: (context, child) {
         return Theme(
-          // Apply a custom theme for the date picker
           data: ThemeData.light().copyWith(
             colorScheme: const ColorScheme.light(
-              primary: Colors.blueAccent, // Header background color
-              onPrimary: Colors.white, // Header text color
-              onSurface: Colors.black87, // Body text color
+              primary: Colors.blueAccent,
+              onPrimary: Colors.white,
+              onSurface: Colors.black87,
             ),
             dialogTheme: const DialogThemeData(
               backgroundColor: Colors.white,
-            ), // Dialog background
+            ),
           ),
           child: child!,
         );
@@ -101,14 +109,12 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
     if (picked != null) {
       setState(() {
         _selectedDate = picked;
-        _dateController.text = DateFormat(
-          'dd-MM-yy',
-        ).format(picked); // Using a more compact date format
+        _dateController.text = DateFormat('dd-MM-yy').format(picked);
       });
     }
   }
 
-  // Function to pick the report date
+  // ▶️ Pick the report date
   Future<void> _pickReportDate() async {
     final now = DateTime.now();
     final picked = await showDatePicker(
@@ -118,16 +124,15 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
       lastDate: DateTime(now.year + 5),
       builder: (context, child) {
         return Theme(
-          // Apply a custom theme for the date picker
           data: ThemeData.light().copyWith(
             colorScheme: const ColorScheme.light(
-              primary: Colors.blueAccent, // Header background color
-              onPrimary: Colors.white, // Header text color
-              onSurface: Colors.black87, // Body text color
+              primary: Colors.blueAccent,
+              onPrimary: Colors.white,
+              onSurface: Colors.black87,
             ),
             dialogTheme: const DialogThemeData(
               backgroundColor: Colors.white,
-            ), // Dialog background
+            ),
           ),
           child: child!,
         );
@@ -136,50 +141,163 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
     if (picked != null) {
       setState(() {
         _selectedReportDate = picked;
-        _reportDateController.text = DateFormat(
-          'dd-MM-yy',
-        ).format(picked); // Using a more compact date format
+        _reportDateController.text = DateFormat('dd-MM-yy').format(picked);
       });
     }
   }
 
-  // Function to pick an image for a specific row
+  // ▶️ Pick an image for a specific row
   Future<void> _pickImage(int index) async {
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
-
     if (pickedFile != null) {
       setState(() {
         _selectedImages[index] = File(pickedFile.path);
       });
     } else {
-      // Print a message if no image was selected
       print('No image selected for row $index.');
     }
   }
 
-  // Function to show a dialog with the selected image
+  // ▶️ Show a full‐screen dialog with the selected image
   void _showImageDialog(File imageFile) {
     showDialog(
       context: context,
       builder: (context) {
         return Dialog(
-          // Use a Dialog widget for a modal popup
           child: Container(
-            width:
-                MediaQuery.of(context).size.width * 0.8, // 80% of screen width
-            height:
-                MediaQuery.of(context).size.height *
-                0.6, // 60% of screen height
+            width: MediaQuery.of(context).size.width * 0.8,
+            height: MediaQuery.of(context).size.height * 0.6,
             decoration: BoxDecoration(
               image: DecorationImage(
-                fit: BoxFit.contain, // Fit the image within the container
-                image: FileImage(imageFile), // Load image from file
+                fit: BoxFit.contain,
+                image: FileImage(imageFile),
               ),
             ),
           ),
         );
       },
     );
+  }
+
+  // ▶️ Submit the data to the API.
+  //
+  // If [exitAfter] is true, pop back after a successful post.
+  // If [exitAfter] is false, clear the form for a new entry.
+  Future<void> _submitData(bool exitAfter) async {
+    if (!_formKey.currentState!.validate()) {
+      print("Form is invalid; skipping submit.");
+      return;
+    }
+
+    // Build valid 'yyyy-MM-dd' strings for submdate & repodate (or default to today)
+    final now = DateTime.now();
+    final String submdateStr = (_selectedDate != null)
+        ? DateFormat('yyyy-MM-dd').format(_selectedDate!)
+        : DateFormat('yyyy-MM-dd').format(now);
+    final String repodateStr = (_selectedReportDate != null)
+        ? DateFormat('yyyy-MM-dd').format(_selectedReportDate!)
+        : DateFormat('yyyy-MM-dd').format(now);
+
+    // 1) Gather all fields into a Map, matching your table’s column names
+    final Map<String, dynamic> payload = {
+      "Proctype": _processItem ?? "",
+      "Submdate": submdateStr,
+      "Repodate": repodateStr,
+      "Actdetl1": _activity1Controller.text.trim(),
+      "Actdetl2": _activity2Controller.text.trim(),
+      "Actdetl3": _activity3Controller.text.trim(),
+      "Othrnote": _anyOtherPointsController.text.trim(),
+      // For images, we always send exactly three keys:
+      "Imgfirst": _getBase64AtIndex(0),
+      "Imgscndd": _getBase64AtIndex(1),
+      "Imgthird": _getBase64AtIndex(2),
+    };
+
+    print("Payload JSON:\n${jsonEncode(payload)}");
+
+    // 2) Send HTTP POST (use http:// if no valid SSL certificate)
+    final uri = Uri.parse("https://qa.birlawhite.com:55232/api/dsranyactiv/submit");
+    print("Posting to: $uri");
+
+    try {
+      final response = await http.post(
+        uri,
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode(payload),
+      );
+
+      print("HTTP Status Code: ${response.statusCode}");
+      print("HTTP Response Body: ${response.body}");
+
+      if (response.statusCode == 200) {
+        if (exitAfter) {
+          if (!mounted) return;
+          print("Success → exiting screen...");
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Submitted successfully. Exiting...")),
+          );
+          Navigator.of(context).pop();
+        } else {
+          if (!mounted) return;
+          print("Success → resetting form for new entry...");
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Submitted successfully. Ready for new entry.")),
+          );
+          _resetForm();
+        }
+      } else {
+        print("Server returned an error code: ${response.statusCode}");
+        print("Error Body: ${response.body}");
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("Error ${response.statusCode}: ${response.body}")),
+          );
+        }
+      }
+    } catch (error, stack) {
+      print("EXCEPTION in _submitData: $error");
+      print(stack);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Submission failed: $error")),
+        );
+      }
+    }
+  }
+
+  // Helper to return a Base64‐encoded string for the image at [index],
+  // or "" if that slot is empty or out of range.
+  String _getBase64AtIndex(int index) {
+    if (index < _selectedImages.length && _selectedImages[index] != null) {
+      final bytes = _selectedImages[index]!.readAsBytesSync();
+      final base64Str = base64Encode(bytes);
+      print("→ Base64 length for image #${index + 1}: ${base64Str.length}");
+      return base64Str;
+    }
+    print("→ No image for slot #${index + 1}; sending empty string.");
+    return "";
+  }
+
+  // ▶️ Clear all fields (for “Submit & New”)
+  void _resetForm() {
+    setState(() {
+      _processItem = 'Select';
+      _dateController.clear();
+      _reportDateController.clear();
+      _selectedDate = null;
+      _selectedReportDate = null;
+      _activity1Controller.clear();
+      _activity2Controller.clear();
+      _activity3Controller.clear();
+      _anyOtherPointsController.clear();
+      // Reset image rows to a single slot with null
+      _uploadRows
+        ..clear()
+        ..add(0);
+      _selectedImages
+        ..clear()
+        ..add(null);
+    });
   }
 
   @override
@@ -190,7 +308,6 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
         appBar: AppBar(
           leading: IconButton(
             onPressed: () {
-              // Navigate back to the DsrEntry screen
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => const DsrEntry()),
@@ -239,12 +356,12 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
               key: _formKey,
               child: ListView(
                 children: [
-                  // Enhanced Instructions Section
+                  // ————— Enhanced Instructions Section —————
                   AppTheme.buildSectionCard(
                     title: 'Activity Information',
                     icon: Icons.info_outline,
                     children: [
-                      // Process Type Dropdown with enhanced styling
+                      // Process Type Dropdown
                       AppTheme.buildLabel('Process Type'),
                       const SizedBox(height: 8),
                       DropdownButtonFormField<String>(
@@ -263,29 +380,24 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
                           isCollapsed: true,
                         ),
                         isExpanded: true,
-                        items:
-                            _processdropdownItems
-                                .map(
-                                  (item) => DropdownMenuItem<String>(
-                                    value: item,
-                                    child: Container(
-                                      constraints: const BoxConstraints(
-                                        maxWidth: 250,
-                                      ),
-                                      child: Text(
-                                        item,
-                                        overflow: TextOverflow.ellipsis,
-                                        maxLines: 1,
-                                        style: const TextStyle(fontSize: 14),
-                                      ),
-                                    ),
-                                  ),
-                                )
-                                .toList(),
+                        items: _processdropdownItems
+                            .map(
+                              (item) => DropdownMenuItem<String>(
+                            value: item,
+                            child: Container(
+                              constraints: const BoxConstraints(maxWidth: 250),
+                              child: Text(
+                                item,
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                                style: const TextStyle(fontSize: 14),
+                              ),
+                            ),
+                          ),
+                        )
+                            .toList(),
                         onChanged: (val) {
-                          if (val != null) {
-                            setState(() => _processItem = val);
-                          }
+                          if (val != null) setState(() => _processItem = val);
                         },
                         validator: (value) {
                           if (value == null || value == 'Select') {
@@ -295,13 +407,13 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
                         },
                       ),
 
-                      // Date Fields Section
+                      // ——— Date Fields Section ———
                       const SizedBox(height: 16),
                       AppTheme.buildSectionCard(
                         title: 'Date Information',
                         icon: Icons.calendar_today,
                         children: [
-                          // Submission Date Field
+                          // Submission Date
                           AppTheme.buildLabel('Submission Date'),
                           const SizedBox(height: 8),
                           AppTheme.buildDateField(
@@ -311,7 +423,7 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
                             'Select Date',
                           ),
 
-                          // Report Date Field
+                          // Report Date
                           const SizedBox(height: 16),
                           AppTheme.buildLabel('Report Date'),
                           const SizedBox(height: 8),
@@ -324,7 +436,7 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
                         ],
                       ),
 
-                      // Activity Details Section Header
+                      // ——— Activity Details Section ———
                       Container(
                         margin: const EdgeInsets.only(bottom: 16),
                         child: Row(
@@ -353,20 +465,20 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
                           ],
                         ),
                       ),
-                      // Activity Details Text Fields
-                      _buildTextField('Activity Details 1'),
-                      const SizedBox(
-                        height: 16,
-                      ), // Consistent spacing between text fields
-                      _buildTextField('Activity Details 2'),
+                      // Text field for Activity Details 1
+                      _buildTextField('Activity Details 1', _activity1Controller),
                       const SizedBox(height: 16),
-                      _buildTextField('Activity Details 3'),
+                      // Text field for Activity Details 2
+                      _buildTextField('Activity Details 2', _activity2Controller),
                       const SizedBox(height: 16),
-                      _buildTextField('Any Other Points'),
-                      const SizedBox(
-                        height: 24,
-                      ), // Increased spacing before image upload
-                      // Image Upload Section - Enhanced UI
+                      // Text field for Activity Details 3
+                      _buildTextField('Activity Details 3', _activity3Controller),
+                      const SizedBox(height: 16),
+                      // Text field for Any Other Points
+                      _buildTextField('Any Other Points', _anyOtherPointsController),
+                      const SizedBox(height: 24),
+
+                      // ——— Image Upload Section ———
                       Container(
                         margin: const EdgeInsets.only(top: 8, bottom: 16),
                         padding: const EdgeInsets.all(16),
@@ -413,7 +525,7 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
                               ),
                             ),
                             const SizedBox(height: 16),
-                            // Image upload rows with enhanced UI
+                            // Dynamically generate up to three upload rows
                             ...List.generate(_uploadRows.length, (index) {
                               final i = _uploadRows[index];
                               return Container(
@@ -423,10 +535,9 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
                                   color: Colors.grey.shade50,
                                   borderRadius: BorderRadius.circular(12),
                                   border: Border.all(
-                                    color:
-                                        _selectedImages[i] != null
-                                            ? Colors.green.shade200
-                                            : Colors.grey.shade200,
+                                    color: _selectedImages[i] != null
+                                        ? Colors.green.shade200
+                                        : Colors.grey.shade200,
                                     width: 1.5,
                                   ),
                                 ),
@@ -441,11 +552,8 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
                                             vertical: 4,
                                           ),
                                           decoration: BoxDecoration(
-                                            color: Colors.blueAccent
-                                                .withOpacity(0.1),
-                                            borderRadius: BorderRadius.circular(
-                                              20,
-                                            ),
+                                            color: Colors.blueAccent.withOpacity(0.1),
+                                            borderRadius: BorderRadius.circular(20),
                                           ),
                                           child: Text(
                                             'Document ${index + 1}',
@@ -465,8 +573,7 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
                                             ),
                                             decoration: BoxDecoration(
                                               color: Colors.green.shade100,
-                                              borderRadius:
-                                                  BorderRadius.circular(20),
+                                              borderRadius: BorderRadius.circular(20),
                                             ),
                                             child: const Row(
                                               mainAxisSize: MainAxisSize.min,
@@ -491,27 +598,18 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
                                       ],
                                     ),
                                     const SizedBox(height: 16),
-                                    // Preview of the image if selected
                                     if (_selectedImages[i] != null)
                                       GestureDetector(
-                                        onTap:
-                                            () => _showImageDialog(
-                                              _selectedImages[i]!,
-                                            ),
+                                        onTap: () =>
+                                            _showImageDialog(_selectedImages[i]!),
                                         child: Container(
                                           height: 120,
                                           width: double.infinity,
-                                          margin: const EdgeInsets.only(
-                                            bottom: 16,
-                                          ),
+                                          margin: const EdgeInsets.only(bottom: 16),
                                           decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.circular(
-                                              8,
-                                            ),
+                                            borderRadius: BorderRadius.circular(8),
                                             image: DecorationImage(
-                                              image: FileImage(
-                                                _selectedImages[i]!,
-                                              ),
+                                              image: FileImage(_selectedImages[i]!),
                                               fit: BoxFit.cover,
                                             ),
                                           ),
@@ -521,9 +619,7 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
                                               margin: const EdgeInsets.all(8),
                                               padding: const EdgeInsets.all(4),
                                               decoration: BoxDecoration(
-                                                color: Colors.black.withOpacity(
-                                                  0.6,
-                                                ),
+                                                color: Colors.black.withOpacity(0.6),
                                                 shape: BoxShape.circle,
                                               ),
                                               child: const Icon(
@@ -553,19 +649,16 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
                                             ),
                                             style: ElevatedButton.styleFrom(
                                               foregroundColor: Colors.white,
-                                              backgroundColor:
-                                                  _selectedImages[i] != null
-                                                      ? Colors.amber.shade600
-                                                      : AppTheme.primaryColor,
+                                              backgroundColor: _selectedImages[i] != null
+                                                  ? Colors.amber.shade600
+                                                  : AppTheme.primaryColor,
                                               elevation: 0,
                                               shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
+                                                borderRadius: BorderRadius.circular(10),
                                               ),
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                    vertical: 12,
-                                                  ),
+                                              padding: const EdgeInsets.symmetric(
+                                                vertical: 12,
+                                              ),
                                             ),
                                           ),
                                         ),
@@ -573,10 +666,8 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
                                           const SizedBox(width: 8),
                                           Expanded(
                                             child: ElevatedButton.icon(
-                                              onPressed:
-                                                  () => _showImageDialog(
-                                                    _selectedImages[i]!,
-                                                  ),
+                                              onPressed: () =>
+                                                  _showImageDialog(_selectedImages[i]!),
                                               icon: const Icon(
                                                 Icons.visibility,
                                                 size: 18,
@@ -584,17 +675,14 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
                                               label: const Text('View'),
                                               style: ElevatedButton.styleFrom(
                                                 foregroundColor: Colors.white,
-                                                backgroundColor:
-                                                    AppTheme.successColor,
+                                                backgroundColor: AppTheme.successColor,
                                                 elevation: 0,
                                                 shape: RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(10),
+                                                  borderRadius: BorderRadius.circular(10),
                                                 ),
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                      vertical: 12,
-                                                    ),
+                                                padding: const EdgeInsets.symmetric(
+                                                  vertical: 12,
+                                                ),
                                               ),
                                             ),
                                           ),
@@ -605,7 +693,7 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
                                 ),
                               );
                             }),
-                            // Add/Remove buttons in a row at the bottom
+                            // Add/Remove row buttons (max 3)
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
@@ -616,10 +704,9 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
                                     size: 20,
                                   ),
                                   label: const Text('Document'),
-                                  style:
-                                      Theme.of(
-                                        context,
-                                      ).elevatedButtonTheme.style,
+                                  style: Theme.of(context)
+                                      .elevatedButtonTheme
+                                      .style,
                                 ),
                                 const SizedBox(width: 12),
                                 if (_uploadRows.length > 1)
@@ -633,10 +720,11 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
                                     style: ElevatedButton.styleFrom(
                                       foregroundColor: Colors.white,
                                       backgroundColor:
-                                          AppTheme.dangerButtonColor,
+                                      AppTheme.dangerButtonColor,
                                       elevation: 0,
                                       shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(10),
+                                        borderRadius:
+                                        BorderRadius.circular(10),
                                       ),
                                       padding: const EdgeInsets.symmetric(
                                         horizontal: 16,
@@ -649,17 +737,15 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
                           ],
                         ),
                       ),
-                      const SizedBox(
-                        height: 30,
-                      ), // Increased spacing before buttons
-                      // Submit Buttons - Enhanced UI
+                      const SizedBox(height: 30),
+
+                      // ——— Submit Buttons ———
                       Container(
                         padding: const EdgeInsets.all(20),
                         decoration: AppTheme.cardDecoration,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            // Section title
                             Row(
                               children: [
                                 const Icon(
@@ -670,10 +756,9 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
                                 const SizedBox(width: 8),
                                 Text(
                                   'Submit Your Activity',
-                                  style:
-                                      Theme.of(
-                                        context,
-                                      ).textTheme.headlineMedium,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .headlineMedium,
                                 ),
                               ],
                             ),
@@ -684,36 +769,24 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
                             ),
                             const SizedBox(height: 20),
 
-                            // Submit & New Button
+                            // ▶️ Submit & New
                             ElevatedButton.icon(
-                              onPressed: () {
-                                // TODO: implement submit and new logic
-                                if (_formKey.currentState!.validate()) {
-                                  // Process form data
-                                  print('Form is valid. Submit and New.');
-                                }
-                              },
-                              icon: const Icon(Icons.save_outlined, size: 20),
+                              onPressed: () => _submitData(false),
+                              icon:
+                              const Icon(Icons.save_outlined, size: 20),
                               label: const Text('Submit & New'),
-                              style:
-                                  Theme.of(context).elevatedButtonTheme.style,
+                              style: Theme.of(context)
+                                  .elevatedButtonTheme
+                                  .style,
                             ),
 
                             const SizedBox(height: 16),
 
-                            // Submit & Exit Button
+                            // ▶️ Submit & Exit
                             ElevatedButton.icon(
-                              onPressed: () {
-                                // TODO: implement submit and exit logic
-                                if (_formKey.currentState!.validate()) {
-                                  // Process form data
-                                  print('Form is valid. Submit and Exit.');
-                                }
-                              },
-                              icon: const Icon(
-                                Icons.check_circle_outline,
-                                size: 20,
-                              ),
+                              onPressed: () => _submitData(true),
+                              icon: const Icon(Icons.check_circle_outline,
+                                  size: 20),
                               label: const Text('Submit & Exit'),
                               style: ElevatedButton.styleFrom(
                                 foregroundColor: Colors.white,
@@ -731,10 +804,9 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
 
                             const SizedBox(height: 16),
 
-                            // View Submitted Data Button
+                            // ▶️ View Submitted Data
                             OutlinedButton.icon(
                               onPressed: () {
-                                // TODO: implement view submitted data logic
                                 print('View Submitted Data button pressed');
                               },
                               icon: const Icon(
@@ -742,13 +814,14 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
                                 size: 20,
                               ),
                               label: const Text('View Submitted Data'),
-                              style:
-                                  Theme.of(context).outlinedButtonTheme.style,
+                              style: Theme.of(context)
+                                  .outlinedButtonTheme
+                                  .style,
                             ),
                           ],
                         ),
                       ),
-                      const SizedBox(height: 20), // Spacing at the bottom
+                      const SizedBox(height: 20),
                     ],
                   ),
                 ],
@@ -760,15 +833,16 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
     );
   }
 
-  // --- Helper Methods for Building Widgets ---
+  // === HELPERS ===
 
-  // Helper to build a standard text field with enhanced styling
-  Widget _buildTextField(String label) {
+  // Build a multi-line TextFormField with a controller
+  Widget _buildTextField(
+      String label, TextEditingController controller) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildLabel(label), // Use the helper for label
-        const SizedBox(height: 8), // Consistent spacing
+        _buildLabel(label),
+        const SizedBox(height: 8),
         Container(
           decoration: BoxDecoration(
             boxShadow: [
@@ -782,7 +856,8 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
             borderRadius: BorderRadius.circular(12),
           ),
           child: TextFormField(
-            maxLines: 3, // Allow multiple lines
+            controller: controller,
+            maxLines: 3,
             style: const TextStyle(fontSize: 16),
             decoration: InputDecoration(
               hintText: label,
@@ -802,7 +877,8 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: Colors.grey.shade200, width: 1),
+                borderSide:
+                BorderSide(color: Colors.grey.shade200, width: 1),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -818,20 +894,12 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
                 vertical: 16,
               ),
             ),
-            // Add validator if the field is required
-            // validator: (value) {
-            //   if (value == null || value.isEmpty) {
-            //     return 'Please enter $label';
-            //   }
-            //   return null;
-            // },
           ),
         ),
       ],
     );
   }
 
-  // Helper to get appropriate icon for text field based on label
   IconData _getIconForLabel(String label) {
     if (label.contains('Activity Details 1')) {
       return Icons.assignment;
@@ -846,130 +914,5 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
     }
   }
 
-  // Helper to build a date input field with enhanced styling
-  Widget _buildDateField(
-    TextEditingController controller,
-    VoidCallback onTap,
-    String hintText,
-  ) {
-    return AppTheme.buildDateField(context, controller, onTap, hintText);
-  }
-
-  // Helper to build a standard text label
   Widget _buildLabel(String text) => AppTheme.buildLabel(text);
-
-  // Helper to build a standard dropdown field with enhanced styling
-  Widget _buildDropdownField({
-    required String? value,
-    required List<String> items,
-    required ValueChanged<String?> onChanged,
-  }) {
-    return DropdownButtonFormField<String>(
-      value: value,
-      decoration: InputDecoration(
-        filled: true,
-        fillColor: Colors.grey[100],
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide.none,
-        ),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 12,
-        ),
-        isCollapsed: true,
-      ),
-      isExpanded: true,
-      items:
-          items
-              .map(
-                (item) => DropdownMenuItem<String>(
-                  value: item,
-                  child: Container(
-                    constraints: const BoxConstraints(maxWidth: 250),
-                    child: Text(
-                      item,
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
-                      style: const TextStyle(fontSize: 14),
-                    ),
-                  ),
-                ),
-              )
-              .toList(),
-      onChanged: onChanged,
-    );
-  }
-
-  // Helper for navigation
-  void _navigateTo(Widget screen) {
-    Navigator.of(context).push(MaterialPageRoute(builder: (_) => screen));
-  }
-
-  // The original _searchableDropdownField and _iconButton helpers are not used in the current layout
-  // but are kept here in case they are needed elsewhere or for future reference.
-
-  // Widget _searchableDropdownField({
-  //   required String selected,
-  //   required List<String> items,
-  //   required ValueChanged<String?> onChanged,
-  // }) =>
-  //     DropdownSearch<String>(
-  //       items: items,
-  //       selectedItem: selected,
-  //       onChanged: onChanged,
-  //       popupProps: PopupProps.menu(
-  //         showSearchBox: true,
-  //         searchFieldProps: const TextFieldProps(
-  //           decoration: InputDecoration(
-  //             hintText: 'Search...',
-  //             hintStyle: TextStyle(color: Colors.black),
-  //             fillColor: Colors.white,
-  //             filled: true,
-  //             border: OutlineInputBorder(
-  //               borderSide: BorderSide(color: Colors.white),
-  //             ),
-  //             isDense: true,
-  //             contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-  //           ),
-  //         ),
-  //         itemBuilder: (context, item, isSelected) => Padding(
-  //           padding: const EdgeInsets.all(12),
-  //           child: Text(item, style: const TextStyle(color: Colors.black)),
-  //         ),
-  //       ),
-  //       dropdownDecoratorProps: DropDownDecoratorProps(
-  //         dropdownSearchDecoration: InputDecoration(
-  //           hintText: 'Select',
-  //           filled: true,
-  //           fillColor: Colors.white,
-  //           isDense: true,
-  //           contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-  //           border: OutlineInputBorder(
-  //             borderRadius: BorderRadius.circular(10),
-  //             borderSide: BorderSide(color: Colors.grey.shade400),
-  //           ),
-  //         ),
-  //       ),
-  //     );
-
-  // InputDecoration _inputDecoration(String hint, {IconData? suffix}) =>
-  //     InputDecoration(
-  //       hintText: hint,
-  //       contentPadding:
-  //       const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-  //       border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-  //       suffixIcon: suffix != null
-  //           ? IconButton(icon: Icon(suffix), onPressed: _pickDate)
-  //           : null,
-  //     );
-
-  // Widget _iconButton(IconData icon, VoidCallback onPressed) => Container(
-  //   height: 50,
-  //   width: 50,
-  //   decoration: BoxDecoration(
-  //       color: Colors.blue, borderRadius: BorderRadius.circular(10)),
-  //   child: IconButton(
-  //       icon: Icon(icon, color: Colors.white), onPressed: onPressed),
-  // );
 }

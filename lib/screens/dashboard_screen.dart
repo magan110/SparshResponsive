@@ -223,32 +223,7 @@ class PrimarySaleScreen extends StatelessWidget {
                   ),
                   rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
                   topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                  bottomTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: true,
-                      reservedSize: 38,
-                      getTitlesWidget: (value, meta) {
-                        if (value.toInt() >= 0 && value.toInt() < _products.length) {
-                          final prod = _products[value.toInt()];
-                          return Padding(
-                            padding: const EdgeInsets.only(top: 2.0, left: 1, right: 1),
-                            child: Text(
-                              prod.name,
-                              style: GoogleFonts.poppins(
-                                fontSize: 9,
-                                fontWeight: FontWeight.w600,
-                                color: prod.color,
-                              ),
-                              textAlign: TextAlign.center,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          );
-                        }
-                        return const SizedBox();
-                      },
-                    ),
-                  ),
+                  bottomTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
                 ),
                 borderData: FlBorderData(show: false),
                 scatterTouchData: ScatterTouchData(
@@ -270,22 +245,29 @@ class PrimarySaleScreen extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: 10),
-          ..._products.map((prod) {
-            return Padding(
-              padding: const EdgeInsets.symmetric(vertical: 3.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(prod.name.replaceAll('\n', ' '), style: GoogleFonts.poppins(fontSize: 13, color: Colors.black)),
-                  Text(
-                    prod.value.toStringAsFixed(3),
-                    style: GoogleFonts.poppins(fontWeight: FontWeight.w600, fontSize: 14, color: prod.color),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 8,
+            runSpacing: 4,
+            children: _products.map((prod) {
+              return Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: prod.color.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: prod.color.withOpacity(0.3)),
+                ),
+                child: Text(
+                  prod.name.replaceAll('\n', ' '),
+                  style: GoogleFonts.poppins(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w500,
+                    color: prod.color,
                   ),
-                ],
-              ),
-            );
-          }).toList(),
+                ),
+              );
+            }).toList(),
+          ),
         ],
       ),
     );
@@ -328,32 +310,7 @@ class SecondarySaleScreen extends StatelessWidget {
                 ),
                 titlesData: FlTitlesData(
                   show: true,
-                  bottomTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: true,
-                      reservedSize: 38,
-                      getTitlesWidget: (value, meta) {
-                        if (value.toInt() >= 0 && value.toInt() < _products.length) {
-                          final prod = _products[value.toInt()];
-                          return Padding(
-                            padding: const EdgeInsets.only(top: 2.0, left: 1, right: 1),
-                            child: Text(
-                              prod.name,
-                              style: GoogleFonts.poppins(
-                                fontSize: 9,
-                                fontWeight: FontWeight.w600,
-                                color: prod.color,
-                              ),
-                              textAlign: TextAlign.center,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          );
-                        }
-                        return const SizedBox();
-                      },
-                    ),
-                  ),
+                  bottomTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
                   leftTitles: AxisTitles(
                     sideTitles: SideTitles(
                       showTitles: true,
@@ -416,23 +373,29 @@ class SecondarySaleScreen extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: 10),
-          ..._products.map((prod) {
-            return Padding(
-              padding: const EdgeInsets.symmetric(vertical: 3.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(prod.name.replaceAll('\n', ' '), style: GoogleFonts.poppins(fontSize: 13, color: Colors.black)),
-                  Text(
-                    prod.value.toStringAsFixed(3),
-                    style: GoogleFonts.poppins(
-                        fontWeight: FontWeight.w600, fontSize: 14, color: prod.color),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 8,
+            runSpacing: 4,
+            children: _products.map((prod) {
+              return Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: prod.color.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: prod.color.withOpacity(0.3)),
+                ),
+                child: Text(
+                  prod.name.replaceAll('\n', ' '),
+                  style: GoogleFonts.poppins(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w500,
+                    color: prod.color,
                   ),
-                ],
-              ),
-            );
-          }).toList(),
+                ),
+              );
+            }).toList(),
+          ),
         ],
       ),
     );

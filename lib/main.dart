@@ -48,7 +48,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'SPARSH',
       theme: AppTheme.lightTheme,
-      home: const StaffHomeScreen(),
+      home: const HomeScreen(),
     );
   }
 }

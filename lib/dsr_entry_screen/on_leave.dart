@@ -1,836 +1,349 @@
-import 'dart:io'; // Import for File
+import 'dart:io';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:image_picker/image_picker.dart'; // Import the image_picker package
-import '../theme/app_theme.dart'; // Import AppTheme
+import 'package:image_picker/image_picker.dart';
+import 'package:http/http.dart' as http;
 
-// Ensure these imports are correct based on your project structure
-import 'Meeting_with_new_purchaser.dart';
-import 'Meetings_With_Contractor.dart';
-import 'any_other_activity.dart';
-import 'btl_activites.dart';
-import 'check_sampling_at_site.dart';
-import 'dsr_entry.dart'; // Assuming DsrEntry is the main entry point
-import 'dsr_retailer_in_out.dart';
-import 'internal_team_meeting.dart';
-import 'office_work.dart';
-// This is the current file, keep it
-import 'phone_call_with_builder.dart';
-import 'phone_call_with_unregisterd_purchaser.dart';
-import 'work_from_home.dart';
-// Assuming HomeScreen is not directly navigated to from here, but keep if needed
-// import 'package:learning2/screens/Home_screen.dart';
+import '../theme/app_theme.dart';
+import 'dsr_entry.dart';
 
 class OnLeave extends StatefulWidget {
   const OnLeave({super.key});
-
   @override
   State<OnLeave> createState() => _OnLeaveState();
 }
 
 class _OnLeaveState extends State<OnLeave> {
-  // State variables for dropdowns and date pickers
+  final _formKey = GlobalKey<FormState>();
+
   String? _processItem = 'Select';
   final List<String> _processdropdownItems = ['Select', 'Add', 'Update'];
 
-
-  // Controllers for date text fields
-  final TextEditingController _submissionDateController =
-      TextEditingController(); // Renamed for clarity
+  final TextEditingController _submissionDateController = TextEditingController();
   final TextEditingController _reportDateController = TextEditingController();
+  final TextEditingController _remarksController = TextEditingController();
 
-  // State variables to hold selected dates
-  DateTime? _selectedSubmissionDate; // Renamed for clarity
-  DateTime? _selectedReportDate;
-
-  // Lists for image uploads
-  final List<int> _uploadRows = [0]; // Tracks the number of image upload rows
-  final ImagePicker _picker = ImagePicker(); // Initialize ImagePicker
-  // List to hold selected image files for each row
-  final List<File?> _selectedImages = [
-    null,
-  ]; // Initialize with null for the first row
-
-  // Global key for the form for validation
-  final _formKey = GlobalKey<FormState>();
+  List<File?> _selectedImages = [null];
 
   @override
   void dispose() {
-    // Dispose controllers when the widget is removed
     _submissionDateController.dispose();
     _reportDateController.dispose();
+    _remarksController.dispose();
     super.dispose();
   }
 
-  // Function to pick the submission date
   Future<void> _pickSubmissionDate() async {
     final now = DateTime.now();
     final picked = await showDatePicker(
       context: context,
-      initialDate: _selectedSubmissionDate ?? now,
+      initialDate: now,
       firstDate: DateTime(1900),
       lastDate: DateTime(now.year + 5),
-      builder: (context, child) {
-        return Theme(
-          // Apply a custom theme for the date picker
-          data: ThemeData.light().copyWith(
-            colorScheme: const ColorScheme.light(
-              primary: AppTheme.primaryColor, // Header background color
-              onPrimary: Colors.white, // Header text color
-              onSurface: Colors.black87, // Body text color
-            ),
-            dialogTheme: const DialogThemeData(
-              backgroundColor: Colors.white,
-            ), // Dialog background
-          ),
-          child: child!,
-        );
-      },
     );
     if (picked != null) {
       setState(() {
-        _selectedSubmissionDate = picked;
-        _submissionDateController.text = DateFormat(
-          'yyyy-MM-dd',
-        ).format(picked);
+        _submissionDateController.text = DateFormat('yyyy-MM-dd').format(picked);
       });
     }
   }
 
-  // Function to pick the report date
   Future<void> _pickReportDate() async {
     final now = DateTime.now();
     final picked = await showDatePicker(
       context: context,
-      initialDate: _selectedReportDate ?? now,
+      initialDate: now,
       firstDate: DateTime(1900),
       lastDate: DateTime(now.year + 5),
-      builder: (context, child) {
-        return Theme(
-          // Apply a custom theme for the date picker
-          data: ThemeData.light().copyWith(
-            colorScheme: const ColorScheme.light(
-              primary: AppTheme.primaryColor, // Header background color
-              onPrimary: Colors.white, // Header text color
-              onSurface: Colors.black87, // Body text color
-            ),
-            dialogTheme: const DialogThemeData(
-              backgroundColor: Colors.white,
-            ), // Dialog background
-          ),
-          child: child!,
-        );
-      },
     );
     if (picked != null) {
       setState(() {
-        _selectedReportDate = picked;
         _reportDateController.text = DateFormat('yyyy-MM-dd').format(picked);
       });
     }
   }
 
-  // Function to add a new image upload row
-  void _addRow() {
-    setState(() {
-      _uploadRows.add(_uploadRows.length); // Add a new index
-      _selectedImages.add(null); // Add null for the new row's image
-    });
-  }
-
-  // Function to remove the last image upload row
-  void _removeRow() {
-    if (_uploadRows.length <= 1) return; // Prevent removing the last row
-    setState(() {
-      _uploadRows.removeLast(); // Remove the last index
-      _selectedImages.removeLast(); // Remove the last image entry
-    });
-  }
-
-  // Function to handle image picking for a specific row
   Future<void> _pickImage(int index) async {
-    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
-
+    final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       setState(() {
         _selectedImages[index] = File(pickedFile.path);
       });
-    } else {
-      print('No image selected for row $index.'); // Important for debugging
     }
   }
 
-  // Function to show the selected image in a dialog
   void _showImageDialog(File imageFile) {
     showDialog(
       context: context,
-      builder: (context) {
-        return Dialog(
-          // Use a Dialog widget for a modal popup
-          child: Container(
-            width:
-                MediaQuery.of(context).size.width * 0.8, // 80% of screen width
-            height:
-                MediaQuery.of(context).size.height *
-                0.6, // 60% of screen height
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                fit: BoxFit.contain, // Fit the image within the container
-                image: FileImage(imageFile), // Load image from file
-              ),
-            ),
-          ),
+      builder: (context) => Dialog(
+        child: Image.file(imageFile, fit: BoxFit.contain),
+      ),
+    );
+  }
+
+  Future<String> fileToBase64(File? file) async {
+    if (file == null) return "";
+    final bytes = await file.readAsBytes();
+    return base64Encode(bytes);
+  }
+
+  Future<void> _submitForm({bool exitAfter = false}) async {
+    if (!_formKey.currentState!.validate()) return;
+
+    final imgfirst = await fileToBase64(_selectedImages.length > 0 ? _selectedImages[0] : null);
+    final imgscndd = await fileToBase64(_selectedImages.length > 1 ? _selectedImages[1] : null);
+    final imgthird = await fileToBase64(_selectedImages.length > 2 ? _selectedImages[2] : null);
+
+    final Map<String, dynamic> payload = {
+      'proctype': _processItem ?? '',
+      'submdate': _submissionDateController.text,
+      'repodate': _reportDateController.text,
+      'remarksc': _remarksController.text,
+      'imgfirst': imgfirst,
+      'imgscndd': imgscndd,
+      'imgthird': imgthird,
+    };
+
+    try {
+      final response = await http.post(
+        Uri.parse('https://qa.birlawhite.com:55232/api/dsroffleave/submit'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(payload),
+      );
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Submitted!'), backgroundColor: Colors.green),
         );
-      },
-    );
+        if (exitAfter) Navigator.of(context).pop();
+        else _clearForm();
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: ${response.body}'), backgroundColor: Colors.red),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Network error: $e'), backgroundColor: Colors.red),
+      );
+    }
   }
 
-  // Helper for navigation (similar to other DSR screens)
-  void _navigateTo(Widget screen) {
-    Navigator.of(context).push(MaterialPageRoute(builder: (_) => screen));
-  }
-
-  // Helper method to show a success dialog
-  void _showSuccessDialog(String message) {
-    showDialog(
-      context: context,
-      builder:
-          (context) => AlertDialog(
-            title: const Text('Success'),
-            content: Text(message),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: const Text('OK'),
-              ),
-            ],
-          ),
-    );
+  void _clearForm() {
+    setState(() {
+      _processItem = 'Select';
+      _submissionDateController.clear();
+      _reportDateController.clear();
+      _remarksController.clear();
+      _selectedImages = [null];
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        backgroundColor: AppTheme.scaffoldBackgroundColor, // Match dsr_entry background
-        appBar: AppBar(
-          leading: IconButton(
-            onPressed: () {
-              // Navigate back to the DsrEntry screen
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const DsrEntry()),
-              );
-            },
-            icon: const Icon(
-              Icons.arrow_back_ios_new, // Match dsr_entry icon
-              color: Colors.white,
-            ),
-          ),
-          title: const Text(
-            'DSR Entry',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 0.5, // Match dsr_entry style
-            ),
-          ),
-          backgroundColor: AppTheme.primaryColor,
-          elevation: 0, // Flat design
-          shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.only(
-              bottomLeft: Radius.circular(15),
-              bottomRight: Radius.circular(15),
-            ),
-          ),
+    return Scaffold(
+      backgroundColor: AppTheme.scaffoldBackgroundColor,
+      appBar: AppBar(
+        leading: IconButton(
+          onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const DsrEntry())),
+          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
         ),
-        body: Padding(
-          padding: const EdgeInsets.all(16.0), // Reduced padding slightly
-          child: Form(
-            key: _formKey, // Assign the form key
-            child: ListView(
-              children: [
-                // Instructions Section
-                const Text(
-                  'Instructions',
-                  style: TextStyle(
-                    fontSize: 24, // Adjusted font size
-                    fontWeight: FontWeight.bold,
-                    color: Colors.blueAccent, // Match AppBar color
-                  ),
-                ),
-                const SizedBox(height: 24), // Increased spacing
-                // Process Type Dropdown
-                _buildLabel('Process type'),
-                const SizedBox(height: 8), // Reduced spacing below label
-                _buildDropdownField(
-                  value: _processItem,
-                  items: _processdropdownItems,
-                  onChanged: (newValue) {
-                    if (newValue != null) {
-                      setState(() => _processItem = newValue);
-                    }
-                  },
-                ),
-                const SizedBox(height: 24), // Increased spacing
-                // Submission Date Field
-                _buildLabel('Submission Date'),
-                const SizedBox(height: 8), // Reduced spacing below label
-                _buildDateField(
-                  _submissionDateController,
-                  _pickSubmissionDate,
-                  'Select Date',
-                ),
-                const SizedBox(height: 24), // Increased spacing
-                // Report Date Field
-                _buildLabel('Report Date'),
-                const SizedBox(height: 8), // Reduced spacing below label
-                _buildDateField(
-                  _reportDateController,
-                  _pickReportDate,
-                  'Select Date',
-                ),
-                const SizedBox(height: 24), // Increased spacing
-                // Remarks Field
-                _buildLabel('Remarks'),
-                const SizedBox(height: 8),
-                _buildTextField(
-                  'Enter Remarks',
-                  maxLines: 3,
-                ), // Using the helper method, multi-line
-                const SizedBox(height: 24), // Increased spacing
-                // Image Upload Section
-                _buildLabel('Upload Supporting'),
-                const SizedBox(height: 8),
-
-                Container(
-                  margin: const EdgeInsets.only(top: 8, bottom: 16),
-                  padding: const EdgeInsets.all(16),
+        title: const Text('On Leave', style: TextStyle(color: Colors.white)),
+        backgroundColor: AppTheme.primaryColor,
+        elevation: 0,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Form(
+          key: _formKey,
+          child: ListView(
+            children: [
+              _buildLabel('Process type'),
+              _buildDropdownField(
+                value: _processItem,
+                items: _processdropdownItems,
+                onChanged: (val) => setState(() => _processItem = val),
+              ),
+              const SizedBox(height: 10),
+              _buildLabel('Submission Date'),
+              _buildDateField(_submissionDateController, _pickSubmissionDate, 'Select Submission Date'),
+              const SizedBox(height: 10),
+              _buildLabel('Report Date'),
+              _buildDateField(_reportDateController, _pickReportDate, 'Select Report Date'),
+              const SizedBox(height: 10),
+              _buildLabel('Remarks'),
+              _buildTextField('Enter Remarks', controller: _remarksController, maxLines: 3),
+              const SizedBox(height: 10),
+              _buildLabel('Upload Images'),
+              ...List.generate(_selectedImages.length, (i) {
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 16),
+                  padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.1),
-                        spreadRadius: 1,
-                        blurRadius: 5,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                    border: Border.all(color: Colors.grey.shade200),
+                    color: Colors.grey.shade50,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: _selectedImages[i] != null ? Colors.green.shade200 : Colors.grey.shade200,
+                      width: 1.5,
+                    ),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Row(
+                      Row(
                         children: [
-                          Icon(
-                            Icons.photo_library_rounded,
-                            color: Color.fromARGB(255, 33, 150, 243),
-                            size: 24,
-                          ),
-                          SizedBox(width: 8),
-                          Text(
-                            'Supporting Documents',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Color.fromARGB(255, 33, 150, 243),
+                          Text('Document ${i + 1}', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                          const Spacer(),
+                          if (_selectedImages[i] != null)
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                              decoration: BoxDecoration(
+                                color: Colors.green.shade100,
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: const [
+                                  Icon(Icons.check_circle, color: Colors.green, size: 16),
+                                  SizedBox(width: 4),
+                                  Text('Uploaded', style: TextStyle(color: Colors.green, fontWeight: FontWeight.w500, fontSize: 13)),
+                                ],
+                              ),
                             ),
-                          ),
                         ],
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Upload images related to your activity',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey.shade600,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      // Image upload rows with enhanced UI
-                      ...List.generate(_uploadRows.length, (index) {
-                        final i = _uploadRows[index];
-                        return Container(
-                          margin: const EdgeInsets.only(bottom: 16),
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: Colors.grey.shade50,
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color:
-                                  _selectedImages[i] != null
-                                      ? Colors.green.shade200
-                                      : Colors.grey.shade200,
-                              width: 1.5,
-                            ),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // Document header row with status
-                              Row(
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 10,
-                                      vertical: 4,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: Colors.blueAccent.withOpacity(0.1),
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                    child: Text(
-                                      'Document ${index + 1}',
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: Color.fromARGB(
-                                          255,
-                                          33,
-                                          150,
-                                          243,
-                                        ),
-                                        fontSize: 14,
-                                      ),
-                                    ),
-                                  ),
-                                  const Spacer(),
-                                  if (_selectedImages[i] != null)
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 10,
-                                        vertical: 4,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: Colors.green.shade100,
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
-                                      child: const Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Icon(
-                                            Icons.check_circle,
-                                            color: Colors.green,
-                                            size: 16,
-                                          ),
-                                          SizedBox(width: 4),
-                                          Text(
-                                            'Uploaded',
-                                            style: TextStyle(
-                                              color: Colors.green,
-                                              fontWeight: FontWeight.w500,
-                                              fontSize: 14,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                ],
-                              ),
-                              const SizedBox(height: 16),
-                              // Image preview if selected
-                              if (_selectedImages[i] != null)
-                                GestureDetector(
-                                  onTap:
-                                      () =>
-                                          _showImageDialog(_selectedImages[i]!),
-                                  child: Container(
-                                    height: 120,
-                                    width: double.infinity,
-                                    margin: const EdgeInsets.only(bottom: 16),
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(8),
-                                      image: DecorationImage(
-                                        image: FileImage(_selectedImages[i]!),
-                                        fit: BoxFit.cover,
-                                      ),
-                                    ),
-                                    child: Align(
-                                      alignment: Alignment.topRight,
-                                      child: Container(
-                                        margin: const EdgeInsets.all(8),
-                                        padding: const EdgeInsets.all(4),
-                                        decoration: BoxDecoration(
-                                          color: Colors.black.withOpacity(0.6),
-                                          shape: BoxShape.circle,
-                                        ),
-                                        child: const Icon(
-                                          Icons.zoom_in,
-                                          color: Colors.white,
-                                          size: 20,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              // Action buttons
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: ElevatedButton.icon(
-                                      onPressed: () => _pickImage(i),
-                                      icon: Icon(
-                                        _selectedImages[i] != null
-                                            ? Icons.refresh
-                                            : Icons.upload_file,
-                                        size: 18,
-                                      ),
-                                      label: Text(
-                                        _selectedImages[i] != null
-                                            ? 'Replace'
-                                            : 'Upload',
-                                      ),
-                                      style: ElevatedButton.styleFrom(
-                                        foregroundColor: Colors.white,
-                                        backgroundColor:
-                                            _selectedImages[i] != null
-                                                ? Colors.amber.shade600
-                                                : Colors.blueAccent,
-                                        elevation: 0,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            8,
-                                          ),
-                                        ),
-                                        padding: const EdgeInsets.symmetric(
-                                          vertical: 12,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  if (_selectedImages[i] != null) ...[
-                                    const SizedBox(width: 8),
-                                    Expanded(
-                                      child: ElevatedButton.icon(
-                                        onPressed:
-                                            () => _showImageDialog(
-                                              _selectedImages[i]!,
-                                            ),
-                                        icon: const Icon(
-                                          Icons.visibility,
-                                          size: 18,
-                                        ),
-                                        label: const Text('View'),
-                                        style: ElevatedButton.styleFrom(
-                                          foregroundColor: Colors.white,
-                                          backgroundColor: Colors.green,
-                                          elevation: 0,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(
-                                              8,
-                                            ),
-                                          ),
-                                          padding: const EdgeInsets.symmetric(
-                                            vertical: 12,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ],
-                              ),
-                            ],
-                          ),
-                        );
-                      }),
-                      // Add/Remove document buttons
+                      const SizedBox(height: 14),
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          ElevatedButton.icon(
-                            onPressed: _addRow,
-                            icon: const Icon(
-                              Icons.add_photo_alternate,
-                              size: 20,
-                            ),
-                            label: const Text('Document'),
-                            style: ElevatedButton.styleFrom(
-                              foregroundColor: Colors.white,
-                              backgroundColor: Colors.blueAccent,
-                              elevation: 0,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 12,
-                              ),
+                          Expanded(
+                            child: ElevatedButton.icon(
+                              onPressed: () => _pickImage(i),
+                              icon: Icon(_selectedImages[i] != null ? Icons.refresh : Icons.upload_file, size: 18),
+                              label: Text(_selectedImages[i] != null ? 'Replace' : 'Upload'),
                             ),
                           ),
-                          const SizedBox(width: 12),
-                          if (_uploadRows.length > 1)
-                            ElevatedButton.icon(
-                              onPressed: _removeRow,
-                              icon: const Icon(
-                                Icons.remove_circle_outline,
-                                size: 20,
-                              ),
-                              label: const Text('Remove'),
-                              style: ElevatedButton.styleFrom(
-                                foregroundColor: Colors.white,
-                                backgroundColor: Colors.redAccent,
-                                elevation: 0,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 12,
-                                ),
+                          if (_selectedImages[i] != null) ...[
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: ElevatedButton.icon(
+                                onPressed: () => _showImageDialog(_selectedImages[i]!),
+                                icon: const Icon(Icons.visibility, size: 18),
+                                label: const Text('View'),
+                                style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
                               ),
                             ),
+                            const SizedBox(width: 10),
+                            IconButton(
+                              onPressed: () {
+                                setState(() {
+                                  _selectedImages.removeAt(i);
+                                });
+                              },
+                              icon: const Icon(Icons.remove_circle_outline, color: Colors.red),
+                            ),
+                          ]
                         ],
                       ),
                     ],
                   ),
+                );
+              }),
+              if (_selectedImages.length < 3)
+                Center(
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      setState(() {
+                        _selectedImages.add(null);
+                      });
+                    },
+                    icon: const Icon(Icons.add_photo_alternate),
+                    label: const Text('Add More Image'),
+                  ),
                 ),
-                const SizedBox(height: 30), // Increased spacing before buttons
-                // Submit Buttons
-                Column(
-                  crossAxisAlignment:
-                      CrossAxisAlignment
-                          .stretch, // Stretch buttons to full width
-                  children: [
-                    ElevatedButton(
-                      onPressed: () {
-                        // TODO: implement submit and new logic
-                        if (_formKey.currentState!.validate()) {
-                          print('Form is valid. Submit and New.');
-                          // Add your submission logic here
-                          _showSuccessDialog(
-                            "Data submitted successfully (Submit & New)!",
-                          );
-                        }
-                      },
-                      style: ElevatedButton.styleFrom(
-                        foregroundColor: Colors.white,
-                        backgroundColor: Colors.blueAccent, // Match theme color
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 14,
-                        ), // Increased vertical padding
-                        textStyle: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ), // Larger, bold text
-                        elevation: 3.0, // Add slight elevation
-                      ),
+              const SizedBox(height: 24),
+              Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () => _submitForm(exitAfter: false),
                       child: const Text('Submit & New'),
                     ),
-                    const SizedBox(height: 16), // Spacing between buttons
-                    ElevatedButton(
-                      onPressed: () {
-                        // TODO: implement submit and exit logic
-                        if (_formKey.currentState!.validate()) {
-                          print('Form is valid. Submit and Exit.');
-                          // Add your submission logic here and then navigate back
-                          _showSuccessDialog(
-                            "Data submitted successfully (Submit & Exit)!",
-                          );
-                        }
-                      },
-                      style: ElevatedButton.styleFrom(
-                        foregroundColor: Colors.white,
-                        backgroundColor: Colors.blueAccent, // Match theme color
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        textStyle: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        elevation: 3.0,
-                      ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () => _submitForm(exitAfter: true),
                       child: const Text('Submit & Exit'),
                     ),
-                    const SizedBox(height: 16),
-                    ElevatedButton(
-                      onPressed: () {
-                        // TODO: implement view submitted data logic
-                        print('View Submitted Data button pressed');
-                        // Add logic to view submitted data
-                      },
-                      style: ElevatedButton.styleFrom(
-                        foregroundColor: Colors.blueAccent, // Blue text
-                        backgroundColor: Colors.white, // White background
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          side: const BorderSide(
-                            color: Colors.blueAccent,
-                          ), // Blue border
-                        ),
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        textStyle: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        elevation: 1.0, // Less elevation
-                      ),
-                      child: const Text('Click to see Submitted Data'),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 20), // Spacing at the bottom
-              ],
-            ),
+                  ),
+                ],
+              ),
+            ],
           ),
         ),
       ),
     );
   }
 
-  // --- Helper Methods for Building Widgets ---
-
-  // Helper to build a standard text field
-  Widget _buildTextField(
-    String hintText, {
-    TextEditingController? controller,
-    TextInputType? keyboardType,
-    int maxLines = 1, // Default to single line
-    String? Function(String?)? validator,
-    bool readOnly = false, // Added readOnly parameter
-  }) {
-    return TextFormField(
-      controller: controller,
-      keyboardType: keyboardType,
-      maxLines: maxLines,
-      readOnly: readOnly, // Apply readOnly property
-      decoration: InputDecoration(
-        hintText: hintText,
-        hintStyle: TextStyle(
-          color: Colors.grey[500], // Slightly darker grey hint text
-          fontSize: 16,
-        ),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10), // Rounded corners
-          borderSide: BorderSide.none, // No visible border line
-        ),
-        filled: true, // Add a background fill
-        fillColor: Colors.white, // White background for text fields
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 12,
-          vertical: 12,
-        ), // Adjusted padding
-      ),
-      validator: validator, // Assign the validator function
-    );
-  }
-
-  // Helper to build a date input field
-  Widget _buildDateField(
-    TextEditingController controller,
-    VoidCallback onTap,
-    String hintText,
-  ) {
-    return TextFormField(
-      controller: controller,
-      readOnly: true, // Make the text field read-only
-      decoration: InputDecoration(
-        hintText: hintText,
-        hintStyle: TextStyle(color: Colors.grey[500], fontSize: 16),
-        suffixIcon: IconButton(
-          icon: const Icon(
-            Icons.calendar_today,
-            color: Colors.blueAccent,
-          ), // Blue calendar icon
-          onPressed: onTap, // Call the provided onTap function
-        ),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide.none, // No visible border line
-        ),
-        filled: true,
-        fillColor: Colors.white,
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 12,
-          vertical: 12,
-        ),
-      ),
-      onTap: onTap, // Allow tapping the field itself to open date picker
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Please select a date';
-        }
-        return null;
-      },
-    );
-  }
-
-  // Helper to build a standard text label
-  Widget _buildLabel(String text) => Text(
-    text,
-    style: const TextStyle(
-      fontSize: 16, // Slightly smaller label font size
-      fontWeight: FontWeight.w600, // Slightly bolder
-      color: Colors.black87, // Darker text color
+  Widget _buildLabel(String text) => Padding(
+    padding: const EdgeInsets.symmetric(vertical: 4),
+    child: Text(
+      text,
+      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.black87),
     ),
   );
 
-  // Helper to build a standard dropdown field (not searchable)
+  Widget _buildTextField(
+      String hint, {
+        TextEditingController? controller,
+        TextInputType? keyboardType,
+        int maxLines = 1,
+      }) =>
+      TextFormField(
+        controller: controller,
+        keyboardType: keyboardType,
+        maxLines: maxLines,
+        decoration: InputDecoration(
+          hintText: hint,
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+        ),
+        validator: (val) => val == null || val.isEmpty ? 'Required' : null,
+      );
+
   Widget _buildDropdownField({
     required String? value,
     required List<String> items,
     required ValueChanged<String?> onChanged,
-  }) {
-    return Container(
-      height: 50, // Fixed height for consistency
-      padding: const EdgeInsets.symmetric(horizontal: 12), // Adjusted padding
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10), // Rounded corners
-        border: Border.all(
-          color: Colors.grey.shade300,
-          width: 1,
-        ), // Lighter border
-        color: Colors.white, // White background
-      ),
-      child: DropdownButton<String>(
-        dropdownColor: Colors.white,
-        isExpanded: true, // Expand to fill the container
-        underline: Container(), // Remove the default underline
-        value: value,
-        onChanged: onChanged,
-        items:
-            items
-                .map(
-                  (item) => DropdownMenuItem(
-                    value: item,
-                    child: Text(
-                      item,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        color: Colors.black87,
-                      ), // Darker text color
-                    ),
-                  ),
-                )
-                .toList(),
-      ),
-    );
-  }
+  }) =>
+      Container(
+        height: 48,
+        padding: const EdgeInsets.symmetric(horizontal: 6),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: Colors.grey.shade300, width: 1),
+          color: Colors.white,
+        ),
+        child: DropdownButton<String>(
+          isExpanded: true,
+          value: value,
+          underline: Container(),
+          items: items.map((item) => DropdownMenuItem(value: item, child: Text(item))).toList(),
+          onChanged: onChanged,
+        ),
+      );
 
-  // Helper to build a standard elevated button
-  Widget _buildButton(String label, VoidCallback onPressed) => ElevatedButton(
-    onPressed: onPressed,
-    style: ElevatedButton.styleFrom(
-      foregroundColor: Colors.white,
-      backgroundColor: Colors.blueAccent, // Match theme color
-      padding: const EdgeInsets.symmetric(vertical: 14), // Adjusted padding
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8), // Rounded corners
-      ),
-      textStyle: const TextStyle(
-        fontSize: 16,
-        fontWeight: FontWeight.bold,
-      ), // Larger, bold text
-      elevation: 3.0, // Add slight elevation
-    ),
-    child: Text(label),
-  );
-
-  // Helper method to show a success dialog
+  Widget _buildDateField(TextEditingController controller, VoidCallback onTap, String hint) =>
+      TextFormField(
+        controller: controller,
+        readOnly: true,
+        decoration: InputDecoration(
+          hintText: hint,
+          suffixIcon: IconButton(icon: const Icon(Icons.calendar_today), onPressed: onTap),
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+        ),
+        onTap: onTap,
+        validator: (val) => val == null || val.isEmpty ? 'Select date' : null,
+      );
 }

@@ -1,22 +1,11 @@
 import 'dart:io';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:image_picker/image_picker.dart'; // Import image_picker
+import 'package:image_picker/image_picker.dart';
+import 'package:http/http.dart' as http;
 
-// Ensure these imports are correct based on your project structure
-import 'Meeting_with_new_purchaser.dart';
-import 'Meetings_With_Contractor.dart';
-import 'any_other_activity.dart';
-// This is the current file, keep it
-import 'check_sampling_at_site.dart';
 import 'dsr_entry.dart';
-import 'dsr_retailer_in_out.dart';
-import 'internal_team_meeting.dart';
-import 'office_work.dart';
-import 'on_leave.dart';
-import 'phone_call_with_builder.dart';
-import 'phone_call_with_unregisterd_purchaser.dart';
-import 'work_from_home.dart';
 import '../theme/app_theme.dart';
 
 class BtlActivites extends StatefulWidget {
@@ -27,14 +16,9 @@ class BtlActivites extends StatefulWidget {
 }
 
 class _BtlActivitesState extends State<BtlActivites> {
-  // State variables for dropdowns and date pickers
   String? _processItem = 'Select';
   final List<String> _processdropdownItems = ['Select', 'Add', 'Update'];
-
-  String? _activityItem = 'BTL Activities'; // Default to BTL Activities
-
-
-  String _activityTypeItem = 'Select'; // Specific dropdown for BTL Activities
+  String _activityTypeItem = 'Select';
   final List<String> _activityTypedropdownItems = [
     'Select',
     'Retailer Meet',
@@ -46,33 +30,21 @@ class _BtlActivitesState extends State<BtlActivites> {
     'Other BTL Activities',
   ];
 
-  // Controllers for date text fields
   final TextEditingController _dateController = TextEditingController();
   final TextEditingController _reportDateController = TextEditingController();
-
-  // State variables to hold selected dates
   DateTime? _selectedDate;
   DateTime? _selectedReportDate;
-
-  // Controllers for new fields specific to BTL Activities
-  final TextEditingController _noOfParticipantsController =
-      TextEditingController();
+  final TextEditingController _noOfParticipantsController = TextEditingController();
   final TextEditingController _townController = TextEditingController();
   final TextEditingController _learningsController = TextEditingController();
 
-  // State variables for image uploads
-  final List<int> _uploadRows = [0]; // Tracks the number of image upload rows
-  final ImagePicker _picker = ImagePicker(); // Initialize ImagePicker
-  final List<File?> _selectedImages = [
-    null,
-  ]; // To hold selected images for each row
+  // For dynamic image fields
+  final List<File?> _selectedImages = [null];
 
-  // Global key for the form for validation
   final _formKey = GlobalKey<FormState>();
 
   @override
   void dispose() {
-    // Dispose controllers when the widget is removed
     _dateController.dispose();
     _reportDateController.dispose();
     _noOfParticipantsController.dispose();
@@ -81,7 +53,6 @@ class _BtlActivitesState extends State<BtlActivites> {
     super.dispose();
   }
 
-  // Function to pick the submission date
   Future<void> _pickDate() async {
     final now = DateTime.now();
     final picked = await showDatePicker(
@@ -91,16 +62,15 @@ class _BtlActivitesState extends State<BtlActivites> {
       lastDate: DateTime(now.year + 5),
       builder: (context, child) {
         return Theme(
-          // Apply a custom theme for the date picker
           data: ThemeData.light().copyWith(
             colorScheme: const ColorScheme.light(
-              primary: Colors.blueAccent, // Header background color
-              onPrimary: Colors.white, // Header text color
-              onSurface: Colors.black87, // Body text color
+              primary: Colors.blueAccent,
+              onPrimary: Colors.white,
+              onSurface: Colors.black87,
             ),
             dialogTheme: const DialogThemeData(
               backgroundColor: Colors.white,
-            ), // Dialog background
+            ),
           ),
           child: child!,
         );
@@ -114,7 +84,6 @@ class _BtlActivitesState extends State<BtlActivites> {
     }
   }
 
-  // Function to pick the report date
   Future<void> _pickReportDate() async {
     final now = DateTime.now();
     final picked = await showDatePicker(
@@ -124,16 +93,15 @@ class _BtlActivitesState extends State<BtlActivites> {
       lastDate: DateTime(now.year + 5),
       builder: (context, child) {
         return Theme(
-          // Apply a custom theme for the date picker
           data: ThemeData.light().copyWith(
             colorScheme: const ColorScheme.light(
-              primary: Colors.blueAccent, // Header background color
-              onPrimary: Colors.white, // Header text color
-              onSurface: Colors.black87, // Body text color
+              primary: Colors.blueAccent,
+              onPrimary: Colors.white,
+              onSurface: Colors.black87,
             ),
             dialogTheme: const DialogThemeData(
               backgroundColor: Colors.white,
-            ), // Dialog background
+            ),
           ),
           child: child!,
         );
@@ -147,54 +115,42 @@ class _BtlActivitesState extends State<BtlActivites> {
     }
   }
 
-  // Function to add a new image upload row
-  void _addRow() {
-    setState(() {
-      _uploadRows.add(_uploadRows.length); // Add a new index
-      _selectedImages.add(null); // Add null for the new row's image
-    });
-  }
-
-  // Function to remove the last image upload row
-  void _removeRow() {
-    if (_uploadRows.length <= 1) return; // Prevent removing the last row
-    setState(() {
-      _uploadRows.removeLast(); // Remove the last index
-      _selectedImages.removeLast(); // Remove the last image file
-    });
-  }
-
-  // Function to pick an image for a specific row
   Future<void> _pickImage(int index) async {
-    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
-
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       setState(() {
         _selectedImages[index] = File(pickedFile.path);
       });
-    } else {
-      // Print a message if no image was selected
-      print('No image selected for row $index.');
     }
   }
 
-  // Function to show a dialog with the selected image
+  void _addImageField() {
+    setState(() {
+      _selectedImages.add(null);
+    });
+  }
+
+  void _removeImageField(int index) {
+    setState(() {
+      if (_selectedImages.length > 1) {
+        _selectedImages.removeAt(index);
+      }
+    });
+  }
+
   void _showImageDialog(File imageFile) {
     showDialog(
       context: context,
       builder: (context) {
         return Dialog(
-          // Use a Dialog widget for a modal popup
           child: Container(
-            width:
-                MediaQuery.of(context).size.width * 0.8, // 80% of screen width
-            height:
-                MediaQuery.of(context).size.height *
-                0.6, // 60% of screen height
+            width: MediaQuery.of(context).size.width * 0.8,
+            height: MediaQuery.of(context).size.height * 0.6,
             decoration: BoxDecoration(
               image: DecorationImage(
-                fit: BoxFit.contain, // Fit the image within the container
-                image: FileImage(imageFile), // Load image from file
+                fit: BoxFit.contain,
+                image: FileImage(imageFile),
               ),
             ),
           ),
@@ -203,6 +159,109 @@ class _BtlActivitesState extends State<BtlActivites> {
     );
   }
 
+  String getDateOnly(TextEditingController controller) {
+    if (controller.text.isEmpty) return '';
+    try {
+      final picked = DateFormat('yyyy-MM-dd').parse(controller.text);
+      return DateFormat('yyyy-MM-dd').format(picked);
+    } catch (e) {
+      return '';
+    }
+  }
+
+  Future<String> fileToBase64(File? file) async {
+    if (file == null) return '';
+    final bytes = await file.readAsBytes();
+    return base64Encode(bytes);
+  }
+
+  Future<void> _submitForm({bool exitAfter = false}) async {
+    if (!_formKey.currentState!.validate()) return;
+
+    final subDateStr = getDateOnly(_dateController);
+    final repDateStr = getDateOnly(_reportDateController);
+
+    if (subDateStr.isEmpty || repDateStr.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Both Submission and Report date are required!"), backgroundColor: Colors.red),
+      );
+      return;
+    }
+
+    // Prepare imgfirst, imgscndd, imgthird (always send even if '')
+    final imgfirst  = _selectedImages.length > 0 && _selectedImages[0] != null ? await fileToBase64(_selectedImages[0]) : '';
+    final imgscndd  = _selectedImages.length > 1 && _selectedImages[1] != null ? await fileToBase64(_selectedImages[1]) : '';
+    final imgthird  = _selectedImages.length > 2 && _selectedImages[2] != null ? await fileToBase64(_selectedImages[2]) : '';
+
+    final Map<String, dynamic> payload = {
+      'proctype': _processItem ?? '',
+      'submdate': subDateStr,
+      'repodate': repDateStr,
+      'actitype': _activityTypeItem,
+      'numpartc': _noOfParticipantsController.text,
+      'townname': _townController.text,
+      'learnnng': _learningsController.text,
+      'imgfirst': imgfirst,
+      'imgscndd': imgscndd,
+      'imgthird': imgthird,
+    };
+
+    debugPrint("Payload: ${jsonEncode(payload)}");
+
+    try {
+      final response = await http.post(
+        Uri.parse('https://qa.birlawhite.com:55232/api/dsrbtlactivity/submit'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(payload),
+      );
+
+      debugPrint("Status code: ${response.statusCode}");
+      debugPrint("👉 Response body: ${response.body}");
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('BTL Activity submitted successfully!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+        if (exitAfter) {
+          Navigator.of(context).pop();
+        } else {
+          _formKey.currentState!.reset();
+          setState(() {
+            _processItem = 'Select';
+            _selectedDate = null;
+            _dateController.clear();
+            _selectedReportDate = null;
+            _reportDateController.clear();
+            _activityTypeItem = 'Select';
+            _noOfParticipantsController.clear();
+            _townController.clear();
+            _learningsController.clear();
+            _selectedImages.clear();
+            _selectedImages.add(null);
+          });
+        }
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Submission failed (${response.statusCode}): ${response.body}'),
+            backgroundColor: Colors.redAccent,
+          ),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error submitting: $e'),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
+    }
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -210,7 +269,6 @@ class _BtlActivitesState extends State<BtlActivites> {
       appBar: AppBar(
         leading: IconButton(
           onPressed: () {
-            // Navigate back to the DsrEntry screen
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => const DsrEntry()),
@@ -243,7 +301,6 @@ class _BtlActivitesState extends State<BtlActivites> {
           IconButton(
             icon: const Icon(Icons.help_outline, color: Colors.white, size: 24),
             onPressed: () {
-              // Show help dialog or tooltip
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
                   content: Text('Help information for BTL Activities'),
@@ -254,7 +311,7 @@ class _BtlActivitesState extends State<BtlActivites> {
           ),
         ],
         backgroundColor: AppTheme.primaryColor,
-        elevation: 0, // Remove shadow for a more modern look
+        elevation: 0,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -262,7 +319,6 @@ class _BtlActivitesState extends State<BtlActivites> {
           key: _formKey,
           child: ListView(
             children: [
-              // Process Section
               AppTheme.buildSectionCard(
                 title: 'Process',
                 icon: Icons.settings_outlined,
@@ -288,18 +344,18 @@ class _BtlActivitesState extends State<BtlActivites> {
                     items: _processdropdownItems
                         .map(
                           (item) => DropdownMenuItem<String>(
-                            value: item,
-                            child: Container(
-                              constraints: const BoxConstraints(maxWidth: 250),
-                              child: Text(
-                                item,
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 1,
-                                style: const TextStyle(fontSize: 14),
-                              ),
-                            ),
+                        value: item,
+                        child: Container(
+                          constraints: const BoxConstraints(maxWidth: 250),
+                          child: Text(
+                            item,
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style: const TextStyle(fontSize: 14),
                           ),
-                        )
+                        ),
+                      ),
+                    )
                         .toList(),
                     onChanged: (newValue) {
                       if (newValue != null) {
@@ -315,8 +371,6 @@ class _BtlActivitesState extends State<BtlActivites> {
                   ),
                 ],
               ),
-
-              // Date Information Section
               AppTheme.buildSectionCard(
                 title: 'Date Information',
                 icon: Icons.date_range_outlined,
@@ -340,7 +394,6 @@ class _BtlActivitesState extends State<BtlActivites> {
                   ),
                 ],
               ),
-              // BTL Activity Details Section
               AppTheme.buildSectionCard(
                 title: 'BTL Activity Details',
                 icon: Icons.campaign_outlined,
@@ -366,18 +419,18 @@ class _BtlActivitesState extends State<BtlActivites> {
                     items: _activityTypedropdownItems
                         .map(
                           (item) => DropdownMenuItem<String>(
-                            value: item,
-                            child: Container(
-                              constraints: const BoxConstraints(maxWidth: 250),
-                              child: Text(
-                                item,
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 1,
-                                style: const TextStyle(fontSize: 14),
-                              ),
-                            ),
+                        value: item,
+                        child: Container(
+                          constraints: const BoxConstraints(maxWidth: 250),
+                          child: Text(
+                            item,
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style: const TextStyle(fontSize: 14),
                           ),
-                        )
+                        ),
+                      ),
+                    )
                         .toList(),
                     onChanged: (newValue) {
                       if (newValue != null) {
@@ -438,8 +491,7 @@ class _BtlActivitesState extends State<BtlActivites> {
                 ],
               ),
               const SizedBox(height: 20),
-
-              // Image Upload Section
+              // --------- Dynamic Image Upload Section -----------
               Container(
                 margin: const EdgeInsets.only(top: 8, bottom: 16),
                 padding: const EdgeInsets.all(16),
@@ -467,9 +519,7 @@ class _BtlActivitesState extends State<BtlActivites> {
                       style: Theme.of(context).textTheme.bodyMedium,
                     ),
                     const SizedBox(height: 16),
-                    // Image upload rows with enhanced UI
-                    ...List.generate(_uploadRows.length, (index) {
-                      final i = _uploadRows[index];
+                    ...List.generate(_selectedImages.length, (index) {
                       return Container(
                         margin: const EdgeInsets.only(bottom: 16),
                         padding: const EdgeInsets.all(16),
@@ -477,17 +527,15 @@ class _BtlActivitesState extends State<BtlActivites> {
                           color: Colors.grey.shade50,
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
-                            color:
-                                _selectedImages[i] != null
-                                    ? Colors.green.shade200
-                                    : Colors.grey.shade200,
+                            color: _selectedImages[index] != null
+                                ? Colors.green.shade200
+                                : Colors.grey.shade200,
                             width: 1.5,
                           ),
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            // Document header row with status
                             Row(
                               children: [
                                 Container(
@@ -503,18 +551,13 @@ class _BtlActivitesState extends State<BtlActivites> {
                                     'Document ${index + 1}',
                                     style: const TextStyle(
                                       fontWeight: FontWeight.bold,
-                                      color: Color.fromARGB(
-                                        255,
-                                        33,
-                                        150,
-                                        243,
-                                      ),
+                                      color: Color.fromARGB(255, 33, 150, 243),
                                       fontSize: 14,
                                     ),
                                   ),
                                 ),
                                 const Spacer(),
-                                if (_selectedImages[i] != null)
+                                if (_selectedImages[index] != null)
                                   Container(
                                     padding: const EdgeInsets.symmetric(
                                       horizontal: 10,
@@ -547,11 +590,9 @@ class _BtlActivitesState extends State<BtlActivites> {
                               ],
                             ),
                             const SizedBox(height: 16),
-                            // Image preview if selected
-                            if (_selectedImages[i] != null)
+                            if (_selectedImages[index] != null)
                               GestureDetector(
-                                onTap:
-                                    () => _showImageDialog(_selectedImages[i]!),
+                                onTap: () => _showImageDialog(_selectedImages[index]!),
                                 child: Container(
                                   height: 120,
                                   width: double.infinity,
@@ -559,7 +600,7 @@ class _BtlActivitesState extends State<BtlActivites> {
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(8),
                                     image: DecorationImage(
-                                      image: FileImage(_selectedImages[i]!),
+                                      image: FileImage(_selectedImages[index]!),
                                       fit: BoxFit.cover,
                                     ),
                                   ),
@@ -581,29 +622,23 @@ class _BtlActivitesState extends State<BtlActivites> {
                                   ),
                                 ),
                               ),
-                            // Action buttons
                             Row(
                               children: [
                                 Expanded(
                                   child: ElevatedButton.icon(
-                                    onPressed: () => _pickImage(i),
+                                    onPressed: () => _pickImage(index),
                                     icon: Icon(
-                                      _selectedImages[i] != null
-                                          ? Icons.refresh
-                                          : Icons.upload_file,
+                                      _selectedImages[index] != null ? Icons.refresh : Icons.upload_file,
                                       size: 18,
                                     ),
                                     label: Text(
-                                      _selectedImages[i] != null
-                                          ? 'Replace'
-                                          : 'Upload',
+                                      _selectedImages[index] != null ? 'Replace' : 'Upload',
                                     ),
                                     style: ElevatedButton.styleFrom(
                                       foregroundColor: Colors.white,
-                                      backgroundColor:
-                                          _selectedImages[i] != null
-                                              ? Colors.amber.shade600
-                                              : Colors.blueAccent,
+                                      backgroundColor: _selectedImages[index] != null
+                                          ? Colors.amber.shade600
+                                          : Colors.blueAccent,
                                       elevation: 0,
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(8),
@@ -614,132 +649,82 @@ class _BtlActivitesState extends State<BtlActivites> {
                                     ),
                                   ),
                                 ),
-                                if (_selectedImages[i] != null) ...[
-                                  const SizedBox(width: 8),
-                                  Expanded(
+                                if (_selectedImages.length > 1)
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 8),
                                     child: ElevatedButton.icon(
-                                      onPressed:
-                                          () => _showImageDialog(
-                                            _selectedImages[i]!,
-                                          ),
-                                      icon: const Icon(
-                                        Icons.visibility,
-                                        size: 18,
-                                      ),
-                                      label: const Text('View'),
+                                      onPressed: () => _removeImageField(index),
+                                      icon: const Icon(Icons.remove_circle_outline, size: 20),
+                                      label: const Text('Remove'),
                                       style: ElevatedButton.styleFrom(
                                         foregroundColor: Colors.white,
-                                        backgroundColor: Colors.green,
+                                        backgroundColor: Colors.redAccent,
                                         elevation: 0,
                                         shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            8,
-                                          ),
+                                          borderRadius: BorderRadius.circular(8),
                                         ),
-                                        padding: const EdgeInsets.symmetric(
-                                          vertical: 12,
-                                        ),
+                                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                                       ),
                                     ),
                                   ),
-                                ],
                               ],
                             ),
                           ],
                         ),
                       );
                     }),
-                    // Add/Remove document buttons
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        ElevatedButton.icon(
-                          onPressed: _addRow,
-                          icon: const Icon(Icons.add_photo_alternate, size: 20),
-                          label: const Text('Document'),
-                          style: ElevatedButton.styleFrom(
-                            foregroundColor: Colors.white,
-                            backgroundColor: Colors.blueAccent,
-                            elevation: 0,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 12,
-                            ),
+                    Center(
+                      child: ElevatedButton.icon(
+                        onPressed: _addImageField,
+                        icon: const Icon(Icons.add_photo_alternate, size: 20),
+                        label: const Text('Add Image'),
+                        style: ElevatedButton.styleFrom(
+                          foregroundColor: Colors.white,
+                          backgroundColor: Colors.blueAccent,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
                           ),
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                         ),
-                        const SizedBox(width: 12),
-                        if (_uploadRows.length > 1)
-                          ElevatedButton.icon(
-                            onPressed: _removeRow,
-                            icon: const Icon(
-                              Icons.remove_circle_outline,
-                              size: 20,
-                            ),
-                            label: const Text('Remove'),
-                            style: ElevatedButton.styleFrom(
-                              foregroundColor: Colors.white,
-                              backgroundColor: Colors.redAccent,
-                              elevation: 0,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 12,
-                              ),
-                            ),
-                          ),
-                      ],
+                      ),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 30), // Increased spacing before buttons
-              // Submit Buttons
+              const SizedBox(height: 30),
               Column(
-                crossAxisAlignment:
-                    CrossAxisAlignment.stretch, // Stretch buttons to full width
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   ElevatedButton(
                     onPressed: () {
-                      // TODO: implement submit and new logic
-                      if (_formKey.currentState!.validate()) {
-                        // Process form data
-                        print('Form is valid. Submit and New.');
-                      }
+                      _submitForm(exitAfter: false);
                     },
                     style: ElevatedButton.styleFrom(
                       foregroundColor: Colors.white,
-                      backgroundColor: Colors.blueAccent, // Match theme color
+                      backgroundColor: Colors.blueAccent,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
                       padding: const EdgeInsets.symmetric(
                         vertical: 14,
-                      ), // Increased vertical padding
+                      ),
                       textStyle: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                      ), // Larger, bold text
-                      elevation: 3.0, // Add slight elevation
+                      ),
+                      elevation: 3.0,
                     ),
                     child: const Text('Submit & New'),
                   ),
-                  const SizedBox(height: 16), // Spacing between buttons
+                  const SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: () {
-                      // TODO: implement submit and exit logic
-                      if (_formKey.currentState!.validate()) {
-                        // Process form data
-                        print('Form is valid. Submit and Exit.');
-                      }
+                      _submitForm(exitAfter: true);
                     },
                     style: ElevatedButton.styleFrom(
                       foregroundColor: Colors.white,
-                      backgroundColor: Colors.blueAccent, // Match theme color
+                      backgroundColor: Colors.blueAccent,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
@@ -755,184 +740,33 @@ class _BtlActivitesState extends State<BtlActivites> {
                   const SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: () {
-                      // TODO: implement view submitted data logic
                       print('View Submitted Data button pressed');
                     },
                     style: ElevatedButton.styleFrom(
-                      foregroundColor: Colors.blueAccent, // Blue text
-                      backgroundColor: Colors.white, // White background
+                      foregroundColor: Colors.blueAccent,
+                      backgroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                         side: const BorderSide(
                           color: Colors.blueAccent,
-                        ), // Blue border
+                        ),
                       ),
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       textStyle: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
-                      elevation: 1.0, // Less elevation
+                      elevation: 1.0,
                     ),
                     child: const Text('Click to see Submitted Data'),
                   ),
                 ],
               ),
-              const SizedBox(height: 20), // Spacing at the
+              const SizedBox(height: 20),
             ],
           ),
         ),
       ),
     );
   }
-
-  // --- Helper Methods for Building Widgets ---
-
-  // Helper to build a standard text field
-  Widget _buildTextField(
-    String hintText, {
-    TextEditingController? controller,
-    TextInputType? keyboardType,
-    int maxLines = 1,
-    String? Function(String?)? validator,
-  }) {
-    return AppTheme.buildTextField(
-      hintText,
-      controller: controller,
-      keyboardType: keyboardType,
-      maxLines: maxLines,
-      validator: validator,
-    );
-  }
-
-  // Helper to build a date input field
-  Widget _buildDateField(
-    TextEditingController controller,
-    VoidCallback onTap,
-    String hintText,
-  ) {
-    return AppTheme.buildDateField(
-      context,
-      controller,
-      onTap,
-      hintText,
-    );
-  }
-
-  // Helper to build a standard text label
-  Widget _buildLabel(String text) => AppTheme.buildLabel(text);
-
-  // Helper to build a standard dropdown field (not searchable)
-  Widget _buildDropdownField({
-    required String? value,
-    required List<String> items,
-    required ValueChanged<String?> onChanged,
-  }) {
-    return Container(
-      height: 50, // Fixed height for consistency
-      padding: const EdgeInsets.symmetric(horizontal: 12), // Adjusted padding
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10), // Rounded corners
-        border: Border.all(
-          color: Colors.grey.shade300,
-          width: 1,
-        ), // Lighter border
-        color: Colors.white, // White background
-      ),
-      child: DropdownButton<String>(
-        dropdownColor: Colors.white,
-        isExpanded: true, // Expand to fill the container
-        underline: Container(), // Remove the default underline
-        value: value,
-        onChanged: onChanged,
-        items:
-            items
-                .map(
-                  (item) => DropdownMenuItem(
-                    value: item,
-                    child: Text(
-                      item,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        color: Colors.black87,
-                      ), // Darker text color
-                    ),
-                  ),
-                )
-                .toList(),
-      ),
-    );
-  }
-
-  // Helper for navigation
-  void _navigateTo(Widget screen) {
-    Navigator.of(context).push(MaterialPageRoute(builder: (_) => screen));
-  }
-
-  // The original _searchableDropdownField and _iconButton helpers are not used in the current layout
-  // but are kept here in case they are needed elsewhere or for future reference.
-
-  // Widget _searchableDropdownField({
-  //   required String selected,
-  //   required List<String> items,
-  //   required ValueChanged<String?> onChanged,
-  // }) =>
-  //     DropdownSearch<String>(
-  //       items: items,
-  //       selectedItem: selected,
-  //       onChanged: onChanged,
-  //       popupProps: PopupProps.menu(
-  //         showSearchBox: true,
-  //         searchFieldProps: const TextFieldProps(
-  //           decoration: InputDecoration(
-  //             hintText: 'Search...',
-  //             hintStyle: TextStyle(color: Colors.black),
-  //             fillColor: Colors.white,
-  //             filled: true,
-  //             border: OutlineInputBorder(
-  //               borderSide: BorderSide(color: Colors.white),
-  //             ),
-  //             isDense: true,
-  //             contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-  //           ),
-  //         ),
-  //         itemBuilder: (context, item, isSelected) => Padding(
-  //           padding: const EdgeInsets.all(12),
-  //           child: Text(item, style: const TextStyle(color: Colors.black)),
-  //         ),
-  //       ),
-  //       dropdownDecoratorProps: DropDownDecoratorProps(
-  //         dropdownSearchDecoration: InputDecoration(
-  //           hintText: 'Select',
-  //           filled: true,
-  //           fillColor: Colors.white,
-  //           isDense: true,
-  //           contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-  //           border: OutlineInputBorder(
-  //             borderRadius: BorderRadius.circular(10),
-  //             borderSide: BorderSide(color: Colors.grey.shade400),
-  //           ),
-  //         ),
-  //       ),
-  //     );
-
-  // InputDecoration _inputDecoration(String hint, {IconData? suffix}) =>
-  //     InputDecoration(
-  //       hintText: hint,
-  //       contentPadding:
-  //       const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-  //       border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-  //       suffixIcon: suffix != null
-  //           ? IconButton(icon: Icon(suffix), onPressed: _pickDate)
-  //           : null,
-  //     );
-
-  // Widget _iconButton(IconData icon, VoidCallback onPressed) => Container(
-  //   height: 50,
-  //   width: 50,
-  //   decoration: BoxDecoration(
-  //       color: Colors.blue, borderRadius: BorderRadius.circular(10)),
-  //   child: IconButton(
-  //       icon: Icon(icon, color: Colors.white), onPressed: onPressed),
-  // );
 }

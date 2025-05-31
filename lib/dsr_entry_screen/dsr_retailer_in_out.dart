@@ -1,7 +1,9 @@
+import 'dart:convert';                    // ← NEW: for jsonEncode
 import 'package:flutter/material.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
+import 'package:http/http.dart' as http;  // ← NEW: for HTTP
 
 class DsrRetailerInOut extends StatefulWidget {
   const DsrRetailerInOut({super.key});
@@ -193,7 +195,7 @@ class _DsrRetailerInOutState extends State<DsrRetailerInOut>
     'Budni', 'Rehti', 'Shyampur', 'Sohagpur', 'Pipariya',
     'Bankhedi', 'Hoshangabad', 'Itarsi', 'Seoni-Malwa', 'Harda',
     'Timarni', 'Sirali', 'Khirkiya', 'Multai', 'Amla',
-    'Betul', 'Bhainsdehi', 'Chicholi', 'Ghoradongri', 'Shahpur',
+    'Betul', 'Bhainsdehi', 'Chicholi', 'Ghoradongri', 'Shahpur'
   ];
 
   // City coordinates mapping
@@ -304,6 +306,90 @@ class _DsrRetailerInOutState extends State<DsrRetailerInOut>
     }
   }
 
+  // --- NEW SUBMISSION LOGIC (no UI changes) ---
+
+  /// Gathers all input fields and POSTS to the server.
+  /// [entryType] is either "IN" or "Exception".
+  Future<void> _submitToServer(String entryType) async {
+    if (!_formKey.currentState!.validate()) {
+      // If any required field is missing, abort
+      return;
+    }
+
+    // Build JSON payload with the exact keys the API expects:
+    final Map<String, dynamic> payload = {
+      "PurchaserRetailerType": _purchaserRetailerItem ?? "",
+      "AreaCode": _areaCode ?? "",
+      "CodeSearch": _codeSearchController.text.trim(),
+      "CustomerName": _customerNameController.text.trim(),
+      "Date": _dateController.text.trim(),       // "yyyy-MM-dd"
+      "YourLatitude": _yourLatitudeController.text.trim(),
+      "YourLongitude": _yourLongitudeController.text.trim(),
+      "CustLatitude": _custLatitudeController.text.trim(),
+      "CustLongitude": _custLongitudeController.text.trim(),
+      "EntryType": entryType,                     // "IN" or "Exception"
+    };
+
+    final uri =
+    Uri.parse("https://qa.birlawhite.com:55232/api/retailerinout/submit");
+    print("Posting to $uri");
+    print("Payload: ${jsonEncode(payload)}");
+
+    try {
+      final response = await http.post(
+        uri,
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode(payload),
+      );
+
+      print("HTTP ${response.statusCode}");
+      print("Response body: ${response.body}");
+
+      if (response.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Successfully submitted ($entryType)."),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+        // Optionally clear fields:
+        // _clearAllFields();
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Error ${response.statusCode}: ${response.body}"),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    } catch (e, stack) {
+      print("Exception: $e");
+      print(stack);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Submission failed: $e"),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
+  }
+
+  /// (Optional) Call this to reset all fields after a successful submission.
+  void _clearAllFields() {
+    setState(() {
+      _purchaserRetailerItem = 'Select';
+      _areaCode = 'Select';
+      _selectedDate = DateTime.now();
+      _dateController.text = DateFormat('yyyy-MM-dd').format(_selectedDate!);
+      _yourLatitudeController.clear();
+      _yourLongitudeController.clear();
+      _custLatitudeController.clear();
+      _custLongitudeController.clear();
+      _codeSearchController.clear();
+      _customerNameController.clear();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -377,7 +463,9 @@ class _DsrRetailerInOutState extends State<DsrRetailerInOut>
                     }).toList(),
                     onChanged: (val) => setState(() => _purchaserRetailerItem = val),
                     validator: (value) =>
-                        value == 'Select' ? 'Please select a type' : null,
+                    (value == null || value == 'Select')
+                        ? 'Please select a type'
+                        : null,
                   ),
                 ),
 
@@ -403,9 +491,11 @@ class _DsrRetailerInOutState extends State<DsrRetailerInOut>
                           _areaCode = val;
                           if (_cityCoordinates.containsKey(val)) {
                             _custLatitudeController.text =
-                                _cityCoordinates[val]!['latitude']!.toStringAsFixed(6);
+                                _cityCoordinates[val]!['latitude']!
+                                    .toStringAsFixed(6);
                             _custLongitudeController.text =
-                                _cityCoordinates[val]!['longitude']!.toStringAsFixed(6);
+                                _cityCoordinates[val]!['longitude']!
+                                    .toStringAsFixed(6);
                           }
                         });
                       }
@@ -423,7 +513,9 @@ class _DsrRetailerInOutState extends State<DsrRetailerInOut>
                           controller: _codeSearchController,
                           decoration: _inputDecoration(hintText: 'Enter code'),
                           validator: (value) =>
-                              value!.isEmpty ? 'Please enter a code' : null,
+                          (value == null || value.isEmpty)
+                              ? 'Please enter a code'
+                              : null,
                         ),
                       ),
                       const SizedBox(width: 8),
@@ -434,7 +526,9 @@ class _DsrRetailerInOutState extends State<DsrRetailerInOut>
                         ),
                         child: IconButton(
                           icon: const Icon(Icons.search, color: Colors.white),
-                          onPressed: () {},
+                          onPressed: () {
+                            // Keep empty if there's no search logic
+                          },
                         ),
                       ),
                     ],
@@ -448,7 +542,9 @@ class _DsrRetailerInOutState extends State<DsrRetailerInOut>
                     controller: _customerNameController,
                     decoration: _inputDecoration(hintText: 'Customer Name'),
                     validator: (value) =>
-                        value!.isEmpty ? 'Please enter customer name' : null,
+                    (value == null || value.isEmpty)
+                        ? 'Please enter customer name'
+                        : null,
                   ),
                 ),
 
@@ -465,7 +561,9 @@ class _DsrRetailerInOutState extends State<DsrRetailerInOut>
                       ),
                     ),
                     validator: (value) =>
-                        value!.isEmpty ? 'Please select a date' : null,
+                    (value == null || value.isEmpty)
+                        ? 'Please select a date'
+                        : null,
                   ),
                 ),
 
@@ -491,7 +589,8 @@ class _DsrRetailerInOutState extends State<DsrRetailerInOut>
                             child: TextFormField(
                               controller: _yourLatitudeController,
                               readOnly: true,
-                              decoration: _inputDecoration(labelText: 'Latitude'),
+                              decoration:
+                              _inputDecoration(labelText: 'Latitude'),
                             ),
                           ),
                           const SizedBox(width: 8),
@@ -499,7 +598,8 @@ class _DsrRetailerInOutState extends State<DsrRetailerInOut>
                             child: TextFormField(
                               controller: _yourLongitudeController,
                               readOnly: true,
-                              decoration: _inputDecoration(labelText: 'Longitude'),
+                              decoration:
+                              _inputDecoration(labelText: 'Longitude'),
                             ),
                           ),
                         ],
@@ -528,7 +628,8 @@ class _DsrRetailerInOutState extends State<DsrRetailerInOut>
                             child: TextFormField(
                               controller: _custLatitudeController,
                               readOnly: true,
-                              decoration: _inputDecoration(labelText: 'Latitude'),
+                              decoration:
+                              _inputDecoration(labelText: 'Latitude'),
                             ),
                           ),
                           const SizedBox(width: 8),
@@ -536,7 +637,8 @@ class _DsrRetailerInOutState extends State<DsrRetailerInOut>
                             child: TextFormField(
                               controller: _custLongitudeController,
                               readOnly: true,
-                              decoration: _inputDecoration(labelText: 'Longitude'),
+                              decoration:
+                              _inputDecoration(labelText: 'Longitude'),
                             ),
                           ),
                         ],
@@ -561,7 +663,7 @@ class _DsrRetailerInOutState extends State<DsrRetailerInOut>
                         color: _primaryColor,
                         onPressed: () {
                           if (_formKey.currentState!.validate()) {
-                            // Handle IN action
+                            _submitToServer("IN");
                           }
                         },
                       ),
@@ -573,7 +675,7 @@ class _DsrRetailerInOutState extends State<DsrRetailerInOut>
                         color: Colors.orange,
                         onPressed: () {
                           if (_formKey.currentState!.validate()) {
-                            // Handle Exception Entry
+                            _submitToServer("Exception");
                           }
                         },
                       ),
@@ -680,6 +782,3 @@ class _DsrRetailerInOutState extends State<DsrRetailerInOut>
     );
   }
 }
-
-
-
