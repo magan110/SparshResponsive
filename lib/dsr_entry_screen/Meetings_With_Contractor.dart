@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:image_picker/image_picker.dart';
@@ -18,13 +17,11 @@ class MeetingsWithContractor extends StatefulWidget {
 class _MeetingsWithContractorState extends State<MeetingsWithContractor> {
   String? _processItem = 'Select';
   final List<String> _processdropdownItems = ['Select', 'Add', 'Update'];
+
   String? _areaCode = 'Select';
   final List<String> _majorCitiesInIndia = [
     'Select', 'Mumbai', 'Delhi', 'Ahmedabad', 'Pune', 'Surat'
-    // (add more cities as you wish)
   ];
-
-  // Coordinates map - (use yours)
   final Map<String, Map<String, double>> _cityCoordinates = {
     'Mumbai': {'latitude': 19.0760, 'longitude': 72.8777},
     'Delhi': {'latitude': 28.7041, 'longitude': 77.1025},
@@ -41,24 +38,24 @@ class _MeetingsWithContractorState extends State<MeetingsWithContractor> {
   ];
 
   final TextEditingController _submissionDateController = TextEditingController();
-  final TextEditingController _reportDateController = TextEditingController();
+  final TextEditingController _reportDateController     = TextEditingController();
   DateTime? _selectedSubmissionDate;
   DateTime? _selectedReportDate;
 
-  final List<int> _uploadRows = [0];
-  final ImagePicker _picker = ImagePicker();
+  final List<int> _uploadRows    = [0];
+  final ImagePicker _picker      = ImagePicker();
   final List<File?> _selectedImages = [null];
 
-  // Controllers for coordinates
-  final TextEditingController _yourLatitudeController = TextEditingController();
+  // Coordinate controllers (if you choose to display these)
+  final TextEditingController _yourLatitudeController  = TextEditingController();
   final TextEditingController _yourLongitudeController = TextEditingController();
-  final TextEditingController _custLatitudeController = TextEditingController();
+  final TextEditingController _custLatitudeController  = TextEditingController();
   final TextEditingController _custLongitudeController = TextEditingController();
 
-  // HIDDEN required controllers
-  final TextEditingController _contrnamController = TextEditingController();
-  final TextEditingController _topcdissController = TextEditingController();
-  final TextEditingController _remarkscController = TextEditingController();
+  // Hidden required fields for your original API (kept hidden in UI)
+  final TextEditingController _contrnamController  = TextEditingController();
+  final TextEditingController _topcdissController  = TextEditingController();
+  final TextEditingController _remarkscController  = TextEditingController();
 
   final _formKey = GlobalKey<FormState>();
 
@@ -83,21 +80,17 @@ class _MeetingsWithContractorState extends State<MeetingsWithContractor> {
       initialDate: _selectedSubmissionDate ?? now,
       firstDate: DateTime(1900),
       lastDate: DateTime(now.year + 5),
-      builder: (context, child) {
-        return Theme(
-          data: ThemeData.light().copyWith(
-            colorScheme: const ColorScheme.light(
-              primary: AppTheme.primaryColor,
-              onPrimary: Colors.white,
-              onSurface: Colors.black87,
-            ),
-            dialogTheme: const DialogThemeData(
-              backgroundColor: AppTheme.primaryColor,
-            ),
+      builder: (context, child) => Theme(
+        data: ThemeData.light().copyWith(
+          colorScheme: const ColorScheme.light(
+            primary: AppTheme.primaryColor,
+            onPrimary: Colors.white,
+            onSurface: Colors.black87,
           ),
-          child: child!,
-        );
-      },
+          dialogTheme: const DialogThemeData(backgroundColor: Colors.white),
+        ),
+        child: child!,
+      ),
     );
     if (picked != null) {
       setState(() {
@@ -114,21 +107,17 @@ class _MeetingsWithContractorState extends State<MeetingsWithContractor> {
       initialDate: _selectedReportDate ?? now,
       firstDate: DateTime(1900),
       lastDate: DateTime(now.year + 5),
-      builder: (context, child) {
-        return Theme(
-          data: ThemeData.light().copyWith(
-            colorScheme: const ColorScheme.light(
-              primary: AppTheme.primaryColor,
-              onPrimary: Colors.white,
-              onSurface: Colors.black87,
-            ),
-            dialogTheme: const DialogThemeData(
-              backgroundColor: AppTheme.primaryColor,
-            ),
+      builder: (context, child) => Theme(
+        data: ThemeData.light().copyWith(
+          colorScheme: const ColorScheme.light(
+            primary: AppTheme.primaryColor,
+            onPrimary: Colors.white,
+            onSurface: Colors.black87,
           ),
-          child: child!,
-        );
-      },
+          dialogTheme: const DialogThemeData(backgroundColor: Colors.white),
+        ),
+        child: child!,
+      ),
     );
     if (picked != null) {
       setState(() {
@@ -165,118 +154,71 @@ class _MeetingsWithContractorState extends State<MeetingsWithContractor> {
   void _showImageDialog(File imageFile) {
     showDialog(
       context: context,
-      builder: (context) {
-        return Dialog(
-          child: Container(
-            width: MediaQuery.of(context).size.width * 0.8,
-            height: MediaQuery.of(context).size.height * 0.6,
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                fit: BoxFit.contain,
-                image: FileImage(imageFile),
-              ),
+      builder: (_) => Dialog(
+        child: Container(
+          width: MediaQuery.of(context).size.width * 0.8,
+          height: MediaQuery.of(context).size.height * 0.6,
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              fit: BoxFit.contain,
+              image: FileImage(imageFile),
             ),
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 
-  // ----------------------- API LOGIC -------------------------------
-  Future<void> _submitForm({bool exitAfter = false}) async {
+  void _onSubmit({required bool exitAfter}) {
     if (!_formKey.currentState!.validate()) return;
 
-    // Fill required API fields if empty (adjust as needed)
-    if (_contrnamController.text.isEmpty) _contrnamController.text = "Contractor Name";
-    if (_topcdissController.text.isEmpty) _topcdissController.text = "Meeting Topic";
-    if (_remarkscController.text.isEmpty) _remarkscController.text = "Remarks";
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(exitAfter
+            ? 'Submitted successfully. Exiting...'
+            : 'Submitted successfully. Ready for new entry.'),
+        backgroundColor: Colors.green,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
 
-    // Only send first 3 images
-    Future<String> fileToBase64(File? file) async {
-      if (file == null) return '';
-      final bytes = await file.readAsBytes();
-      return base64Encode(bytes);
-    }
-
-    final imgfirst  = _selectedImages.length > 0 && _selectedImages[0] != null ? await fileToBase64(_selectedImages[0]) : '';
-    final imgscndd  = _selectedImages.length > 1 && _selectedImages[1] != null ? await fileToBase64(_selectedImages[1]) : '';
-    final imgthird  = _selectedImages.length > 2 && _selectedImages[2] != null ? await fileToBase64(_selectedImages[2]) : '';
-
-    // Prepare payload
-    final Map<String, dynamic> payload = {
-      "Proctype": _processItem ?? '',
-      "Submdate": _submissionDateController.text,
-      "Repodate": _reportDateController.text,
-      "Areacode": _areaCode ?? '',
-      "Purchtype": _purchaserItem ?? '',
-      "Code": "",           // Add logic if you have a code field
-      "Neworder": "",       // Add logic if you have these fields
-      "Ugrecov": "",
-      "Grievanc": "",
-      "Anyothpt": "",
-      "Contrnam": _contrnamController.text,
-      "Remarksc": _remarkscController.text,
-      "Topcdiss": _topcdissController.text,
-      "imgfirst": imgfirst,
-      "imgscndd": imgscndd,
-      "imgthird": imgthird,
-      "custlat": _custLatitudeController.text,
-      "custlng": _custLongitudeController.text,
-    };
-
-    debugPrint("API PAYLOAD: ${jsonEncode(payload)}");
-
-    try {
-      final response = await HttpClient()
-          .postUrl(Uri.parse('https://qa.birlawhite.com:55232/api/dsrmeetconr/submit'))
-          .then((request) {
-        request.headers.set('Content-Type', 'application/json');
-        request.add(utf8.encode(jsonEncode(payload)));
-        return request.close();
-      });
-
-      final responseBody = await response.transform(utf8.decoder).join();
-      debugPrint('API STATUS: ${response.statusCode}');
-      debugPrint('API RESPONSE: $responseBody');
-
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Meeting submitted successfully!'),
-              backgroundColor: Colors.green,
-            ),
-          );
-        }
-        if (exitAfter) Navigator.of(context).pop();
-        else _formKey.currentState!.reset();
-      } else {
-        debugPrint('API ERROR: ${response.statusCode}');
-        debugPrint('Response Body: $responseBody');
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Submission failed: ${response.statusCode}'),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
-      }
-    } catch (e) {
-      debugPrint('API EXCEPTION: $e');
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Submission failed: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
+    if (exitAfter) {
+      Navigator.of(context).pop();
+    } else {
+      _resetForm();
     }
   }
-  // ---------------------- END API LOGIC ----------------------
 
-  // UI Helper Widgets (unchanged from your original code)
+  void _resetForm() {
+    setState(() {
+      _processItem = 'Select';
+      _areaCode = 'Select';
+      _purchaserItem = 'Select';
+
+      _selectedSubmissionDate = null;
+      _selectedReportDate     = null;
+      _submissionDateController.clear();
+      _reportDateController.clear();
+
+      _yourLatitudeController.clear();
+      _yourLongitudeController.clear();
+      _custLatitudeController.clear();
+      _custLongitudeController.clear();
+
+      _contrnamController.clear();
+      _topcdissController.clear();
+      _remarkscController.clear();
+
+      _uploadRows
+        ..clear()
+        ..add(0);
+      _selectedImages
+        ..clear()
+        ..add(null);
+    });
+    _formKey.currentState!.reset();
+  }
+
   Widget _buildTextField(
       String hintText, {
         TextEditingController? controller,
@@ -292,20 +234,11 @@ class _MeetingsWithContractorState extends State<MeetingsWithContractor> {
       readOnly: readOnly,
       decoration: InputDecoration(
         hintText: hintText,
-        hintStyle: TextStyle(
-          color: Colors.grey[500],
-          fontSize: 16,
-        ),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide.none,
-        ),
+        hintStyle: TextStyle(color: Colors.grey[500], fontSize: 16),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
         filled: true,
         fillColor: Colors.white,
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 12,
-          vertical: 12,
-        ),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
       ),
       validator: validator,
     );
@@ -322,35 +255,20 @@ class _MeetingsWithContractorState extends State<MeetingsWithContractor> {
       decoration: InputDecoration(
         hintText: hintText,
         hintStyle: TextStyle(color: Colors.grey[500], fontSize: 16),
-        suffixIcon: IconButton(
-          icon: const Icon(Icons.calendar_today, color: Colors.blueAccent),
-          onPressed: onTap,
-        ),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide.none,
-        ),
+        suffixIcon: IconButton(icon: const Icon(Icons.calendar_today, color: Colors.blueAccent), onPressed: onTap),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
         filled: true,
         fillColor: Colors.white,
         contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
       ),
       onTap: onTap,
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Please select a date';
-        }
-        return null;
-      },
+      validator: (value) => (value == null || value.isEmpty) ? 'Please select a date' : null,
     );
   }
 
   Widget _buildLabel(String text) => Text(
     text,
-    style: const TextStyle(
-      fontSize: 16,
-      fontWeight: FontWeight.w600,
-      color: Colors.black87,
-    ),
+    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.black87),
   );
 
   Widget _buildDropdownField({
@@ -373,18 +291,7 @@ class _MeetingsWithContractorState extends State<MeetingsWithContractor> {
         value: value,
         onChanged: onChanged,
         items: items
-            .map(
-              (item) => DropdownMenuItem(
-            value: item,
-            child: Text(
-              item,
-              style: const TextStyle(
-                fontSize: 16,
-                color: Colors.black87,
-              ),
-            ),
-          ),
-        )
+            .map((item) => DropdownMenuItem(value: item, child: Text(item, style: const TextStyle(fontSize: 16, color: Colors.black87))))
             .toList(),
       ),
     );
@@ -395,59 +302,44 @@ class _MeetingsWithContractorState extends State<MeetingsWithContractor> {
     required List<String> items,
     required ValueChanged<String?> onChanged,
     String? Function(String?)? validator,
-  }) => DropdownSearch<String>(
-    items: items,
-    selectedItem: selected,
-    onChanged: onChanged,
-    validator: validator,
-    popupProps: PopupProps.menu(
-      showSearchBox: true,
-      searchFieldProps: const TextFieldProps(
-        decoration: InputDecoration(
-          hintText: 'Search...',
-          hintStyle: TextStyle(color: Colors.black54),
-          fillColor: Colors.white,
-          filled: true,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.all(Radius.circular(8.0)),
-            borderSide: BorderSide(color: Colors.blueAccent),
+  }) =>
+      DropdownSearch<String>(
+        items: items,
+        selectedItem: selected,
+        onChanged: onChanged,
+        validator: validator,
+        popupProps: PopupProps.menu(
+          showSearchBox: true,
+          searchFieldProps: const TextFieldProps(
+            decoration: InputDecoration(
+              hintText: 'Search...',
+              hintStyle: TextStyle(color: Colors.black54),
+              fillColor: Colors.white,
+              filled: true,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                borderSide: BorderSide(color: Colors.blueAccent),
+              ),
+              isDense: true,
+              contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            ),
           ),
-          isDense: true,
-          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          itemBuilder: (context, item, isSelected) => Padding(
+            padding: const EdgeInsets.all(12),
+            child: Text(item, style: const TextStyle(color: Colors.black87)),
+          ),
         ),
-      ),
-      itemBuilder: (context, item, isSelected) => Padding(
-        padding: const EdgeInsets.all(12),
-        child: Text(item, style: const TextStyle(color: Colors.black87)),
-      ),
-    ),
-    dropdownDecoratorProps: DropDownDecoratorProps(
-      dropdownSearchDecoration: InputDecoration(
-        hintText: 'Select',
-        filled: true,
-        fillColor: Colors.white,
-        isDense: true,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide(color: Colors.grey.shade300),
+        dropdownDecoratorProps: DropDownDecoratorProps(
+          dropdownSearchDecoration: InputDecoration(
+            hintText: 'Select',
+            filled: true,
+            fillColor: Colors.white,
+            isDense: true,
+            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: Colors.grey.shade300)),
+          ),
         ),
-      ),
-    ),
-  );
-
-  Widget _buildIconButton(IconData icon, VoidCallback onPressed) => Container(
-    height: 50,
-    width: 50,
-    decoration: BoxDecoration(
-      color: Colors.blueAccent,
-      borderRadius: BorderRadius.circular(10),
-    ),
-    child: IconButton(
-      icon: Icon(icon, color: Colors.white),
-      onPressed: onPressed,
-    ),
-  );
+      );
 
   @override
   Widget build(BuildContext context) {
@@ -456,30 +348,18 @@ class _MeetingsWithContractorState extends State<MeetingsWithContractor> {
         backgroundColor: AppTheme.scaffoldBackgroundColor,
         appBar: AppBar(
           leading: IconButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const DsrEntry()),
-              );
-            },
+            onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const DsrEntry())),
             icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 22),
           ),
           title: const Text(
             'Meetings With Contractor',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
+            style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
             overflow: TextOverflow.ellipsis,
           ),
           backgroundColor: AppTheme.primaryColor,
           elevation: 0,
           shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.only(
-              bottomLeft: Radius.circular(15),
-              bottomRight: Radius.circular(15),
-            ),
+            borderRadius: BorderRadius.only(bottomLeft: Radius.circular(15), bottomRight: Radius.circular(15)),
           ),
         ),
         body: Container(
@@ -497,24 +377,24 @@ class _MeetingsWithContractorState extends State<MeetingsWithContractor> {
               key: _formKey,
               child: ListView(
                 children: [
-                  // ... (your existing UI as above) ...
                   _buildLabel('Process type'),
                   const SizedBox(height: 8),
                   _buildDropdownField(
                     value: _processItem,
                     items: _processdropdownItems,
-                    onChanged: (newValue) {
-                      if (newValue != null) setState(() => _processItem = newValue);
-                    },
+                    onChanged: (val) => setState(() => _processItem = val),
                   ),
+
                   const SizedBox(height: 24),
                   _buildLabel('Submission Date'),
                   const SizedBox(height: 8),
                   _buildDateField(_submissionDateController, _pickSubmissionDate, 'Select Date'),
+
                   const SizedBox(height: 24),
                   _buildLabel('Report Date'),
                   const SizedBox(height: 8),
                   _buildDateField(_reportDateController, _pickReportDate, 'Select Date'),
+
                   const SizedBox(height: 24),
                   _buildLabel('Area code *:'),
                   const SizedBox(height: 8),
@@ -526,8 +406,10 @@ class _MeetingsWithContractorState extends State<MeetingsWithContractor> {
                         setState(() {
                           _areaCode = val;
                           if (_cityCoordinates.containsKey(val)) {
-                            _custLatitudeController.text = _cityCoordinates[val]!['latitude']!.toString();
-                            _custLongitudeController.text = _cityCoordinates[val]!['longitude']!.toString();
+                            _custLatitudeController.text =
+                                _cityCoordinates[val]!['latitude']!.toString();
+                            _custLongitudeController.text =
+                                _cityCoordinates[val]!['longitude']!.toString();
                           } else {
                             _custLatitudeController.clear();
                             _custLongitudeController.clear();
@@ -535,19 +417,18 @@ class _MeetingsWithContractorState extends State<MeetingsWithContractor> {
                         });
                       }
                     },
-                    validator: (value) => (value == null || value == 'Select') ? 'Please select an Area Code' : null,
+                    validator: (val) => (val == null || val == 'Select') ? 'Please select an Area Code' : null,
                   ),
+
                   const SizedBox(height: 24),
                   _buildLabel('Purchaser'),
                   const SizedBox(height: 8),
                   _buildDropdownField(
                     value: _purchaserItem,
                     items: _purchaserdropdownItems,
-                    onChanged: (newValue) {
-                      if (newValue != null) setState(() => _purchaserItem = newValue);
-                    },
+                    onChanged: (val) => setState(() => _purchaserItem = val),
                   ),
-                  // ... your other fields ...
+
                   const SizedBox(height: 24),
                   _buildLabel('Upload Supporting'),
                   const SizedBox(height: 8),
@@ -566,30 +447,21 @@ class _MeetingsWithContractorState extends State<MeetingsWithContractor> {
                           children: [
                             const Icon(Icons.photo_library_rounded, color: AppTheme.primaryColor, size: 24),
                             const SizedBox(width: 8),
-                            Text(
-                              'Supporting Documents',
-                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.primaryColor),
-                            ),
+                            Text('Supporting Documents', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.primaryColor)),
                           ],
                         ),
                         const SizedBox(height: 4),
-                        Text(
-                          'Upload images related to your activity',
-                          style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
-                        ),
+                        Text('Upload images related to your activity', style: TextStyle(fontSize: 14, color: Colors.grey.shade600)),
                         const SizedBox(height: 16),
                         ...List.generate(_uploadRows.length, (index) {
-                          final i = _uploadRows[index];
+                          final file = _selectedImages[index];
                           return Container(
                             margin: const EdgeInsets.only(bottom: 16),
                             padding: const EdgeInsets.all(16),
                             decoration: BoxDecoration(
                               color: Colors.grey.shade50,
                               borderRadius: BorderRadius.circular(12),
-                              border: Border.all(
-                                color: _selectedImages[i] != null ? Colors.green.shade200 : Colors.grey.shade200,
-                                width: 1.5,
-                              ),
+                              border: Border.all(color: file != null ? Colors.green.shade200 : Colors.grey.shade200, width: 1.5),
                             ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -602,35 +474,38 @@ class _MeetingsWithContractorState extends State<MeetingsWithContractor> {
                                         color: AppTheme.primaryColor.withOpacity(0.1),
                                         borderRadius: BorderRadius.circular(20),
                                       ),
-                                      child: Text('Document ${index + 1}', style: const TextStyle(fontWeight: FontWeight.bold, color: AppTheme.primaryColor, fontSize: 14)),
+                                      child: Text('Document ${index + 1}',
+                                          style: const TextStyle(fontWeight: FontWeight.bold, color: AppTheme.primaryColor, fontSize: 14)),
                                     ),
                                     const Spacer(),
-                                    if (_selectedImages[i] != null)
+                                    if (file != null)
                                       Container(
                                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                                        decoration: BoxDecoration(color: Colors.green.shade100, borderRadius: BorderRadius.circular(20)),
+                                        decoration:
+                                        BoxDecoration(color: Colors.green.shade100, borderRadius: BorderRadius.circular(20)),
                                         child: const Row(
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
                                             Icon(Icons.check_circle, color: Colors.green, size: 16),
                                             SizedBox(width: 4),
-                                            Text('Uploaded', style: TextStyle(color: Colors.green, fontWeight: FontWeight.w500, fontSize: 14)),
+                                            Text('Uploaded',
+                                                style: TextStyle(color: Colors.green, fontWeight: FontWeight.w500, fontSize: 14)),
                                           ],
                                         ),
                                       ),
                                   ],
                                 ),
                                 const SizedBox(height: 16),
-                                if (_selectedImages[i] != null)
+                                if (file != null)
                                   GestureDetector(
-                                    onTap: () => _showImageDialog(_selectedImages[i]!),
+                                    onTap: () => _showImageDialog(file),
                                     child: Container(
                                       height: 120,
                                       width: double.infinity,
                                       margin: const EdgeInsets.only(bottom: 16),
                                       decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(8),
-                                        image: DecorationImage(image: FileImage(_selectedImages[i]!), fit: BoxFit.cover),
+                                        image: DecorationImage(image: FileImage(file), fit: BoxFit.cover),
                                       ),
                                       child: Align(
                                         alignment: Alignment.topRight,
@@ -647,12 +522,12 @@ class _MeetingsWithContractorState extends State<MeetingsWithContractor> {
                                   children: [
                                     Expanded(
                                       child: ElevatedButton.icon(
-                                        onPressed: () => _pickImage(i),
-                                        icon: Icon(_selectedImages[i] != null ? Icons.refresh : Icons.upload_file, size: 18),
-                                        label: Text(_selectedImages[i] != null ? 'Replace' : 'Upload'),
+                                        onPressed: () => _pickImage(index),
+                                        icon: Icon(file != null ? Icons.refresh : Icons.upload_file, size: 18),
+                                        label: Text(file != null ? 'Replace' : 'Upload'),
                                         style: ElevatedButton.styleFrom(
                                           foregroundColor: Colors.white,
-                                          backgroundColor: _selectedImages[i] != null ? Colors.amber.shade600 : AppTheme.primaryColor,
+                                          backgroundColor: file != null ? Colors.amber.shade600 : AppTheme.primaryColor,
                                           elevation: 0,
                                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                                           padding: const EdgeInsets.symmetric(vertical: 12),
@@ -701,12 +576,13 @@ class _MeetingsWithContractorState extends State<MeetingsWithContractor> {
                       ],
                     ),
                   ),
+
                   const SizedBox(height: 30),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       ElevatedButton(
-                        onPressed: () => _submitForm(exitAfter: false),
+                        onPressed: () => _onSubmit(exitAfter: false),
                         style: ElevatedButton.styleFrom(
                           foregroundColor: Colors.white,
                           backgroundColor: Colors.blueAccent,
@@ -719,7 +595,7 @@ class _MeetingsWithContractorState extends State<MeetingsWithContractor> {
                       ),
                       const SizedBox(height: 16),
                       ElevatedButton(
-                        onPressed: () => _submitForm(exitAfter: true),
+                        onPressed: () => _onSubmit(exitAfter: true),
                         style: ElevatedButton.styleFrom(
                           foregroundColor: Colors.white,
                           backgroundColor: Colors.green,
@@ -732,7 +608,8 @@ class _MeetingsWithContractorState extends State<MeetingsWithContractor> {
                       ),
                     ],
                   ),
-                  // Offstage hidden fields for API-required values
+
+                  // Hidden offstage fields (unchanged UI)
                   Offstage(
                     offstage: true,
                     child: Column(
@@ -743,6 +620,7 @@ class _MeetingsWithContractorState extends State<MeetingsWithContractor> {
                       ],
                     ),
                   ),
+
                   const SizedBox(height: 20),
                 ],
               ),

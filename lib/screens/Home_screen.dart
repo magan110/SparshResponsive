@@ -1,7 +1,9 @@
-import 'dart:ui';
+// File: lib/screens/home_screen.dart
 
-import 'package:flutter/material.dart';
+import 'dart:ui';
 import 'dart:async';
+import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:learning2/screens/notification_screen.dart';
 import 'package:learning2/screens/profile_screen.dart';
 import 'package:learning2/screens/dashboard_screen.dart';
@@ -9,10 +11,16 @@ import 'package:learning2/screens/schema.dart';
 import 'package:learning2/screens/token_scan.dart';
 import 'package:learning2/screens/live_location_screen.dart';
 import '../dsr_entry_screen/dsr_entry.dart';
+import 'AccountsStatementPage.dart';
+import 'ActivitySummaryPage.dart';
+import 'EmployeeDashboardPage.dart';
+import 'GrcLeadEntryPage.dart';
+import 'PainterKycTrackingPage.dart';
+import 'RetailerRegistrationPage.dart';
+import 'SchemeDocumentPage.dart';
+import 'UniversalOutletRegistrationPage.dart';
 import 'mail_screen.dart';
 import 'app_drawer.dart';
-import 'package:flutter_animate/flutter_animate.dart';
-// import '../chat_screen.dart'; // Removed
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -25,6 +33,8 @@ class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
   bool _isSearchVisible = false;
   final TextEditingController _searchController = TextEditingController();
+
+  // These are the four “root” screens for bottom navigation:
   final List<Widget> _screens = [
     const HomeContent(),
     const DashboardScreen(),
@@ -32,7 +42,7 @@ class _HomeScreenState extends State<HomeScreen> {
     const ProfilePage(),
   ];
 
-  // Store the current screen.  Important for keeping bottom nav.
+  // The currently displayed screen:
   Widget _currentScreen = const HomeContent();
 
   @override
@@ -46,14 +56,12 @@ class _HomeScreenState extends State<HomeScreen> {
     super.dispose();
   }
 
-  // Method to update the current screen.  Crucial for bottom nav persistence.
+  /// Updates both the selected index and the displayed screen.
   void _updateCurrentScreen(int index, {Widget? screen}) {
     if (mounted) {
-      //Check if the widget is still mounted.
       setState(() {
         _selectedIndex = index;
-        _currentScreen =
-            screen ?? _screens[index]; // Use provided screen or default
+        _currentScreen = screen ?? _screens[index];
       });
     }
   }
@@ -61,15 +69,14 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      // Wrap your Scaffold with WillPopScope
+      // Intercept Android “back” button:
       onWillPop: () async {
-        // Handle back button press here
         if (_selectedIndex != 0) {
-          //check if bottom navigation is selected
-          _updateCurrentScreen(0); // Go back to the home screen
-          return false; // Prevent default back button behavior (closing the app)
+          // If we’re not on Home, send back to Home.
+          _updateCurrentScreen(0);
+          return false;
         }
-        return true; // Allow closing the app from the home screen
+        return true; // Let the system handle “back” when already on Home.
       },
       child: Scaffold(
         backgroundColor: Colors.white,
@@ -77,8 +84,9 @@ class _HomeScreenState extends State<HomeScreen> {
         drawer: const AppDrawer(),
         body: Stack(
           children: [
-            // Use _currentScreen here.
+            // The currently active screen (HomeContent / Dashboard / Mail / Profile):
             _currentScreen,
+            // The search‐overlay (if _isSearchVisible):
             _buildSearchInput(context),
           ],
         ),
@@ -87,6 +95,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  /// Builds the gradient AppBar with a search‐icon and notifications‐icon.
   PreferredSizeWidget _buildAppBar() {
     return AppBar(
       elevation: 4,
@@ -131,7 +140,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 builder: (context) => const NotificationScreen(),
               ),
             );
-            print('Notifications tapped');
           },
         ),
         AnimatedSwitcher(
@@ -139,27 +147,27 @@ class _HomeScreenState extends State<HomeScreen> {
           transitionBuilder: (Widget child, Animation<double> animation) {
             return ScaleTransition(scale: animation, child: child);
           },
-          child:
-              _isSearchVisible
-                  ? const SizedBox(width: 48, height: 48)
-                  : IconButton(
-                    key: const ValueKey('search_icon'),
-                    icon: const Icon(
-                      Icons.search,
-                      size: 28,
-                      color: Colors.white,
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        _isSearchVisible = true;
-                      });
-                    },
-                  ),
+          child: _isSearchVisible
+              ? const SizedBox(width: 48, height: 48)
+              : IconButton(
+            key: const ValueKey('search_icon'),
+            icon: const Icon(
+              Icons.search,
+              size: 28,
+              color: Colors.white,
+            ),
+            onPressed: () {
+              setState(() {
+                _isSearchVisible = true;
+              });
+            },
+          ),
         ),
       ],
     );
   }
 
+  /// The sliding search bar that appears on top of everything else.
   Widget _buildSearchInput(BuildContext context) {
     return AnimatedOpacity(
       opacity: _isSearchVisible ? 1.0 : 0.0,
@@ -190,7 +198,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
                 onSubmitted: (value) {
-                  print('Searching for: $value');
+                  // Implement your search logic here.
                   setState(() {
                     _isSearchVisible = false;
                   });
@@ -203,6 +211,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  /// Bottom navigation bar with a center “floating QR scanner” button.
   Widget _buildPremiumBottomBar() {
     final List<Map<String, dynamic>> navItems = [
       {
@@ -265,7 +274,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Stack(
       alignment: Alignment.bottomCenter,
       children: [
-        // Enhanced glass morphism background with parallax effect
+        // Glass‐morphism background behind the bottom bar
         ClipPath(
           clipper: BottomNavClipper(),
           child: Container(
@@ -275,13 +284,13 @@ class _HomeScreenState extends State<HomeScreen> {
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  const Color(0xFFEAF6FF).withOpacity(0.8),
-                  const Color(0xFFD6ECFF).withOpacity(0.8),
+                  const Color(0xFFEAF6FF).withValues(alpha: 0.8),
+                  const Color(0xFFD6ECFF).withValues(alpha: 0.8),
                 ],
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.15),
+                  color: Colors.black.withValues(alpha: 0.15),
                   blurRadius: 30,
                   spreadRadius: 2,
                   offset: const Offset(0, -5),
@@ -289,7 +298,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
               border: Border(
                 top: BorderSide(
-                  color: Colors.blue.withOpacity(0.6),
+                  color: Colors.blue.withValues(alpha: 0.6),
                   width: 1.5,
                 ),
               ),
@@ -299,6 +308,7 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: List.generate(navItems.length, (index) {
+                  // Skip index 2 so we can leave a gap for the floating button
                   if (index == 2) return const SizedBox(width: 70);
 
                   final item = navItems[index];
@@ -309,12 +319,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   return GestureDetector(
                     onTap: () {
                       if (index == 3) {
+                        // “Scheme” tab: directly open Schema() screen
                         _updateCurrentScreen(index, screen: const Schema());
                       } else if (index == 4) {
-                        _updateCurrentScreen(
-                          index,
-                          screen: const ProfilePage(),
-                        );
+                        // “Profile” tab:
+                        _updateCurrentScreen(index, screen: const ProfilePage());
                       } else {
                         _updateCurrentScreen(index);
                       }
@@ -329,16 +338,15 @@ class _HomeScreenState extends State<HomeScreen> {
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(16),
                         gradient: isActive ? gradient : null,
-                        boxShadow:
-                            isActive
-                                ? [
-                                  BoxShadow(
-                                    color: color.withOpacity(0.3),
-                                    blurRadius: 10,
-                                    offset: const Offset(0, 4),
-                                  ),
-                                ]
-                                : null,
+                        boxShadow: isActive
+                            ? [
+                          BoxShadow(
+                            color: color.withOpacity(0.3),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ]
+                            : null,
                       ),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
@@ -347,7 +355,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           Icon(
                             isActive ? item['activeIcon'] : item['icon'],
                             color:
-                                isActive ? Colors.white : Colors.grey.shade600,
+                            isActive ? Colors.white : Colors.grey.shade600,
                             size: 24,
                           ),
                           const SizedBox(height: 4),
@@ -356,13 +364,10 @@ class _HomeScreenState extends State<HomeScreen> {
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight:
-                                  isActive
-                                      ? FontWeight.bold
-                                      : FontWeight.normal,
-                              color:
-                                  isActive
-                                      ? Colors.white
-                                      : Colors.grey.shade700,
+                              isActive ? FontWeight.bold : FontWeight.normal,
+                              color: isActive
+                                  ? Colors.white
+                                  : Colors.grey.shade700,
                             ),
                           ),
                         ],
@@ -375,7 +380,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
 
-        // Floating Scanner Button with pulse animation
+        // Floating “Scanner” button in the center with shimmer/pulse animation:
         Positioned(
           bottom: 30,
           child: GestureDetector(
@@ -383,59 +388,59 @@ class _HomeScreenState extends State<HomeScreen> {
               _updateCurrentScreen(2, screen: const TokenScanPage());
             },
             child: Container(
-                  width: 60,
-                  height: 60,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        Colors.blueAccent.shade400,
-                        Colors.blueAccent.shade700,
-                      ],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.blueAccent.withOpacity(0.4),
-                        blurRadius: 15,
-                        spreadRadius: 2,
-                        offset: const Offset(0, 5),
-                      ),
-                      BoxShadow(
-                        color: Colors.blueAccent.withOpacity(0.2),
-                        blurRadius: 20,
-                        spreadRadius: 5,
-                        offset: Offset.zero,
-                      ),
-                    ],
-                    border: Border.all(color: Colors.white, width: 4),
+              width: 60,
+              height: 60,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Colors.blueAccent.shade400,
+                    Colors.blueAccent.shade700,
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.blueAccent.withValues(alpha: 0.4),
+                    blurRadius: 15,
+                    spreadRadius: 2,
+                    offset: const Offset(0, 5),
                   ),
-                  child: const Icon(
-                    Icons.qr_code_scanner,
-                    color: Colors.white,
-                    size: 28,
+                  BoxShadow(
+                    color: Colors.blueAccent.withValues(alpha: 0.2),
+                    blurRadius: 20,
+                    spreadRadius: 5,
+                    offset: Offset.zero,
                   ),
-                )
+                ],
+                border: Border.all(color: Colors.white, width: 4),
+              ),
+              child: const Icon(
+                Icons.qr_code_scanner,
+                color: Colors.white,
+                size: 28,
+              ),
+            )
                 .animate(onPlay: (controller) => controller.repeat())
                 .shimmer(
-                  delay: 1000.ms,
-                  duration: 1800.ms,
-                  color: Colors.white.withOpacity(0.3),
-                )
+              delay: 1000.ms,
+              duration: 1800.ms,
+              color: Colors.white.withValues(alpha: 0.3),
+            )
                 .scale(
-                  begin: const Offset(1, 1),
-                  end: const Offset(1.1, 1.1),
-                  duration: 1000.ms,
-                  curve: Curves.easeInOut,
-                )
+              begin: const Offset(1, 1),
+              end: const Offset(1.1, 1.1),
+              duration: 1000.ms,
+              curve: Curves.easeInOut,
+            )
                 .then()
                 .scale(
-                  begin: const Offset(1.1, 1.1),
-                  end: const Offset(1, 1),
-                  duration: 1000.ms,
-                  curve: Curves.easeInOut,
-                ),
+              begin: const Offset(1.1, 1.1),
+              end: const Offset(1, 1),
+              duration: 1000.ms,
+              curve: Curves.easeInOut,
+            ),
           ),
         ),
       ],
@@ -443,6 +448,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
+/// Custom clipper to “cut out” the notch for the floating button.
 class BottomNavClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {
@@ -450,30 +456,29 @@ class BottomNavClipper extends CustomClipper<Path> {
     final double centerX = size.width / 2;
     const double notchWidth = notchRadius * 2 + 30;
 
-    final path =
-        Path()
-          ..lineTo(centerX - notchWidth / 2, 0)
-          ..quadraticBezierTo(
-            centerX - notchRadius - 15,
-            0,
-            centerX - notchRadius,
-            25,
-          )
-          ..arcToPoint(
-            Offset(centerX + notchRadius, 25),
-            radius: const Radius.circular(notchRadius),
-            clockwise: false,
-          )
-          ..quadraticBezierTo(
-            centerX + notchRadius + 15,
-            0,
-            centerX + notchWidth / 2,
-            0,
-          )
-          ..lineTo(size.width, 0)
-          ..lineTo(size.width, size.height)
-          ..lineTo(0, size.height)
-          ..close();
+    final path = Path()
+      ..lineTo(centerX - notchWidth / 2, 0)
+      ..quadraticBezierTo(
+        centerX - notchRadius - 15,
+        0,
+        centerX - notchRadius,
+        25,
+      )
+      ..arcToPoint(
+        Offset(centerX + notchRadius, 25),
+        radius: const Radius.circular(notchRadius),
+        clockwise: false,
+      )
+      ..quadraticBezierTo(
+        centerX + notchRadius + 15,
+        0,
+        centerX + notchWidth / 2,
+        0,
+      )
+      ..lineTo(size.width, 0)
+      ..lineTo(size.width, size.height)
+      ..lineTo(0, size.height)
+      ..close();
 
     return path;
   }
@@ -482,6 +487,7 @@ class BottomNavClipper extends CustomClipper<Path> {
   bool shouldReclip(CustomClipper<Path> oldClipper) => false;
 }
 
+/// The “Home” tab’s main content, including banners, “Mostly Used Apps,” horizontal menu, and Quick Menu.
 class HomeContent extends StatefulWidget {
   const HomeContent({super.key});
 
@@ -493,6 +499,8 @@ class _HomeContentState extends State<HomeContent> {
   late PageController _pageController;
   Timer? _autoScrollTimer;
   int _currentIndex = 0;
+
+  /// Banner images (replace with your own assets if needed):
   final List<String> _bannerImagePaths = [
     'assets/image1.png',
     'assets/image21.jpg',
@@ -600,27 +608,68 @@ class _HomeContentState extends State<HomeContent> {
     );
   }
 
+  /// Three‐column Quick Menu with 14 items (icons + labels).
   Widget _quickMenu(double screenHeight, double screenWidth) {
     final List<Map<String, String>> quickMenuItems = [
-      {'image': 'assets/image37.png', 'label': 'RPL Outlet\nTracker'},
-      {'image': 'assets/image38.png', 'label': 'GKC\nLead Entry'},
-      {'image': 'assets/image8.png', 'label': 'RPL Outlet\nTracker'},
-      {'image': 'assets/image39.png', 'label': 'Training\nFeedback'},
-      {'image': 'assets/image28.png', 'label': 'Settings'},
-      {'image': 'assets/image29.png', 'label': 'Sales\nSummary'},
-      {'image': 'assets/image30.png', 'label': 'Inventory'},
-      {'image': 'assets/image31.png', 'label': 'Order\nHistory'},
-      {'image': 'assets/image32.png', 'label': 'Delivery\nStatus'},
-      {'image': 'assets/image40.png', 'label': 'First Aid\nPersonal'},
       {
-        'image': 'assets/location_icon.png',
-        'label': 'Live Location',
-      }, // Add this line
+        'image': 'assets/painter_kyc_tracking.png',
+        'label': 'Painter KYC\nTracking'
+      },
+      {
+        'image': 'assets/painter_kyc_registration.png',
+        'label': 'Painter KYC\nRegistration'
+      },
+      {
+        'image': 'assets/universal_outlets_registration.png',
+        'label': 'Universal Outlets\nRegistration'
+      },
+      {
+        'image': 'assets/retailer_registration.png',
+        'label': 'Retailer\nRegistration'
+      },
+      {
+        'image': 'assets/accounts_statement.png',
+        'label': 'Accounts\nStatement'
+      },
+      {
+        'image': 'assets/information_document.png',
+        'label': 'Information\nDocument'
+      },
+      {
+        'image': 'assets/rpl_outlet_tracker.png',
+        'label': 'RPL Outlet\nTracker'
+      },
+      {
+        'image': 'assets/scheme_document.png',
+        'label': 'Scheme\nDocument'
+      },
+      {
+        'image': 'assets/activity_summary.png',
+        'label': 'Activity\nSummary'
+      },
+      {
+        'image': 'assets/purchaser_360.png',
+        'label': 'Purchaser\n360'
+      },
+      {
+        'image': 'assets/employee_dashboard.png',
+        'label': 'Employee\nDashBoard'
+      },
+      {
+        'image': 'assets/grc_lead_entry.png',
+        'label': 'GRC\nLead Entry'
+      },
+      {
+        'image': 'assets/rpl_6_enrolment.png',
+        'label': 'RPL 6\nEnrolment'
+      },
     ];
-    final double itemWidth = screenWidth / 4;
+
+    // Three columns to match your screenshot. Adjust to 4 if you’d prefer a 4‐column layout.
+    final double itemWidth = screenWidth / 3;
 
     return Container(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 8.0),
       decoration: BoxDecoration(
         borderRadius: const BorderRadius.all(Radius.circular(12.0)),
         border: Border.all(color: Colors.grey.shade300, width: 1),
@@ -628,27 +677,64 @@ class _HomeContentState extends State<HomeContent> {
       ),
       child: GridView.builder(
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 4,
-          crossAxisSpacing: 8.0,
-          mainAxisSpacing: 8.0,
-          childAspectRatio: itemWidth / (itemWidth + 40),
+          crossAxisCount: 3, // ← 3 columns for Quick Menu
+          crossAxisSpacing: 12.0,
+          mainAxisSpacing: 16.0,
+          childAspectRatio: 0.85, // Adjusted to accommodate button-style items
         ),
         itemCount: quickMenuItems.length,
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
         itemBuilder: (context, index) {
           final item = quickMenuItems[index];
-          return GestureDetector(
+          return InkWell(
             onTap: () {
-              print("${item['label']} tapped");
-              // if (item['label'] == 'Live Location') {
-              //   Navigator.push(
-              //     context,
-              //     MaterialPageRoute(
-              //       builder: (context) => const LiveLocationScreen(),
-              //     ),
-              //   );
-              // }
+              if (item['label']!.contains('Painter KYC\nTracking')) {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (_) => const PainterKycTrackingPage()));
+              }
+              else if (item['label']!.contains('Universal Outlets\nRegistration')) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const UniversalOutletRegistrationPage()),
+                );
+              }
+              else if (item['label']!.contains('Retailer\nRegistration')) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const RetailerRegistrationPage()),
+                );
+              }
+              else if (item['label']!.contains('Accounts\nStatement')) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const AccountsStatementPage()),
+                );
+              }
+              else if (item['label']!.contains('Scheme\nDocument')) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const SchemeDocumentPage()),
+                );
+              }
+              else if (item['label']!.contains('Activity\nSummary')) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const ActivitySummaryPage()),
+                );
+              }
+              else if (item['label']!.contains('Employee\nDashBoard')) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const EmployeeDashboardPage()),
+                );
+              }
+              else if (item['label']!.contains('GRC\nLead Entry')) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const GrcLeadEntryPage()),
+                );
+              }
             },
             child: _buildQuickMenuItem(
               item['image']!,
@@ -661,21 +747,30 @@ class _HomeContentState extends State<HomeContent> {
     );
   }
 
+  /// Helper to draw each Quick Menu icon + label.
   Widget _buildQuickMenuItem(String imagePath, String label, double itemWidth) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Image.asset(
-          imagePath,
-          width: itemWidth * 0.6,
-          height: itemWidth * 0.6,
-          fit: BoxFit.contain,
+        Material(
+          elevation: 4.0,
+          borderRadius: BorderRadius.circular(12.0),
+          child: Container(
+            width: 56,
+            height: 56,
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12.0),
+              color: Colors.white,
+            ),
+            child: Image.asset(imagePath, fit: BoxFit.contain),
+          ),
         ),
         const SizedBox(height: 8),
         Text(
           label,
           textAlign: TextAlign.center,
-          style: const TextStyle(fontSize: 12, color: Colors.black),
+          style: const TextStyle(fontSize: 12, color: Colors.black87),
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
         ),
@@ -683,6 +778,7 @@ class _HomeContentState extends State<HomeContent> {
     );
   }
 
+  /// “Mostly Used Apps” row (unchanged from before):
   Widget _mostlyUsedApps(double screenWidth, double screenHeight) {
     final List<Map<String, String>> mostlyUsedItems = [
       {'image': 'assets/image33.png', 'label': 'DSR', 'route': 'dsr'},
@@ -712,28 +808,26 @@ class _HomeContentState extends State<HomeContent> {
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children:
-            mostlyUsedItems.map((item) {
-              return InkWell(
-                onTap: () {
-                  print('${item['label']} tapped');
-                  if (item['route'] == 'dsr') {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const DsrEntry()),
-                    );
-                  } else if (item['route'] == 'scanner') {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const TokenScanPage(),
-                      ),
-                    );
-                  }
-                },
-                child: _buildMostlyUsedAppItem(item['image']!, item['label']!),
-              );
-            }).toList(),
+        children: mostlyUsedItems.map((item) {
+          return InkWell(
+            onTap: () {
+              if (item['route'] == 'dsr') {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const DsrEntry()),
+                );
+              } else if (item['route'] == 'scanner') {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const TokenScanPage(),
+                  ),
+                );
+              }
+            },
+            child: _buildMostlyUsedAppItem(item['image']!, item['label']!),
+          );
+        }).toList(),
       ),
     );
   }
@@ -768,6 +862,7 @@ class _HomeContentState extends State<HomeContent> {
     );
   }
 
+  /// Banner widget (unchanged):
   Widget _buildBanner() {
     return SizedBox(
       height: 160,
@@ -808,10 +903,9 @@ class _HomeContentState extends State<HomeContent> {
                     height: 8,
                     margin: const EdgeInsets.symmetric(horizontal: 2),
                     decoration: BoxDecoration(
-                      color:
-                          _currentIndex == index
-                              ? Colors.blue
-                              : Colors.white.withOpacity(0.5),
+                      color: _currentIndex == index
+                          ? Colors.blue
+                          : Colors.white.withOpacity(0.5),
                       borderRadius: BorderRadius.circular(4),
                     ),
                   );
@@ -822,26 +916,9 @@ class _HomeContentState extends State<HomeContent> {
       ),
     );
   }
-
-  Widget _buildBannerItem(
-    double screenWidth,
-    double screenHeight,
-    String imagePath,
-  ) {
-    return Container(
-      width: screenWidth,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8.0),
-        border: Border.all(color: Colors.grey.shade400, width: 1.0),
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(7.0),
-        child: Image.asset(imagePath, fit: BoxFit.cover),
-      ),
-    );
-  }
 }
 
+/// A simple horizontal menu bar above the Quick Menu (unchanged).
 class HorizontalMenu extends StatefulWidget {
   const HorizontalMenu({super.key});
 
@@ -893,7 +970,6 @@ class _HorizontalMenuState extends State<HorizontalMenu> {
                 setState(() {
                   selected = label;
                 });
-                print('$label selected');
               },
               child: Text(
                 label,

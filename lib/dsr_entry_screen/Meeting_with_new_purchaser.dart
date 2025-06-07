@@ -1,9 +1,7 @@
 import 'dart:io';
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:http/http.dart' as http;
 import '../theme/app_theme.dart';
 
 // Import all the required screens
@@ -32,17 +30,17 @@ class _MeetingWithNewPurchaserState extends State<MeetingWithNewPurchaser> {
   final List<String> _processdropdownItems = ['Select', 'Add', 'Update'];
 
   final TextEditingController _submissionDateController = TextEditingController();
-  final TextEditingController _reportDateController = TextEditingController();
+  final TextEditingController _reportDateController     = TextEditingController();
 
-  final TextEditingController _purchaserNameController = TextEditingController();
+  final TextEditingController _purchaserNameController  = TextEditingController();
   final TextEditingController _topicDiscussedController = TextEditingController();
-  final TextEditingController _remarksController = TextEditingController();
+  final TextEditingController _remarksController         = TextEditingController();
 
   DateTime? _selectedSubmissionDate;
   DateTime? _selectedReportDate;
 
   final List<int> _uploadRows = [0];
-  final ImagePicker _picker = ImagePicker();
+  final ImagePicker _picker   = ImagePicker();
   final List<File?> _selectedImages = [null];
 
   final _formKey = GlobalKey<FormState>();
@@ -64,19 +62,17 @@ class _MeetingWithNewPurchaserState extends State<MeetingWithNewPurchaser> {
       initialDate: _selectedSubmissionDate ?? now,
       firstDate: DateTime(1900),
       lastDate: DateTime(now.year + 5),
-      builder: (context, child) {
-        return Theme(
-          data: ThemeData.light().copyWith(
-            colorScheme: const ColorScheme.light(
-              primary: AppTheme.primaryColor,
-              onPrimary: Colors.white,
-              onSurface: Colors.black87,
-            ),
-            dialogTheme: const DialogThemeData(backgroundColor: Colors.white),
+      builder: (context, child) => Theme(
+        data: ThemeData.light().copyWith(
+          colorScheme: const ColorScheme.light(
+            primary: AppTheme.primaryColor,
+            onPrimary: Colors.white,
+            onSurface: Colors.black87,
           ),
-          child: child!,
-        );
-      },
+          dialogTheme: const DialogThemeData(backgroundColor: Colors.white),
+        ),
+        child: child!,
+      ),
     );
     if (picked != null) {
       setState(() {
@@ -93,19 +89,17 @@ class _MeetingWithNewPurchaserState extends State<MeetingWithNewPurchaser> {
       initialDate: _selectedReportDate ?? now,
       firstDate: DateTime(1900),
       lastDate: DateTime(now.year + 5),
-      builder: (context, child) {
-        return Theme(
-          data: ThemeData.light().copyWith(
-            colorScheme: const ColorScheme.light(
-              primary: AppTheme.primaryColor,
-              onPrimary: Colors.white,
-              onSurface: Colors.black87,
-            ),
-            dialogTheme: const DialogThemeData(backgroundColor: Colors.white),
+      builder: (context, child) => Theme(
+        data: ThemeData.light().copyWith(
+          colorScheme: const ColorScheme.light(
+            primary: AppTheme.primaryColor,
+            onPrimary: Colors.white,
+            onSurface: Colors.black87,
           ),
-          child: child!,
-        );
-      },
+          dialogTheme: const DialogThemeData(backgroundColor: Colors.white),
+        ),
+        child: child!,
+      ),
     );
     if (picked != null) {
       setState(() {
@@ -132,7 +126,6 @@ class _MeetingWithNewPurchaserState extends State<MeetingWithNewPurchaser> {
 
   Future<void> _pickImage(int index) async {
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
-
     if (pickedFile != null) {
       setState(() {
         _selectedImages[index] = File(pickedFile.path);
@@ -143,86 +136,55 @@ class _MeetingWithNewPurchaserState extends State<MeetingWithNewPurchaser> {
   void _showImageDialog(File imageFile) {
     showDialog(
       context: context,
-      builder: (context) {
-        return Dialog(
-          child: Container(
-            width: MediaQuery.of(context).size.width * 0.8,
-            height: MediaQuery.of(context).size.height * 0.6,
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                fit: BoxFit.contain,
-                image: FileImage(imageFile),
-              ),
+      builder: (_) => Dialog(
+        child: Container(
+          width: MediaQuery.of(context).size.width * 0.8,
+          height: MediaQuery.of(context).size.height * 0.6,
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              fit: BoxFit.contain,
+              image: FileImage(imageFile),
             ),
           ),
-        );
-      },
-    );
-  }
-
-  // Helper: Map UI to API JSON keys for POST
-  Future<void> _submitForm() async {
-    if (!_formKey.currentState!.validate()) return;
-
-    // Always provide base64 strings for images, even if blank
-    String imgfirst = '';
-    String imgscndd = '';
-    String imgthird = '';
-
-    if (_selectedImages.length > 0 && _selectedImages[0] != null) {
-      imgfirst = base64Encode(await _selectedImages[0]!.readAsBytes());
-    }
-    if (_selectedImages.length > 1 && _selectedImages[1] != null) {
-      imgscndd = base64Encode(await _selectedImages[1]!.readAsBytes());
-    }
-    if (_selectedImages.length > 2 && _selectedImages[2] != null) {
-      imgthird = base64Encode(await _selectedImages[2]!.readAsBytes());
-    }
-
-    final Map<String, dynamic> payload = {
-      "Proctype": _processItem,
-      "Submdate": _submissionDateController.text,
-      "Repodate": _reportDateController.text,
-      "Bldrname": _purchaserNameController.text,
-      "Topcdiss": _topicDiscussedController.text,
-      "Remarksf": _remarksController.text,
-      "Imgfirst": imgfirst,
-      "Imgscndd": imgscndd,
-      "Imgthird": imgthird,
-    };
-
-    final url = Uri.parse(
-        "https://qa.birlawhite.com:55232/api/dsrmeetnpur/submit");
-
-    try {
-      final response = await http.post(
-        url,
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode(payload),
-      );
-      print("Status: ${response.statusCode}");
-      print("Body: ${response.body}");
-      _showOutcomeSnackbar(response.statusCode, response.body);
-    } catch (e) {
-      _showOutcomeSnackbar(0, 'Exception: $e');
-    }
-  }
-
-    void _showOutcomeSnackbar(int status, String message) {
-    final isSuccess = status == 200;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          isSuccess ? 'Submitted successfully!' : message,
-          style: const TextStyle(color: Colors.white),
         ),
-        backgroundColor: isSuccess ? Colors.green : Colors.red,
-        behavior: SnackBarBehavior.floating,
-        duration: const Duration(seconds: 3),
       ),
     );
   }
 
+  // === Stubbed submit: validate, show SnackBar, reset ===
+  void _onSubmit() {
+    if (!_formKey.currentState!.validate()) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Form validated. Submitted successfully!'),
+        backgroundColor: Colors.green,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+
+    _resetForm();
+  }
+
+  void _resetForm() {
+    setState(() {
+      _processItem = 'Select';
+      _selectedSubmissionDate = null;
+      _selectedReportDate     = null;
+      _submissionDateController.clear();
+      _reportDateController.clear();
+      _purchaserNameController.clear();
+      _topicDiscussedController.clear();
+      _remarksController.clear();
+      _uploadRows
+        ..clear()
+        ..add(0);
+      _selectedImages
+        ..clear()
+        ..add(null);
+    });
+    _formKey.currentState!.reset();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -230,32 +192,22 @@ class _MeetingWithNewPurchaserState extends State<MeetingWithNewPurchaser> {
       backgroundColor: AppTheme.scaffoldBackgroundColor,
       appBar: AppBar(
         leading: IconButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const DsrEntry()),
-            );
-          },
-          icon: const Icon(
-            Icons.arrow_back_ios_new,
-            color: Colors.white,
-            size: 22,
+          onPressed: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const DsrEntry()),
           ),
+          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 22),
         ),
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               'Meeting with New Purchaser',
-              style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                color: Colors.white,
-              ),
+              style: Theme.of(context).textTheme.displaySmall?.copyWith(color: Colors.white),
             ),
             Text(
               'Daily Sales Report Entry',
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Colors.white70,
-              ),
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.white70),
             ),
           ],
         ),
@@ -278,7 +230,7 @@ class _MeetingWithNewPurchaserState extends State<MeetingWithNewPurchaser> {
       body: Form(
         key: _formKey,
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -290,12 +242,7 @@ class _MeetingWithNewPurchaserState extends State<MeetingWithNewPurchaser> {
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.1),
-                      spreadRadius: 1,
-                      blurRadius: 5,
-                      offset: const Offset(0, 2),
-                    ),
+                    BoxShadow(color: Colors.grey.withOpacity(0.1), blurRadius: 5, offset: const Offset(0, 2)),
                   ],
                 ),
                 child: Column(
@@ -305,10 +252,7 @@ class _MeetingWithNewPurchaserState extends State<MeetingWithNewPurchaser> {
                       children: [
                         Icon(Icons.settings_outlined, color: AppTheme.primaryColor),
                         const SizedBox(width: 8),
-                        Text(
-                          'Process',
-                          style: Theme.of(context).textTheme.titleLarge,
-                        ),
+                        Text('Process', style: Theme.of(context).textTheme.titleLarge),
                       ],
                     ),
                     const SizedBox(height: 16),
@@ -317,48 +261,21 @@ class _MeetingWithNewPurchaserState extends State<MeetingWithNewPurchaser> {
                       decoration: InputDecoration(
                         filled: true,
                         fillColor: Colors.grey[100],
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: BorderSide.none,
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 12,
-                        ),
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                         isCollapsed: true,
                       ),
                       isExpanded: true,
                       items: _processdropdownItems
-                          .map(
-                            (item) => DropdownMenuItem<String>(
-                          value: item,
-                          child: Container(
-                            constraints: const BoxConstraints(maxWidth: 250),
-                            child: Text(
-                              item,
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 1,
-                              style: const TextStyle(fontSize: 14),
-                            ),
-                          ),
-                        ),
-                      )
+                          .map((item) => DropdownMenuItem<String>(value: item, child: Text(item)))
                           .toList(),
-                      onChanged: (val) {
-                        if (val != null) {
-                          setState(() => _processItem = val);
-                        }
-                      },
-                      validator: (value) {
-                        if (value == null || value == 'Select') {
-                          return 'Please select a process';
-                        }
-                        return null;
-                      },
+                      onChanged: (val) => setState(() => _processItem = val),
+                      validator: (val) => (val == null || val == 'Select') ? 'Please select a process' : null,
                     ),
                   ],
                 ),
               ),
+
               // Date Selection Card
               Card(
                 margin: const EdgeInsets.only(bottom: 16),
@@ -371,17 +288,11 @@ class _MeetingWithNewPurchaserState extends State<MeetingWithNewPurchaser> {
                         children: [
                           Icon(Icons.date_range_outlined, color: AppTheme.primaryColor),
                           const SizedBox(width: 8),
-                          Text(
-                            'Date Information',
-                            style: Theme.of(context).textTheme.titleLarge,
-                          ),
+                          Text('Date Information', style: Theme.of(context).textTheme.titleLarge),
                         ],
                       ),
                       const SizedBox(height: 16),
-                      Text(
-                        'Submission Date',
-                        style: Theme.of(context).textTheme.titleLarge,
-                      ),
+                      Text('Submission Date', style: Theme.of(context).textTheme.titleLarge),
                       const SizedBox(height: 8),
                       TextFormField(
                         controller: _submissionDateController,
@@ -389,24 +300,13 @@ class _MeetingWithNewPurchaserState extends State<MeetingWithNewPurchaser> {
                         decoration: InputDecoration(
                           labelText: 'Submission Date',
                           hintText: 'Select Submission Date',
-                          suffixIcon: IconButton(
-                            icon: const Icon(Icons.calendar_today),
-                            onPressed: _pickSubmissionDate,
-                          ),
+                          suffixIcon: IconButton(icon: const Icon(Icons.calendar_today), onPressed: _pickSubmissionDate),
                         ),
                         onTap: _pickSubmissionDate,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please select a submission date';
-                          }
-                          return null;
-                        },
+                        validator: (val) => (val == null || val.isEmpty) ? 'Please select a submission date' : null,
                       ),
                       const SizedBox(height: 16),
-                      Text(
-                        'Report Date',
-                        style: Theme.of(context).textTheme.titleLarge,
-                      ),
+                      Text('Report Date', style: Theme.of(context).textTheme.titleLarge),
                       const SizedBox(height: 8),
                       TextFormField(
                         controller: _reportDateController,
@@ -414,18 +314,10 @@ class _MeetingWithNewPurchaserState extends State<MeetingWithNewPurchaser> {
                         decoration: InputDecoration(
                           labelText: 'Report Date',
                           hintText: 'Select Report Date',
-                          suffixIcon: IconButton(
-                            icon: const Icon(Icons.calendar_today),
-                            onPressed: _pickReportDate,
-                          ),
+                          suffixIcon: IconButton(icon: const Icon(Icons.calendar_today), onPressed: _pickReportDate),
                         ),
                         onTap: _pickReportDate,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please select a report date';
-                          }
-                          return null;
-                        },
+                        validator: (val) => (val == null || val.isEmpty) ? 'Please select a report date' : null,
                       ),
                     ],
                   ),
@@ -440,7 +332,7 @@ class _MeetingWithNewPurchaserState extends State<MeetingWithNewPurchaser> {
                   hintText: 'Enter Purchaser Name',
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                 ),
-                validator: (value) => value == null || value.isEmpty ? 'Required' : null,
+                validator: (val) => val == null || val.isEmpty ? 'Required' : null,
               ),
               const SizedBox(height: 16),
 
@@ -452,7 +344,7 @@ class _MeetingWithNewPurchaserState extends State<MeetingWithNewPurchaser> {
                   hintText: 'Enter Topic Discussed',
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                 ),
-                validator: (value) => value == null || value.isEmpty ? 'Required' : null,
+                validator: (val) => val == null || val.isEmpty ? 'Required' : null,
               ),
               const SizedBox(height: 16),
 
@@ -466,7 +358,7 @@ class _MeetingWithNewPurchaserState extends State<MeetingWithNewPurchaser> {
                 ),
                 minLines: 2,
                 maxLines: 4,
-                validator: (value) => value == null || value.isEmpty ? 'Required' : null,
+                validator: (val) => val == null || val.isEmpty ? 'Required' : null,
               ),
               const SizedBox(height: 16),
 
@@ -483,16 +375,9 @@ class _MeetingWithNewPurchaserState extends State<MeetingWithNewPurchaser> {
                         children: [
                           Row(
                             children: [
-                              Icon(
-                                Icons.photo_library_rounded,
-                                color: Colors.blue,
-                                size: 24,
-                              ),
+                              Icon(Icons.photo_library_rounded, color: Colors.blue, size: 24),
                               const SizedBox(width: 8),
-                              Text(
-                                'Supporting Documents',
-                                style: Theme.of(context).textTheme.titleLarge,
-                              ),
+                              Text('Supporting Documents', style: Theme.of(context).textTheme.titleLarge),
                             ],
                           ),
                           Row(
@@ -514,16 +399,13 @@ class _MeetingWithNewPurchaserState extends State<MeetingWithNewPurchaser> {
                         ],
                       ),
                       const SizedBox(height: 4),
-                      Text(
-                        'Upload images related to your activity',
-                        style: Theme.of(context).textTheme.bodyMedium,
-                      ),
+                      Text('Upload images related to your activity', style: Theme.of(context).textTheme.bodyMedium),
                       const SizedBox(height: 16),
                       ListView.builder(
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
                         itemCount: _uploadRows.length,
-                        itemBuilder: (context, index) {
+                        itemBuilder: (_, index) {
                           return Padding(
                             padding: const EdgeInsets.only(bottom: 16),
                             child: Container(
@@ -536,13 +418,9 @@ class _MeetingWithNewPurchaserState extends State<MeetingWithNewPurchaser> {
                                 children: [
                                   Expanded(
                                     child: Text(
-                                      _selectedImages[index] == null
-                                          ? 'No image selected'
-                                          : 'Image selected',
+                                      _selectedImages[index] == null ? 'No image selected' : 'Image selected',
                                       style: TextStyle(
-                                        color: _selectedImages[index] == null
-                                            ? Colors.grey[600]
-                                            : Colors.black87,
+                                        color: _selectedImages[index] == null ? Colors.grey[600] : Colors.black87,
                                       ),
                                     ),
                                   ),
@@ -552,17 +430,14 @@ class _MeetingWithNewPurchaserState extends State<MeetingWithNewPurchaser> {
                                     icon: const Icon(Icons.add_photo_alternate),
                                     label: const Text('Select'),
                                     style: ElevatedButton.styleFrom(
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                                     ),
                                   ),
                                   if (_selectedImages[index] != null) ...[
                                     const SizedBox(width: 8),
                                     IconButton(
                                       icon: const Icon(Icons.visibility),
-                                      onPressed: () => _showImageDialog(
-                                          _selectedImages[index]!),
+                                      onPressed: () => _showImageDialog(_selectedImages[index]!),
                                       tooltip: 'View Image',
                                       color: Colors.blue,
                                     ),
@@ -580,17 +455,12 @@ class _MeetingWithNewPurchaserState extends State<MeetingWithNewPurchaser> {
 
               // Submit Button
               ElevatedButton(
-                onPressed: _submitForm,
+                onPressed: _onSubmit,
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                 ),
-                child: const Text(
-                  'Submit',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
+                child: const Text('Submit', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
               ),
             ],
           ),

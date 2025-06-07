@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:image_picker/image_picker.dart';
@@ -148,70 +147,26 @@ class _WorkFromHomeState extends State<WorkFromHome> {
     );
   }
 
-  Future<String> fileToBase64(File? file) async {
-    if (file == null) return '';
-    final bytes = await file.readAsBytes();
-    return base64Encode(bytes);
-  }
-
-  Future<void> _submitForm() async {
+  void _submitForm() {
     if (!_formKey.currentState!.validate()) return;
 
-    final subDateStr = _submissionDateController.text;
-    final repDateStr = _reportDateController.text;
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Work From Home submitted! (local only)'), backgroundColor: Colors.green),
+    );
 
-    // Always prepare three image fields as per backend structure (can be "")
-    String imgfirst = '', imgscndd = '', imgthird = '';
-    if (_selectedImages.isNotEmpty) imgfirst = await fileToBase64(_selectedImages[0]);
-    if (_selectedImages.length > 1) imgscndd = await fileToBase64(_selectedImages[1]);
-    if (_selectedImages.length > 2) imgthird = await fileToBase64(_selectedImages[2]);
-
-    final Map<String, dynamic> payload = {
-      'proctype': _processItem ?? '',
-      'submdate': subDateStr,
-      'repodate': repDateStr,
-      'imgfirst': imgfirst,
-      'imgscndd': imgscndd,
-      'imgthird': imgthird,
-    };
-
-    try {
-      final response = await HttpClient()
-          .postUrl(Uri.parse('https://qa.birlawhite.com:55232/api/dsrworkhome/submit'))
-          .then((req) {
-        req.headers.set(HttpHeaders.contentTypeHeader, 'application/json');
-        req.add(utf8.encode(jsonEncode(payload)));
-        return req.close();
-      });
-
-      final respBody = await response.transform(utf8.decoder).join();
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Work From Home submitted successfully!'), backgroundColor: Colors.green),
-        );
-        // Clear form after submission
-        _formKey.currentState!.reset();
-        setState(() {
-          _processItem = 'Select';
-          _selectedSubmissionDate = null;
-          _submissionDateController.clear();
-          _selectedReportDate = null;
-          _reportDateController.clear();
-          _uploadRows.clear();
-          _selectedImages.clear();
-          _uploadRows.add(0);
-          _selectedImages.add(null);
-        });
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Submission failed (${response.statusCode}): $respBody'), backgroundColor: Colors.redAccent),
-        );
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error submitting: $e'), backgroundColor: Colors.redAccent),
-      );
-    }
+    // Clear form after "submission"
+    _formKey.currentState!.reset();
+    setState(() {
+      _processItem = 'Select';
+      _selectedSubmissionDate = null;
+      _submissionDateController.clear();
+      _selectedReportDate = null;
+      _reportDateController.clear();
+      _uploadRows.clear();
+      _selectedImages.clear();
+      _uploadRows.add(0);
+      _selectedImages.add(null);
+    });
   }
 
   @override

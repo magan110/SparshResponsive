@@ -1,9 +1,7 @@
 import 'dart:io';
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:http/http.dart' as http;
 
 import '../theme/app_theme.dart';
 import 'dsr_entry.dart';
@@ -16,33 +14,31 @@ class PhoneCallWithBuilder extends StatefulWidget {
 }
 
 class _PhoneCallWithBuilderState extends State<PhoneCallWithBuilder> {
-  // Controllers for all input fields
   final _formKey = GlobalKey<FormState>();
 
   String? _processItem = 'Select';
   final List<String> _processdropdownItems = ['Select', 'Add', 'Update'];
 
   final TextEditingController _submissionDateController = TextEditingController();
-  final TextEditingController _reportDateController = TextEditingController();
+  final TextEditingController _reportDateController     = TextEditingController();
 
   String? _areaCode = 'Select';
-  final List<String> _areaCodeItems = ['Select', 'Agra', 'Delhi', 'Mumbai']; // add all needed
+  final List<String> _areaCodeItems = ['Select', 'Agra', 'Delhi', 'Mumbai'];
 
   String? _purchaserItem = 'Select';
   final List<String> _purchaserItems = ['Select', 'Purchaser(Non Trade)', 'AUTHORISED DEALER'];
 
-  final TextEditingController _codeController = TextEditingController();
-  final TextEditingController _siteController = TextEditingController();
-  final TextEditingController _contractorController = TextEditingController(); // For Bldrname
+  final TextEditingController _codeController         = TextEditingController();
+  final TextEditingController _siteController         = TextEditingController();
+  final TextEditingController _contractorController   = TextEditingController();
   String? _metWithItem = 'Select';
   final List<String> _metWithItems = ['Select', 'Builder', 'Contractor'];
-  final TextEditingController _namedesgController = TextEditingController();
-  final TextEditingController _topicController = TextEditingController();      // For Topcdiss
+  final TextEditingController _namedesgController     = TextEditingController();
+  final TextEditingController _topicController        = TextEditingController();
   final TextEditingController _ugaiRecoveryController = TextEditingController();
-  final TextEditingController _grievanceController = TextEditingController();
-  final TextEditingController _otherPointController = TextEditingController(); // For Remarksc
+  final TextEditingController _grievanceController    = TextEditingController();
+  final TextEditingController _otherPointController   = TextEditingController();
 
-  // Images
   List<File?> _selectedImages = [null];
 
   @override
@@ -102,83 +98,60 @@ class _PhoneCallWithBuilderState extends State<PhoneCallWithBuilder> {
   void _showImageDialog(File imageFile) {
     showDialog(
       context: context,
-      builder: (context) {
-        return Dialog(
-          child: Container(
-            width: MediaQuery.of(context).size.width * 0.8,
-            height: MediaQuery.of(context).size.height * 0.6,
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                fit: BoxFit.contain,
-                image: FileImage(imageFile),
-              ),
+      builder: (_) => Dialog(
+        child: Container(
+          width: MediaQuery.of(context).size.width * 0.8,
+          height: MediaQuery.of(context).size.height * 0.6,
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              fit: BoxFit.contain,
+              image: FileImage(imageFile),
             ),
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 
-  Future<String> fileToBase64(File? file) async {
-    if (file == null) return "";
-    final bytes = await file.readAsBytes();
-    return base64Encode(bytes);
-  }
-
-  Future<void> _submitForm({bool exitAfter = false}) async {
+  void _onSubmit({required bool exitAfter}) {
     if (!_formKey.currentState!.validate()) return;
 
-    final imgfirst = await fileToBase64(_selectedImages.length > 0 ? _selectedImages[0] : null);
-    final imgscndd = await fileToBase64(_selectedImages.length > 1 ? _selectedImages[1] : null);
-    final imgthird = await fileToBase64(_selectedImages.length > 2 ? _selectedImages[2] : null);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(exitAfter
+            ? 'Form validated. Exiting...'
+            : 'Form validated. Ready for new entry.'),
+        backgroundColor: Colors.green,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
 
-    final Map<String, dynamic> payload = {
-      'proctype': _processItem ?? '',
-      'submdate': _submissionDateController.text,
-      'repodate': _reportDateController.text,
-      'areacode': _areaCode ?? '',
-      'purchser': _purchaserItem ?? '',
-      'code': _codeController.text,
-      'sitename': _siteController.text,
-      'Bldrname': _contractorController.text,   // <- as per API
-      'metwith': _metWithItem ?? '',
-      'namedesg': _namedesgController.text,
-      'Topcdiss': _topicController.text,        // <- as per API
-      'ugairecov': _ugaiRecoveryController.text,
-      'grievance': _grievanceController.text,
-      'Remarksc': _otherPointController.text,   // <- as per API
-      'imgfirst': imgfirst,
-      'imgscndd': imgscndd,
-      'imgthird': imgthird,
-    };
-
-    debugPrint("Payload: ${jsonEncode(payload)}");
-
-    try {
-      final response = await http.post(
-        Uri.parse('https://qa.birlawhite.com:55232/api/dsrphnbldr/submit'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(payload),
-      );
-      debugPrint("Status code: ${response.statusCode}");
-      debugPrint("👉 Response body: ${response.body}");
-
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Submitted!'), backgroundColor: Colors.green),
-        );
-        if (exitAfter) Navigator.of(context).pop();
-        // No dialog shown after submission!
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: ${response.body}'), backgroundColor: Colors.red),
-        );
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Network error: $e'), backgroundColor: Colors.red),
-      );
+    if (exitAfter) {
+      Navigator.of(context).pop();
+    } else {
+      _clearForm();
     }
+  }
+
+  void _clearForm() {
+    setState(() {
+      _processItem = 'Select';
+      _submissionDateController.clear();
+      _reportDateController.clear();
+      _areaCode = 'Select';
+      _purchaserItem = 'Select';
+      _codeController.clear();
+      _siteController.clear();
+      _contractorController.clear();
+      _metWithItem = 'Select';
+      _namedesgController.clear();
+      _topicController.clear();
+      _ugaiRecoveryController.clear();
+      _grievanceController.clear();
+      _otherPointController.clear();
+      _selectedImages = [null];
+    });
+    _formKey.currentState!.reset();
   }
 
   @override
@@ -187,10 +160,14 @@ class _PhoneCallWithBuilderState extends State<PhoneCallWithBuilder> {
       backgroundColor: AppTheme.scaffoldBackgroundColor,
       appBar: AppBar(
         leading: IconButton(
-          onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const DsrEntry())),
+          onPressed: () =>
+              Navigator.push(context, MaterialPageRoute(builder: (_) => const DsrEntry())),
           icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 22),
         ),
-        title: Text('Phone Call With Builder', style: Theme.of(context).textTheme.displaySmall?.copyWith(color: Colors.white)),
+        title: Text(
+          'Phone Call With Builder',
+          style: Theme.of(context).textTheme.displaySmall?.copyWith(color: Colors.white),
+        ),
         backgroundColor: AppTheme.primaryColor,
         elevation: 0,
       ),
@@ -208,10 +185,12 @@ class _PhoneCallWithBuilderState extends State<PhoneCallWithBuilder> {
               ),
               const SizedBox(height: 10),
               _buildLabel('Submission Date'),
-              _buildDateField(_submissionDateController, _pickSubmissionDate, 'Select Submission Date'),
+              _buildDateField(
+                  _submissionDateController, _pickSubmissionDate, 'Select Submission Date'),
               const SizedBox(height: 10),
               _buildLabel('Report Date'),
-              _buildDateField(_reportDateController, _pickReportDate, 'Select Report Date'),
+              _buildDateField(
+                  _reportDateController, _pickReportDate, 'Select Report Date'),
               const SizedBox(height: 10),
               _buildLabel('Area Code'),
               _buildDropdownField(
@@ -234,7 +213,8 @@ class _PhoneCallWithBuilderState extends State<PhoneCallWithBuilder> {
               _buildTextField('Enter Site Name', controller: _siteController),
               const SizedBox(height: 10),
               _buildLabel('Contractor Working at Site'),
-              _buildTextField('Enter Contractor Name', controller: _contractorController),
+              _buildTextField(
+                  'Enter Contractor Name', controller: _contractorController),
               const SizedBox(height: 10),
               _buildLabel('Met With'),
               _buildDropdownField(
@@ -244,22 +224,28 @@ class _PhoneCallWithBuilderState extends State<PhoneCallWithBuilder> {
               ),
               const SizedBox(height: 10),
               _buildLabel('Name and Designation of Person'),
-              _buildTextField('Enter Name and Designation', controller: _namedesgController),
+              _buildTextField(
+                  'Enter Name and Designation', controller: _namedesgController),
               const SizedBox(height: 10),
               _buildLabel('Topic Discussed'),
-              _buildTextField('Enter Topic Discussed', controller: _topicController, maxLines: 3),
+              _buildTextField('Enter Topic Discussed',
+                  controller: _topicController, maxLines: 3),
               const SizedBox(height: 10),
               _buildLabel('Ugai Recovery Plans'),
-              _buildTextField('Enter Ugai Recovery Plans', controller: _ugaiRecoveryController, maxLines: 3),
+              _buildTextField('Enter Ugai Recovery Plans',
+                  controller: _ugaiRecoveryController, maxLines: 3),
               const SizedBox(height: 10),
               _buildLabel('Any Purchaser Grievances'),
-              _buildTextField('Enter Purchaser Grievances', controller: _grievanceController, maxLines: 3),
+              _buildTextField('Enter Purchaser Grievances',
+                  controller: _grievanceController, maxLines: 3),
               const SizedBox(height: 10),
-              _buildLabel('Any other Point'),
-              _buildTextField('Enter Any Other Point', controller: _otherPointController, maxLines: 3),
+              _buildLabel('Any Other Point'),
+              _buildTextField('Enter Any Other Point',
+                  controller: _otherPointController, maxLines: 3),
               const SizedBox(height: 10),
               _buildLabel('Upload Images'),
               ...List.generate(_selectedImages.length, (i) {
+                final file = _selectedImages[i];
                 return Container(
                   margin: const EdgeInsets.only(bottom: 16),
                   padding: const EdgeInsets.all(12),
@@ -267,7 +253,8 @@ class _PhoneCallWithBuilderState extends State<PhoneCallWithBuilder> {
                     color: Colors.grey.shade50,
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                      color: _selectedImages[i] != null ? Colors.green.shade200 : Colors.grey.shade200,
+                      color:
+                      file != null ? Colors.green.shade200 : Colors.grey.shade200,
                       width: 1.5,
                     ),
                   ),
@@ -276,11 +263,14 @@ class _PhoneCallWithBuilderState extends State<PhoneCallWithBuilder> {
                     children: [
                       Row(
                         children: [
-                          Text('Document ${i + 1}', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                          Text('Document ${i + 1}',
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 14)),
                           const Spacer(),
-                          if (_selectedImages[i] != null)
+                          if (file != null)
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 3),
                               decoration: BoxDecoration(
                                 color: Colors.green.shade100,
                                 borderRadius: BorderRadius.circular(16),
@@ -288,9 +278,14 @@ class _PhoneCallWithBuilderState extends State<PhoneCallWithBuilder> {
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: const [
-                                  Icon(Icons.check_circle, color: Colors.green, size: 16),
+                                  Icon(Icons.check_circle,
+                                      color: Colors.green, size: 16),
                                   SizedBox(width: 4),
-                                  Text('Uploaded', style: TextStyle(color: Colors.green, fontWeight: FontWeight.w500, fontSize: 13)),
+                                  Text('Uploaded',
+                                      style: TextStyle(
+                                          color: Colors.green,
+                                          fontWeight: FontWeight.w500,
+                                          fontSize: 13)),
                                 ],
                               ),
                             ),
@@ -302,18 +297,21 @@ class _PhoneCallWithBuilderState extends State<PhoneCallWithBuilder> {
                           Expanded(
                             child: ElevatedButton.icon(
                               onPressed: () => _pickImage(i),
-                              icon: Icon(_selectedImages[i] != null ? Icons.refresh : Icons.upload_file, size: 18),
-                              label: Text(_selectedImages[i] != null ? 'Replace' : 'Upload'),
+                              icon: Icon(
+                                  file != null ? Icons.refresh : Icons.upload_file,
+                                  size: 18),
+                              label: Text(file != null ? 'Replace' : 'Upload'),
                             ),
                           ),
-                          if (_selectedImages[i] != null) ...[
+                          if (file != null) ...[
                             const SizedBox(width: 10),
                             Expanded(
                               child: ElevatedButton.icon(
-                                onPressed: () => _showImageDialog(_selectedImages[i]!),
+                                onPressed: () => _showImageDialog(file),
                                 icon: const Icon(Icons.visibility, size: 18),
                                 label: const Text('View'),
-                                style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+                                style:
+                                ElevatedButton.styleFrom(backgroundColor: Colors.green),
                               ),
                             ),
                             const SizedBox(width: 10),
@@ -323,7 +321,8 @@ class _PhoneCallWithBuilderState extends State<PhoneCallWithBuilder> {
                                   _selectedImages.removeAt(i);
                                 });
                               },
-                              icon: const Icon(Icons.remove_circle_outline, color: Colors.red),
+                              icon: const Icon(Icons.remove_circle_outline,
+                                  color: Colors.red),
                             ),
                           ]
                         ],
@@ -349,14 +348,14 @@ class _PhoneCallWithBuilderState extends State<PhoneCallWithBuilder> {
                 children: [
                   Expanded(
                     child: ElevatedButton(
-                      onPressed: () => _submitForm(exitAfter: false),
+                      onPressed: () => _onSubmit(exitAfter: false),
                       child: const Text('Submit & New'),
                     ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: ElevatedButton(
-                      onPressed: () => _submitForm(exitAfter: true),
+                      onPressed: () => _onSubmit(exitAfter: true),
                       child: const Text('Submit & Exit'),
                     ),
                   ),
@@ -373,7 +372,8 @@ class _PhoneCallWithBuilderState extends State<PhoneCallWithBuilder> {
     padding: const EdgeInsets.symmetric(vertical: 4),
     child: Text(
       text,
-      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.black87),
+      style: const TextStyle(
+          fontSize: 16, fontWeight: FontWeight.w600, color: Colors.black87),
     ),
   );
 
@@ -412,18 +412,22 @@ class _PhoneCallWithBuilderState extends State<PhoneCallWithBuilder> {
           isExpanded: true,
           value: value,
           underline: Container(),
-          items: items.map((item) => DropdownMenuItem(value: item, child: Text(item))).toList(),
+          items: items
+              .map((item) => DropdownMenuItem(value: item, child: Text(item)))
+              .toList(),
           onChanged: onChanged,
         ),
       );
 
-  Widget _buildDateField(TextEditingController controller, VoidCallback onTap, String hint) =>
+  Widget _buildDateField(
+      TextEditingController controller, VoidCallback onTap, String hint) =>
       TextFormField(
         controller: controller,
         readOnly: true,
         decoration: InputDecoration(
           hintText: hint,
-          suffixIcon: IconButton(icon: const Icon(Icons.calendar_today), onPressed: onTap),
+          suffixIcon:
+          IconButton(icon: const Icon(Icons.calendar_today), onPressed: onTap),
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
           contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
         ),

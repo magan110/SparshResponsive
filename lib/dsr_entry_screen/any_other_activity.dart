@@ -1,12 +1,10 @@
 import 'dart:io';
-import 'dart:convert';                  // ← For JSON & Base64
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:http/http.dart' as http;
 
 import 'package:learning2/dsr_entry_screen/phone_call_with_builder.dart';
-import 'package:learning2/dsr_entry_screen/phone_call_with_unregisterd_purchaser.dart';
 import 'package:learning2/dsr_entry_screen/work_from_home.dart';
 import 'Meeting_with_new_purchaser.dart';
 import 'Meetings_With_Contractor.dart';
@@ -45,10 +43,10 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
   DateTime? _selectedDate;
   DateTime? _selectedReportDate;
 
-  // 3) Image‐upload state (up to 3)
+  // 3) Image-upload state (up to 3)
   final List<int> _uploadRows = [0];
   final ImagePicker _picker = ImagePicker();
-  final List<File?> _selectedImages = [null];
+  final List<XFile?> _selectedImages = [null];
 
   // Global key for the form (validation)
   final _formKey = GlobalKey<FormState>();
@@ -64,16 +62,16 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
     super.dispose();
   }
 
-  // ▶️ Add a new image‐upload row (max 3)
+  // ▶️ Add a new image-upload row (max 3)
   void _addRow() {
-    if (_uploadRows.length >= 3) return; // up to three images only
+    if (_uploadRows.length >= 3) return;
     setState(() {
       _uploadRows.add(_uploadRows.length);
       _selectedImages.add(null);
     });
   }
 
-  // ▶️ Remove the last image‐upload row
+  // ▶️ Remove the last image-upload row
   void _removeRow() {
     if (_uploadRows.length <= 1) return;
     setState(() {
@@ -151,15 +149,15 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       setState(() {
-        _selectedImages[index] = File(pickedFile.path);
+        _selectedImages[index] = pickedFile;
       });
     } else {
       print('No image selected for row $index.');
     }
   }
 
-  // ▶️ Show a full‐screen dialog with the selected image
-  void _showImageDialog(File imageFile) {
+  // ▶️ Show a full-screen dialog with the selected image
+  void _showImageDialog(XFile imageFile) {
     showDialog(
       context: context,
       builder: (context) {
@@ -170,7 +168,7 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
             decoration: BoxDecoration(
               image: DecorationImage(
                 fit: BoxFit.contain,
-                image: FileImage(imageFile),
+                image: FileImage(File(imageFile.path)),
               ),
             ),
           ),
@@ -179,103 +177,20 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
     );
   }
 
-  // ▶️ Submit the data to the API.
-  //
-  // If [exitAfter] is true, pop back after a successful post.
-  // If [exitAfter] is false, clear the form for a new entry.
-  Future<void> _submitData(bool exitAfter) async {
-    if (!_formKey.currentState!.validate()) {
-      print("Form is invalid; skipping submit.");
-      return;
-    }
-
-    // Build valid 'yyyy-MM-dd' strings for submdate & repodate (or default to today)
-    final now = DateTime.now();
-    final String submdateStr = (_selectedDate != null)
-        ? DateFormat('yyyy-MM-dd').format(_selectedDate!)
-        : DateFormat('yyyy-MM-dd').format(now);
-    final String repodateStr = (_selectedReportDate != null)
-        ? DateFormat('yyyy-MM-dd').format(_selectedReportDate!)
-        : DateFormat('yyyy-MM-dd').format(now);
-
-    // 1) Gather all fields into a Map, matching your table’s column names
-    final Map<String, dynamic> payload = {
-      "Proctype": _processItem ?? "",
-      "Submdate": submdateStr,
-      "Repodate": repodateStr,
-      "Actdetl1": _activity1Controller.text.trim(),
-      "Actdetl2": _activity2Controller.text.trim(),
-      "Actdetl3": _activity3Controller.text.trim(),
-      "Othrnote": _anyOtherPointsController.text.trim(),
-      // For images, we always send exactly three keys:
-      "Imgfirst": _getBase64AtIndex(0),
-      "Imgscndd": _getBase64AtIndex(1),
-      "Imgthird": _getBase64AtIndex(2),
-    };
-
-    print("Payload JSON:\n${jsonEncode(payload)}");
-
-    // 2) Send HTTP POST (use http:// if no valid SSL certificate)
-    final uri = Uri.parse("https://qa.birlawhite.com:55232/api/dsranyactiv/submit");
-    print("Posting to: $uri");
-
-    try {
-      final response = await http.post(
-        uri,
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode(payload),
+  // ▶️ Stubbed submit: validate and reset/exit
+  void _onSubmit(bool exitAfter) {
+    if (!_formKey.currentState!.validate()) return;
+    if (exitAfter) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Form validated. Exiting...")),
       );
-
-      print("HTTP Status Code: ${response.statusCode}");
-      print("HTTP Response Body: ${response.body}");
-
-      if (response.statusCode == 200) {
-        if (exitAfter) {
-          if (!mounted) return;
-          print("Success → exiting screen...");
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Submitted successfully. Exiting...")),
-          );
-          Navigator.of(context).pop();
-        } else {
-          if (!mounted) return;
-          print("Success → resetting form for new entry...");
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Submitted successfully. Ready for new entry.")),
-          );
-          _resetForm();
-        }
-      } else {
-        print("Server returned an error code: ${response.statusCode}");
-        print("Error Body: ${response.body}");
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Error ${response.statusCode}: ${response.body}")),
-          );
-        }
-      }
-    } catch (error, stack) {
-      print("EXCEPTION in _submitData: $error");
-      print(stack);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Submission failed: $error")),
-        );
-      }
+      Navigator.of(context).pop();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Form validated. Ready for new entry.")),
+      );
+      _resetForm();
     }
-  }
-
-  // Helper to return a Base64‐encoded string for the image at [index],
-  // or "" if that slot is empty or out of range.
-  String _getBase64AtIndex(int index) {
-    if (index < _selectedImages.length && _selectedImages[index] != null) {
-      final bytes = _selectedImages[index]!.readAsBytesSync();
-      final base64Str = base64Encode(bytes);
-      print("→ Base64 length for image #${index + 1}: ${base64Str.length}");
-      return base64Str;
-    }
-    print("→ No image for slot #${index + 1}; sending empty string.");
-    return "";
   }
 
   // ▶️ Clear all fields (for “Submit & New”)
@@ -290,7 +205,6 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
       _activity2Controller.clear();
       _activity3Controller.clear();
       _anyOtherPointsController.clear();
-      // Reset image rows to a single slot with null
       _uploadRows
         ..clear()
         ..add(0);
@@ -356,12 +270,11 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
               key: _formKey,
               child: ListView(
                 children: [
-                  // ————— Enhanced Instructions Section —————
                   AppTheme.buildSectionCard(
                     title: 'Activity Information',
                     icon: Icons.info_outline,
                     children: [
-                      // Process Type Dropdown
+                      // -- Process Type Dropdown --
                       AppTheme.buildLabel('Process Type'),
                       const SizedBox(height: 8),
                       DropdownButtonFormField<String>(
@@ -381,20 +294,18 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
                         ),
                         isExpanded: true,
                         items: _processdropdownItems
-                            .map(
-                              (item) => DropdownMenuItem<String>(
-                            value: item,
-                            child: Container(
-                              constraints: const BoxConstraints(maxWidth: 250),
-                              child: Text(
-                                item,
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 1,
-                                style: const TextStyle(fontSize: 14),
-                              ),
+                            .map((item) => DropdownMenuItem<String>(
+                          value: item,
+                          child: Container(
+                            constraints: const BoxConstraints(maxWidth: 250),
+                            child: Text(
+                              item,
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              style: const TextStyle(fontSize: 14),
                             ),
                           ),
-                        )
+                        ))
                             .toList(),
                         onChanged: (val) {
                           if (val != null) setState(() => _processItem = val);
@@ -407,13 +318,12 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
                         },
                       ),
 
-                      // ——— Date Fields Section ———
+                      // -- Date Fields Section --
                       const SizedBox(height: 16),
                       AppTheme.buildSectionCard(
                         title: 'Date Information',
                         icon: Icons.calendar_today,
                         children: [
-                          // Submission Date
                           AppTheme.buildLabel('Submission Date'),
                           const SizedBox(height: 8),
                           AppTheme.buildDateField(
@@ -422,8 +332,6 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
                             _pickDate,
                             'Select Date',
                           ),
-
-                          // Report Date
                           const SizedBox(height: 16),
                           AppTheme.buildLabel('Report Date'),
                           const SizedBox(height: 8),
@@ -436,7 +344,7 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
                         ],
                       ),
 
-                      // ——— Activity Details Section ———
+                      // -- Activity Details Section --
                       Container(
                         margin: const EdgeInsets.only(bottom: 16),
                         child: Row(
@@ -465,20 +373,16 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
                           ],
                         ),
                       ),
-                      // Text field for Activity Details 1
                       _buildTextField('Activity Details 1', _activity1Controller),
                       const SizedBox(height: 16),
-                      // Text field for Activity Details 2
                       _buildTextField('Activity Details 2', _activity2Controller),
                       const SizedBox(height: 16),
-                      // Text field for Activity Details 3
                       _buildTextField('Activity Details 3', _activity3Controller),
                       const SizedBox(height: 16),
-                      // Text field for Any Other Points
                       _buildTextField('Any Other Points', _anyOtherPointsController),
                       const SizedBox(height: 24),
 
-                      // ——— Image Upload Section ———
+                      // -- Image Upload Section --
                       Container(
                         margin: const EdgeInsets.only(top: 8, bottom: 16),
                         padding: const EdgeInsets.all(16),
@@ -525,7 +429,6 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
                               ),
                             ),
                             const SizedBox(height: 16),
-                            // Dynamically generate up to three upload rows
                             ...List.generate(_uploadRows.length, (index) {
                               final i = _uploadRows[index];
                               return Container(
@@ -600,8 +503,7 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
                                     const SizedBox(height: 16),
                                     if (_selectedImages[i] != null)
                                       GestureDetector(
-                                        onTap: () =>
-                                            _showImageDialog(_selectedImages[i]!),
+                                        onTap: () => _showImageDialog(_selectedImages[i]!),
                                         child: Container(
                                           height: 120,
                                           width: double.infinity,
@@ -609,7 +511,7 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
                                           decoration: BoxDecoration(
                                             borderRadius: BorderRadius.circular(8),
                                             image: DecorationImage(
-                                              image: FileImage(_selectedImages[i]!),
+                                              image: FileImage(File(_selectedImages[i]!.path)),
                                               fit: BoxFit.cover,
                                             ),
                                           ),
@@ -643,9 +545,7 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
                                               size: 18,
                                             ),
                                             label: Text(
-                                              _selectedImages[i] != null
-                                                  ? 'Replace'
-                                                  : 'Upload',
+                                              _selectedImages[i] != null ? 'Replace' : 'Upload',
                                             ),
                                             style: ElevatedButton.styleFrom(
                                               foregroundColor: Colors.white,
@@ -666,8 +566,7 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
                                           const SizedBox(width: 8),
                                           Expanded(
                                             child: ElevatedButton.icon(
-                                              onPressed: () =>
-                                                  _showImageDialog(_selectedImages[i]!),
+                                              onPressed: () => _showImageDialog(_selectedImages[i]!),
                                               icon: const Icon(
                                                 Icons.visibility,
                                                 size: 18,
@@ -693,7 +592,6 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
                                 ),
                               );
                             }),
-                            // Add/Remove row buttons (max 3)
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
@@ -704,9 +602,6 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
                                     size: 20,
                                   ),
                                   label: const Text('Document'),
-                                  style: Theme.of(context)
-                                      .elevatedButtonTheme
-                                      .style,
                                 ),
                                 const SizedBox(width: 12),
                                 if (_uploadRows.length > 1)
@@ -719,12 +614,10 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
                                     label: const Text('Remove'),
                                     style: ElevatedButton.styleFrom(
                                       foregroundColor: Colors.white,
-                                      backgroundColor:
-                                      AppTheme.dangerButtonColor,
+                                      backgroundColor: AppTheme.dangerButtonColor,
                                       elevation: 0,
                                       shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                        BorderRadius.circular(10),
+                                        borderRadius: BorderRadius.circular(10),
                                       ),
                                       padding: const EdgeInsets.symmetric(
                                         horizontal: 16,
@@ -737,9 +630,9 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
                           ],
                         ),
                       ),
-                      const SizedBox(height: 30),
 
-                      // ——— Submit Buttons ———
+                      // -- Submit Buttons --
+                      const SizedBox(height: 30),
                       Container(
                         padding: const EdgeInsets.all(20),
                         decoration: AppTheme.cardDecoration,
@@ -756,9 +649,7 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
                                 const SizedBox(width: 8),
                                 Text(
                                   'Submit Your Activity',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .headlineMedium,
+                                  style: Theme.of(context).textTheme.headlineMedium,
                                 ),
                               ],
                             ),
@@ -768,25 +659,15 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
                               style: Theme.of(context).textTheme.bodyMedium,
                             ),
                             const SizedBox(height: 20),
-
-                            // ▶️ Submit & New
                             ElevatedButton.icon(
-                              onPressed: () => _submitData(false),
-                              icon:
-                              const Icon(Icons.save_outlined, size: 20),
+                              onPressed: () => _onSubmit(false),
+                              icon: const Icon(Icons.save_outlined, size: 20),
                               label: const Text('Submit & New'),
-                              style: Theme.of(context)
-                                  .elevatedButtonTheme
-                                  .style,
                             ),
-
                             const SizedBox(height: 16),
-
-                            // ▶️ Submit & Exit
                             ElevatedButton.icon(
-                              onPressed: () => _submitData(true),
-                              icon: const Icon(Icons.check_circle_outline,
-                                  size: 20),
+                              onPressed: () => _onSubmit(true),
+                              icon: const Icon(Icons.check_circle_outline, size: 20),
                               label: const Text('Submit & Exit'),
                               style: ElevatedButton.styleFrom(
                                 foregroundColor: Colors.white,
@@ -801,10 +682,7 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
                                 ),
                               ),
                             ),
-
                             const SizedBox(height: 16),
-
-                            // ▶️ View Submitted Data
                             OutlinedButton.icon(
                               onPressed: () {
                                 print('View Submitted Data button pressed');
@@ -814,9 +692,6 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
                                 size: 20,
                               ),
                               label: const Text('View Submitted Data'),
-                              style: Theme.of(context)
-                                  .outlinedButtonTheme
-                                  .style,
                             ),
                           ],
                         ),
@@ -835,9 +710,7 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
 
   // === HELPERS ===
 
-  // Build a multi-line TextFormField with a controller
-  Widget _buildTextField(
-      String label, TextEditingController controller) {
+  Widget _buildTextField(String label, TextEditingController controller) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -877,8 +750,7 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide:
-                BorderSide(color: Colors.grey.shade200, width: 1),
+                borderSide: BorderSide(color: Colors.grey.shade200, width: 1),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -894,6 +766,12 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
                 vertical: 16,
               ),
             ),
+            validator: (val) {
+              if (val == null || val.isEmpty) {
+                return 'Please enter $label';
+              }
+              return null;
+            },
           ),
         ),
       ],

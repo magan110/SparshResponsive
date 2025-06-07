@@ -1,9 +1,7 @@
 import 'dart:io';
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:http/http.dart' as http;
 
 import '../theme/app_theme.dart';
 import 'dsr_entry.dart';
@@ -21,9 +19,9 @@ class _OfficeWorkState extends State<OfficeWork> {
   final List<String> _processdropdownItems = ['Select', 'Add', 'Update'];
 
   final TextEditingController _submissionDateController = TextEditingController();
-  final TextEditingController _reportDateController = TextEditingController();
-  final TextEditingController _workRelatedToController = TextEditingController();
-  final TextEditingController _hoursSpentController = TextEditingController();
+  final TextEditingController _reportDateController     = TextEditingController();
+  final TextEditingController _workRelatedToController   = TextEditingController();
+  final TextEditingController _hoursSpentController      = TextEditingController();
 
   List<File?> _selectedImages = [null];
 
@@ -78,57 +76,31 @@ class _OfficeWorkState extends State<OfficeWork> {
   void _showImageDialog(File imageFile) {
     showDialog(
       context: context,
-      builder: (context) => Dialog(
+      builder: (_) => Dialog(
         child: Image.file(imageFile, fit: BoxFit.contain),
       ),
     );
   }
 
-  Future<String> fileToBase64(File? file) async {
-    if (file == null) return "";
-    final bytes = await file.readAsBytes();
-    return base64Encode(bytes);
-  }
-
-  Future<void> _submitForm({bool exitAfter = false}) async {
+  void _onSubmit({required bool exitAfter}) {
     if (!_formKey.currentState!.validate()) return;
 
-    final imgfirst = await fileToBase64(_selectedImages.length > 0 ? _selectedImages[0] : null);
-    final imgscndd = await fileToBase64(_selectedImages.length > 1 ? _selectedImages[1] : null);
-    final imgthird = await fileToBase64(_selectedImages.length > 2 ? _selectedImages[2] : null);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          exitAfter
+              ? 'Form validated. Exiting...'
+              : 'Form validated. Ready for new entry.',
+        ),
+        backgroundColor: Colors.green,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
 
-    final Map<String, dynamic> payload = {
-      'proctype': _processItem ?? '',
-      'submdate': _submissionDateController.text,
-      'repodate': _reportDateController.text,
-      'wrkrelto': _workRelatedToController.text,
-      'nhrsspent': _hoursSpentController.text,
-      'imgfirst': imgfirst,
-      'imgscndd': imgscndd,
-      'imgthird': imgthird,
-    };
-
-    try {
-      final response = await http.post(
-        Uri.parse('https://qa.birlawhite.com:55232/api/dsrofficework/submit'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(payload),
-      );
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Submitted!'), backgroundColor: Colors.green),
-        );
-        if (exitAfter) Navigator.of(context).pop();
-        else _clearForm();
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: ${response.body}'), backgroundColor: Colors.red),
-        );
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Network error: $e'), backgroundColor: Colors.red),
-      );
+    if (exitAfter) {
+      Navigator.of(context).pop();
+    } else {
+      _clearForm();
     }
   }
 
@@ -141,6 +113,7 @@ class _OfficeWorkState extends State<OfficeWork> {
       _hoursSpentController.clear();
       _selectedImages = [null];
     });
+    _formKey.currentState!.reset();
   }
 
   @override
@@ -149,7 +122,10 @@ class _OfficeWorkState extends State<OfficeWork> {
       backgroundColor: AppTheme.scaffoldBackgroundColor,
       appBar: AppBar(
         leading: IconButton(
-          onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const DsrEntry())),
+          onPressed: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const DsrEntry()),
+          ),
           icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
         ),
         title: const Text('Office Work', style: TextStyle(color: Colors.white)),
@@ -179,10 +155,15 @@ class _OfficeWorkState extends State<OfficeWork> {
               _buildTextField('Enter Work Related To', controller: _workRelatedToController, maxLines: 3),
               const SizedBox(height: 10),
               _buildLabel('No. of Hours Spent'),
-              _buildTextField('Enter Number of Hours', controller: _hoursSpentController, keyboardType: TextInputType.number),
+              _buildTextField(
+                'Enter Number of Hours',
+                controller: _hoursSpentController,
+                keyboardType: TextInputType.number,
+              ),
               const SizedBox(height: 10),
               _buildLabel('Upload Images'),
               ...List.generate(_selectedImages.length, (i) {
+                final file = _selectedImages[i];
                 return Container(
                   margin: const EdgeInsets.only(bottom: 16),
                   padding: const EdgeInsets.all(12),
@@ -190,7 +171,7 @@ class _OfficeWorkState extends State<OfficeWork> {
                     color: Colors.grey.shade50,
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                      color: _selectedImages[i] != null ? Colors.green.shade200 : Colors.grey.shade200,
+                      color: file != null ? Colors.green.shade200 : Colors.grey.shade200,
                       width: 1.5,
                     ),
                   ),
@@ -199,9 +180,10 @@ class _OfficeWorkState extends State<OfficeWork> {
                     children: [
                       Row(
                         children: [
-                          Text('Document ${i + 1}', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                          Text('Document ${i + 1}',
+                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                           const Spacer(),
-                          if (_selectedImages[i] != null)
+                          if (file != null)
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                               decoration: BoxDecoration(
@@ -213,7 +195,9 @@ class _OfficeWorkState extends State<OfficeWork> {
                                 children: const [
                                   Icon(Icons.check_circle, color: Colors.green, size: 16),
                                   SizedBox(width: 4),
-                                  Text('Uploaded', style: TextStyle(color: Colors.green, fontWeight: FontWeight.w500, fontSize: 13)),
+                                  Text('Uploaded',
+                                      style: TextStyle(
+                                          color: Colors.green, fontWeight: FontWeight.w500, fontSize: 13)),
                                 ],
                               ),
                             ),
@@ -225,15 +209,15 @@ class _OfficeWorkState extends State<OfficeWork> {
                           Expanded(
                             child: ElevatedButton.icon(
                               onPressed: () => _pickImage(i),
-                              icon: Icon(_selectedImages[i] != null ? Icons.refresh : Icons.upload_file, size: 18),
-                              label: Text(_selectedImages[i] != null ? 'Replace' : 'Upload'),
+                              icon: Icon(file != null ? Icons.refresh : Icons.upload_file, size: 18),
+                              label: Text(file != null ? 'Replace' : 'Upload'),
                             ),
                           ),
-                          if (_selectedImages[i] != null) ...[
+                          if (file != null) ...[
                             const SizedBox(width: 10),
                             Expanded(
                               child: ElevatedButton.icon(
-                                onPressed: () => _showImageDialog(_selectedImages[i]!),
+                                onPressed: () => _showImageDialog(file),
                                 icon: const Icon(Icons.visibility, size: 18),
                                 label: const Text('View'),
                                 style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
@@ -272,14 +256,14 @@ class _OfficeWorkState extends State<OfficeWork> {
                 children: [
                   Expanded(
                     child: ElevatedButton(
-                      onPressed: () => _submitForm(exitAfter: false),
+                      onPressed: () => _onSubmit(exitAfter: false),
                       child: const Text('Submit & New'),
                     ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: ElevatedButton(
-                      onPressed: () => _submitForm(exitAfter: true),
+                      onPressed: () => _onSubmit(exitAfter: true),
                       child: const Text('Submit & Exit'),
                     ),
                   ),
