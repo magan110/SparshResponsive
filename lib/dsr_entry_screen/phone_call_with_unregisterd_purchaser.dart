@@ -10,33 +10,70 @@ class PhoneCallWithUnregisterdPurchaser extends StatefulWidget {
   const PhoneCallWithUnregisterdPurchaser({super.key});
 
   @override
-  State<PhoneCallWithUnregisterdPurchaser> createState() =>
-      _PhoneCallWithUnregisterdPurchaserState();
+  State<PhoneCallWithUnregisterdPurchaser> createState() => _PhoneCallWithUnregisterdPurchaserState();
 }
 
-class _PhoneCallWithUnregisterdPurchaserState
-    extends State<PhoneCallWithUnregisterdPurchaser> {
+class _PhoneCallWithUnregisterdPurchaserState extends State<PhoneCallWithUnregisterdPurchaser> {
+  // Process dropdown
   String? _processItem = 'Select';
   final List<String> _processdropdownItems = ['Select', 'Add', 'Update'];
 
+  // Dates
   final TextEditingController _submissionDateController = TextEditingController();
-  final TextEditingController _reportDateController     = TextEditingController();
+  final TextEditingController _reportDateController = TextEditingController();
 
-  final TextEditingController _purchaserController = TextEditingController();
-  final TextEditingController _topicController     = TextEditingController();
-  final TextEditingController _remarksController   = TextEditingController();
+  // Area Code dropdown
+  String? _areaCode = 'Select';
+  final List<String> _areaCodes = ['Select', 'North', 'South', 'East', 'West'];
 
+  // Mobile No
+  final TextEditingController _mobileController = TextEditingController();
+
+  // Purchaser / Retailer dropdown
+  String? _purchaserType = 'Select';
+  final List<String> _purchaserTypes = [
+    'Select',
+    'Purchaser (Non Trade)',
+    'Authorised Dealer'
+  ];
+
+  // Party Name
+  final TextEditingController _partyNameController = TextEditingController();
+
+  // Counter Type dropdown
+  String? _counterType = 'Select';
+  final List<String> _counterTypes = ['Select', 'Type A', 'Type B'];
+
+  // Pin Code
+  final TextEditingController _pinCodeController = TextEditingController();
+
+  // District
+  final TextEditingController _districtController = TextEditingController();
+
+  // Visited City
+  final TextEditingController _visitedCityController = TextEditingController();
+
+  // Name & Designation
+  final TextEditingController _nameDesigController = TextEditingController();
+
+  // Topics discussed
+  final TextEditingController _topicsController = TextEditingController();
+
+  // Images
   List<File?> _selectedImages = [null];
-
   final _formKey = GlobalKey<FormState>();
 
   @override
   void dispose() {
     _submissionDateController.dispose();
     _reportDateController.dispose();
-    _purchaserController.dispose();
-    _topicController.dispose();
-    _remarksController.dispose();
+    _mobileController.dispose();
+    _partyNameController.dispose();
+    _pinCodeController.dispose();
+    _districtController.dispose();
+    _visitedCityController.dispose();
+    _nameDesigController.dispose();
+    _topicsController.dispose();
     super.dispose();
   }
 
@@ -49,36 +86,40 @@ class _PhoneCallWithUnregisterdPurchaserState
       lastDate: DateTime(now.year + 5),
     );
     if (picked != null) {
-      setState(() {
-        controller.text = DateFormat('yyyy-MM-dd').format(picked);
-      });
+      controller.text = DateFormat('yyyy-MM-dd').format(picked);
     }
   }
 
   Future<void> _pickImage(int index) async {
-    final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+    final pickedFile = await ImagePicker().pickImage(
+        source: ImageSource.gallery);
     if (pickedFile != null) {
-      setState(() {
-        _selectedImages[index] = File(pickedFile.path);
-      });
+      setState(() => _selectedImages[index] = File(pickedFile.path));
     }
   }
 
   void _showImageDialog(File imageFile) {
     showDialog(
       context: context,
-      builder: (_) => Dialog(
-        child: Container(
-          width: MediaQuery.of(context).size.width * 0.8,
-          height: MediaQuery.of(context).size.height * 0.6,
-          decoration: BoxDecoration(
-            image: DecorationImage(
-              fit: BoxFit.contain,
-              image: FileImage(imageFile),
+      builder: (_) =>
+          Dialog(
+            child: Container(
+              width: MediaQuery
+                  .of(context)
+                  .size
+                  .width * 0.8,
+              height: MediaQuery
+                  .of(context)
+                  .size
+                  .height * 0.6,
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  fit: BoxFit.contain,
+                  image: FileImage(imageFile),
+                ),
+              ),
             ),
           ),
-        ),
-      ),
     );
   }
 
@@ -107,9 +148,16 @@ class _PhoneCallWithUnregisterdPurchaserState
       _processItem = 'Select';
       _submissionDateController.clear();
       _reportDateController.clear();
-      _purchaserController.clear();
-      _topicController.clear();
-      _remarksController.clear();
+      _areaCode = 'Select';
+      _mobileController.clear();
+      _purchaserType = 'Select';
+      _partyNameController.clear();
+      _counterType = 'Select';
+      _pinCodeController.clear();
+      _districtController.clear();
+      _visitedCityController.clear();
+      _nameDesigController.clear();
+      _topicsController.clear();
       _selectedImages = [null];
     });
     _formKey.currentState!.reset();
@@ -121,14 +169,15 @@ class _PhoneCallWithUnregisterdPurchaserState
       backgroundColor: AppTheme.scaffoldBackgroundColor,
       appBar: AppBar(
         leading: IconButton(
-          onPressed: () => Navigator.push(
-              context, MaterialPageRoute(builder: (_) => const DsrEntry())),
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 22),
+          onPressed: () =>
+              Navigator.push(
+                  context, MaterialPageRoute(builder: (_) => const DsrEntry())),
+          icon: const Icon(Icons.arrow_back_ios_new,
+              color: Colors.white, size: 22),
         ),
-        title: Text(
-          'Phone Call With Unregistered Purchaser',
-          style:
-          Theme.of(context).textTheme.displaySmall?.copyWith(color: Colors.white),
+        title: const Text(
+          'Phone Call with Unregistered Purchasers',
+          style: TextStyle(color: Colors.white),
         ),
         backgroundColor: AppTheme.primaryColor,
         elevation: 0,
@@ -139,44 +188,104 @@ class _PhoneCallWithUnregisterdPurchaserState
           key: _formKey,
           child: ListView(
             children: [
-              _buildLabel('Process type'),
+              _buildLabel('Process Type'),
               _buildDropdownField(
                 value: _processItem,
                 items: _processdropdownItems,
-                onChanged: (val) => setState(() => _processItem = val),
+                onChanged: (v) => setState(() => _processItem = v),
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 12),
 
               _buildLabel('Submission Date'),
               _buildDateField(
-                  _submissionDateController, () => _pickDate(_submissionDateController), 'Select Submission Date'),
-              const SizedBox(height: 10),
+                  _submissionDateController,
+                      () => _pickDate(_submissionDateController),
+                  'Select Submission Date'),
+              const SizedBox(height: 12),
 
               _buildLabel('Report Date'),
               _buildDateField(
-                  _reportDateController, () => _pickDate(_reportDateController), 'Select Report Date'),
-              const SizedBox(height: 10),
+                  _reportDateController,
+                      () => _pickDate(_reportDateController),
+                  'Select Report Date'),
+              const SizedBox(height: 12),
 
-              _buildLabel('Purchaser Name/Details'),
-              _buildTextField(
-                'Enter Purchaser Name/Details',
-                controller: _purchaserController,
+              _buildLabel('Area Code'),
+              _buildDropdownField(
+                value: _areaCode,
+                items: _areaCodes,
+                onChanged: (v) => setState(() => _areaCode = v),
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 12),
 
-              _buildLabel('Topic Discussed'),
+              _buildLabel('Mobile No'),
               _buildTextField(
-                'Enter Topic Discussed',
-                controller: _topicController,
-              ),
-              const SizedBox(height: 10),
+                  'Mobile No',
+                  controller: _mobileController,
+                  keyboardType: TextInputType.phone,
+                  validator: (v) => v == null || v.isEmpty ? 'Required' : null),
+              const SizedBox(height: 12),
 
-              _buildLabel('Remarks'),
-              _buildTextField(
-                'Enter Remarks',
-                controller: _remarksController,
+              _buildLabel('Purchaser / Retailer'),
+              _buildDropdownField(
+                value: _purchaserType,
+                items: _purchaserTypes,
+                onChanged: (v) => setState(() => _purchaserType = v),
               ),
-              const SizedBox(height: 18),
+              const SizedBox(height: 12),
+
+              _buildLabel('Party Name'),
+              _buildTextField('Party Name',
+                  controller: _partyNameController,
+                  maxLines: 2,
+                  validator: (v) => v == null || v.isEmpty ? 'Required' : null),
+              const SizedBox(height: 12),
+
+              _buildLabel('Counter Type'),
+              _buildDropdownField(
+                value: _counterType,
+                items: _counterTypes,
+                onChanged: (v) => setState(() => _counterType = v),
+              ),
+              const SizedBox(height: 12),
+
+              _buildLabel('Pin Code *'),
+              _buildTextField('Enter Pin Code Number',
+                  controller: _pinCodeController,
+                  keyboardType: TextInputType.number,
+                  validator: (v) => v == null || v.isEmpty ? 'Required' : null),
+              TextButton(
+                onPressed: () {
+                  // TODO: lookup pin code
+                },
+                child: const Text('Update Pincode'),
+              ),
+              const SizedBox(height: 12),
+
+              _buildLabel('District *'),
+              _buildTextField('District',
+                  controller: _districtController,
+                  validator: (v) => v == null || v.isEmpty ? 'Required' : null),
+              const SizedBox(height: 12),
+
+              _buildLabel('Visited City'),
+              _buildTextField('Visited City',
+                  controller: _visitedCityController),
+              const SizedBox(height: 12),
+
+              _buildLabel('Name & Designation of Person'),
+              _buildTextField('Name & Designation of Person',
+                  controller: _nameDesigController,
+                  maxLines: 2,
+                  validator: (v) => v == null || v.isEmpty ? 'Required' : null),
+              const SizedBox(height: 12),
+
+              _buildLabel('Topics discussed during meeting'),
+              _buildTextField('Topics discussed during meeting',
+                  controller: _topicsController,
+                  maxLines: 3,
+                  validator: (v) => v == null || v.isEmpty ? 'Required' : null),
+              const SizedBox(height: 24),
 
               _buildLabel('Upload Images'),
               const SizedBox(height: 8),
@@ -189,9 +298,10 @@ class _PhoneCallWithUnregisterdPurchaserState
                     color: Colors.grey.shade50,
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                      color: file != null ? Colors.green.shade200 : Colors.grey.shade200,
-                      width: 1.5,
-                    ),
+                        color: file != null
+                            ? Colors.green.shade200
+                            : Colors.grey.shade200,
+                        width: 1.5),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -200,12 +310,13 @@ class _PhoneCallWithUnregisterdPurchaserState
                         children: [
                           Text('Document ${i + 1}',
                               style: const TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 14)),
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14)),
                           const Spacer(),
                           if (file != null)
                             Container(
-                              padding:
-                              const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 3),
                               decoration: BoxDecoration(
                                 color: Colors.green.shade100,
                                 borderRadius: BorderRadius.circular(16),
@@ -218,7 +329,8 @@ class _PhoneCallWithUnregisterdPurchaserState
                                   SizedBox(width: 4),
                                   Text('Uploaded',
                                       style: TextStyle(
-                                          color: Colors.green,
+                                          color: Colors.green
+                                          ,
                                           fontWeight: FontWeight.w500,
                                           fontSize: 13)),
                                 ],
@@ -236,7 +348,8 @@ class _PhoneCallWithUnregisterdPurchaserState
                                   ? Icons.refresh
                                   : Icons.upload_file,
                                   size: 18),
-                              label: Text(file != null ? 'Replace' : 'Upload'),
+                              label:
+                              Text(file != null ? 'Replace' : 'Upload'),
                             ),
                           ),
                           if (file != null) ...[
@@ -267,7 +380,7 @@ class _PhoneCallWithUnregisterdPurchaserState
                   ),
                 );
               }),
-              if (_selectedImages.length < 3)
+              if (_selectedImages.length < 3) ...[
                 Center(
                   child: ElevatedButton.icon(
                     onPressed: () {
@@ -279,24 +392,17 @@ class _PhoneCallWithUnregisterdPurchaserState
                     label: const Text('Add More Image'),
                   ),
                 ),
+                const SizedBox(height: 24),
+              ],
 
-              const SizedBox(height: 24),
-              Row(
-                children: [
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () => _onSubmit(exitAfter: false),
-                      child: const Text('Submit & New'),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () => _onSubmit(exitAfter: true),
-                      child: const Text('Submit & Exit'),
-                    ),
-                  ),
-                ],
+              ElevatedButton(
+                onPressed: () => _onSubmit(exitAfter: false),
+                child: const Text('Submit & New'),
+              ),
+              const SizedBox(height: 12),
+              ElevatedButton(
+                onPressed: () => _onSubmit(exitAfter: true),
+                child: const Text('Submit & Exit'),
               ),
             ],
           ),
@@ -305,66 +411,72 @@ class _PhoneCallWithUnregisterdPurchaserState
     );
   }
 
-  Widget _buildLabel(String text) => Padding(
-    padding: const EdgeInsets.symmetric(vertical: 4),
-    child: Text(
-      text,
-      style: const TextStyle(
-          fontSize: 16, fontWeight: FontWeight.w600, color: Colors.black87),
-    ),
-  );
-
-  Widget _buildTextField(
-      String hint, {
-        TextEditingController? controller,
-        TextInputType? keyboardType,
-      }) =>
-      TextFormField(
-        controller: controller,
-        keyboardType: keyboardType,
-        decoration: InputDecoration(
-          hintText: hint,
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+  Widget _buildLabel(String text) =>
+      Padding(
+        padding: const EdgeInsets.symmetric(vertical: 4),
+        child: Text(
+          text,
+          style: const TextStyle(
+              fontSize: 16, fontWeight: FontWeight.w600, color: Colors.black87),
         ),
-        validator: (val) => val == null || val.isEmpty ? 'Required' : null,
       );
+
+  Widget _buildTextField(String hint, {
+    required TextEditingController controller,
+    TextInputType keyboardType = TextInputType.text,
+    int maxLines = 1,
+    String? Function(String?)? validator,
+  }) {
+    return TextFormField(
+      controller: controller,
+      keyboardType: keyboardType,
+      maxLines: maxLines,
+      decoration: InputDecoration(
+        hintText: hint,
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+        contentPadding: const EdgeInsets.symmetric(
+            horizontal: 10, vertical: 12),
+      ),
+      validator: validator,
+    );
+  }
 
   Widget _buildDropdownField({
     required String? value,
     required List<String> items,
     required ValueChanged<String?> onChanged,
-  }) =>
-      Container(
-        height: 48,
-        padding: const EdgeInsets.symmetric(horizontal: 6),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: Colors.grey.shade300, width: 1),
-          color: Colors.white,
-        ),
-        child: DropdownButton<String>(
-          isExpanded: true,
-          value: value,
-          underline: Container(),
-          items: items
-              .map((item) => DropdownMenuItem(value: item, child: Text(item)))
-              .toList(),
-          onChanged: onChanged,
-        ),
-      );
+  }) {
+    return Container(
+      height: 48,
+      padding: const EdgeInsets.symmetric(horizontal: 6),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: Colors.grey.shade300, width: 1),
+        color: Colors.white,
+      ),
+      child: DropdownButton<String>(
+        isExpanded: true,
+        value: value,
+        underline: Container(),
+        items: items.map((item) =>
+            DropdownMenuItem(value: item, child: Text(item))).toList(),
+        onChanged: onChanged,
+      ),
+    );
+  }
 
-  Widget _buildDateField(
-      TextEditingController controller, VoidCallback onTap, String hint) =>
+  Widget _buildDateField(TextEditingController controller, VoidCallback onTap,
+      String hint) =>
       TextFormField(
         controller: controller,
         readOnly: true,
         decoration: InputDecoration(
           hintText: hint,
-          suffixIcon:
-          IconButton(icon: const Icon(Icons.calendar_today), onPressed: onTap),
+          suffixIcon: IconButton(
+              icon: const Icon(Icons.calendar_today), onPressed: onTap),
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+          contentPadding: const EdgeInsets.symmetric(
+              horizontal: 10, vertical: 12),
         ),
         onTap: onTap,
         validator: (val) => val == null || val.isEmpty ? 'Select date' : null,
