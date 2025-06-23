@@ -1,16 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:learning2/StaffScreen/staff_home_screen.dart';
-import 'package:learning2/WorkerScreen/Worker_Home_Screen.dart';
-import 'package:learning2/dsr_entry_screen/DsrVisitPage.dart';
 import 'package:learning2/screens/Home_screen.dart';
 import 'package:learning2/screens/firebase_api.dart';
 import 'package:learning2/screens/notification_screen.dart';
-import 'package:learning2/screens/splash_screen.dart';
 import 'package:provider/provider.dart';
-import 'package:learning2/services/background_service.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:learning2/theme/app_theme.dart';
 
 void main() async {
@@ -30,7 +23,7 @@ void main() async {
   // This ensures the user must manually start the service
   // await backgroundService.initializeService(autoStart: false);
 
-  print('Background service initialized but not started - user must start it manually');
+  // Background service initialized but not started - user must start it manually
 
   runApp(
     ChangeNotifierProvider.value(
@@ -49,7 +42,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'SPARSH',
       theme: AppTheme.lightTheme,
-      home: const HomeScreen()
+      home: const HomeScreen(),
     );
   }
 }
