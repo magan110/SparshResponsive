@@ -147,21 +147,22 @@ class _HomeScreenState extends State<HomeScreen> {
           transitionBuilder: (Widget child, Animation<double> animation) {
             return ScaleTransition(scale: animation, child: child);
           },
-          child: _isSearchVisible
-              ? const SizedBox(width: 48, height: 48)
-              : IconButton(
-            key: const ValueKey('search_icon'),
-            icon: const Icon(
-              Icons.search,
-              size: 28,
-              color: Colors.white,
-            ),
-            onPressed: () {
-              setState(() {
-                _isSearchVisible = true;
-              });
-            },
-          ),
+          child:
+              _isSearchVisible
+                  ? const SizedBox(width: 48, height: 48)
+                  : IconButton(
+                    key: const ValueKey('search_icon'),
+                    icon: const Icon(
+                      Icons.search,
+                      size: 28,
+                      color: Colors.white,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _isSearchVisible = true;
+                      });
+                    },
+                  ),
         ),
       ],
     );
@@ -323,7 +324,10 @@ class _HomeScreenState extends State<HomeScreen> {
                         _updateCurrentScreen(index, screen: const Schema());
                       } else if (index == 4) {
                         // “Profile” tab:
-                        _updateCurrentScreen(index, screen: const ProfilePage());
+                        _updateCurrentScreen(
+                          index,
+                          screen: const ProfilePage(),
+                        );
                       } else {
                         _updateCurrentScreen(index);
                       }
@@ -338,15 +342,16 @@ class _HomeScreenState extends State<HomeScreen> {
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(16),
                         gradient: isActive ? gradient : null,
-                        boxShadow: isActive
-                            ? [
-                          BoxShadow(
-                            color: color.withOpacity(0.3),
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
-                          ),
-                        ]
-                            : null,
+                        boxShadow:
+                            isActive
+                                ? [
+                                  BoxShadow(
+                                    color: color.withOpacity(0.3),
+                                    blurRadius: 10,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ]
+                                : null,
                       ),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
@@ -355,7 +360,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           Icon(
                             isActive ? item['activeIcon'] : item['icon'],
                             color:
-                            isActive ? Colors.white : Colors.grey.shade600,
+                                isActive ? Colors.white : Colors.grey.shade600,
                             size: 24,
                           ),
                           const SizedBox(height: 4),
@@ -364,10 +369,13 @@ class _HomeScreenState extends State<HomeScreen> {
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight:
-                              isActive ? FontWeight.bold : FontWeight.normal,
-                              color: isActive
-                                  ? Colors.white
-                                  : Colors.grey.shade700,
+                                  isActive
+                                      ? FontWeight.bold
+                                      : FontWeight.normal,
+                              color:
+                                  isActive
+                                      ? Colors.white
+                                      : Colors.grey.shade700,
                             ),
                           ),
                         ],
@@ -388,59 +396,59 @@ class _HomeScreenState extends State<HomeScreen> {
               _updateCurrentScreen(2, screen: const TokenScanPage());
             },
             child: Container(
-              width: 60,
-              height: 60,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    Colors.blueAccent.shade400,
-                    Colors.blueAccent.shade700,
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.blueAccent.withValues(alpha: 0.4),
-                    blurRadius: 15,
-                    spreadRadius: 2,
-                    offset: const Offset(0, 5),
+                  width: 60,
+                  height: 60,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Colors.blueAccent.shade400,
+                        Colors.blueAccent.shade700,
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.blueAccent.withValues(alpha: 0.4),
+                        blurRadius: 15,
+                        spreadRadius: 2,
+                        offset: const Offset(0, 5),
+                      ),
+                      BoxShadow(
+                        color: Colors.blueAccent.withValues(alpha: 0.2),
+                        blurRadius: 20,
+                        spreadRadius: 5,
+                        offset: Offset.zero,
+                      ),
+                    ],
+                    border: Border.all(color: Colors.white, width: 4),
                   ),
-                  BoxShadow(
-                    color: Colors.blueAccent.withValues(alpha: 0.2),
-                    blurRadius: 20,
-                    spreadRadius: 5,
-                    offset: Offset.zero,
+                  child: const Icon(
+                    Icons.qr_code_scanner,
+                    color: Colors.white,
+                    size: 28,
                   ),
-                ],
-                border: Border.all(color: Colors.white, width: 4),
-              ),
-              child: const Icon(
-                Icons.qr_code_scanner,
-                color: Colors.white,
-                size: 28,
-              ),
-            )
+                )
                 .animate(onPlay: (controller) => controller.repeat())
                 .shimmer(
-              delay: 1000.ms,
-              duration: 1800.ms,
-              color: Colors.white.withValues(alpha: 0.3),
-            )
+                  delay: 1000.ms,
+                  duration: 1800.ms,
+                  color: Colors.white.withValues(alpha: 0.3),
+                )
                 .scale(
-              begin: const Offset(1, 1),
-              end: const Offset(1.1, 1.1),
-              duration: 1000.ms,
-              curve: Curves.easeInOut,
-            )
+                  begin: const Offset(1, 1),
+                  end: const Offset(1.1, 1.1),
+                  duration: 1000.ms,
+                  curve: Curves.easeInOut,
+                )
                 .then()
                 .scale(
-              begin: const Offset(1.1, 1.1),
-              end: const Offset(1, 1),
-              duration: 1000.ms,
-              curve: Curves.easeInOut,
-            ),
+                  begin: const Offset(1.1, 1.1),
+                  end: const Offset(1, 1),
+                  duration: 1000.ms,
+                  curve: Curves.easeInOut,
+                ),
           ),
         ),
       ],
@@ -456,29 +464,30 @@ class BottomNavClipper extends CustomClipper<Path> {
     final double centerX = size.width / 2;
     const double notchWidth = notchRadius * 2 + 30;
 
-    final path = Path()
-      ..lineTo(centerX - notchWidth / 2, 0)
-      ..quadraticBezierTo(
-        centerX - notchRadius - 15,
-        0,
-        centerX - notchRadius,
-        25,
-      )
-      ..arcToPoint(
-        Offset(centerX + notchRadius, 25),
-        radius: const Radius.circular(notchRadius),
-        clockwise: false,
-      )
-      ..quadraticBezierTo(
-        centerX + notchRadius + 15,
-        0,
-        centerX + notchWidth / 2,
-        0,
-      )
-      ..lineTo(size.width, 0)
-      ..lineTo(size.width, size.height)
-      ..lineTo(0, size.height)
-      ..close();
+    final path =
+        Path()
+          ..lineTo(centerX - notchWidth / 2, 0)
+          ..quadraticBezierTo(
+            centerX - notchRadius - 15,
+            0,
+            centerX - notchRadius,
+            25,
+          )
+          ..arcToPoint(
+            Offset(centerX + notchRadius, 25),
+            radius: const Radius.circular(notchRadius),
+            clockwise: false,
+          )
+          ..quadraticBezierTo(
+            centerX + notchRadius + 15,
+            0,
+            centerX + notchWidth / 2,
+            0,
+          )
+          ..lineTo(size.width, 0)
+          ..lineTo(size.width, size.height)
+          ..lineTo(0, size.height)
+          ..close();
 
     return path;
   }
@@ -613,56 +622,41 @@ class _HomeContentState extends State<HomeContent> {
     final List<Map<String, String>> quickMenuItems = [
       {
         'image': 'assets/painter_kyc_tracking.png',
-        'label': 'Painter KYC\nTracking'
+        'label': 'Painter KYC\nTracking',
       },
       {
         'image': 'assets/painter_kyc_registration.png',
-        'label': 'Painter KYC\nRegistration'
+        'label': 'Painter KYC\nRegistration',
       },
       {
         'image': 'assets/universal_outlets_registration.png',
-        'label': 'Universal Outlets\nRegistration'
+        'label': 'Universal Outlets\nRegistration',
       },
       {
         'image': 'assets/retailer_registration.png',
-        'label': 'Retailer\nRegistration'
+        'label': 'Retailer\nRegistration',
       },
       {
         'image': 'assets/accounts_statement.png',
-        'label': 'Accounts\nStatement'
+        'label': 'Accounts\nStatement',
       },
       {
         'image': 'assets/information_document.png',
-        'label': 'Information\nDocument'
+        'label': 'Information\nDocument',
       },
       {
         'image': 'assets/rpl_outlet_tracker.png',
-        'label': 'RPL Outlet\nTracker'
+        'label': 'RPL Outlet\nTracker',
       },
-      {
-        'image': 'assets/scheme_document.png',
-        'label': 'Scheme\nDocument'
-      },
-      {
-        'image': 'assets/activity_summary.png',
-        'label': 'Activity\nSummary'
-      },
-      {
-        'image': 'assets/purchaser_360.png',
-        'label': 'Purchaser\n360'
-      },
+      {'image': 'assets/scheme_document.png', 'label': 'Scheme\nDocument'},
+      {'image': 'assets/activity_summary.png', 'label': 'Activity\nSummary'},
+      {'image': 'assets/purchaser_360.png', 'label': 'Purchaser\n360'},
       {
         'image': 'assets/employee_dashboard.png',
-        'label': 'Employee\nDashBoard'
+        'label': 'Employee\nDashBoard',
       },
-      {
-        'image': 'assets/grc_lead_entry.png',
-        'label': 'GRC\nLead Entry'
-      },
-      {
-        'image': 'assets/rpl_6_enrolment.png',
-        'label': 'RPL 6\nEnrolment'
-      },
+      {'image': 'assets/grc_lead_entry.png', 'label': 'GRC\nLead Entry'},
+      {'image': 'assets/rpl_6_enrolment.png', 'label': 'RPL 6\nEnrolment'},
     ];
 
     // Three columns to match your screenshot. Adjust to 4 if you’d prefer a 4‐column layout.
@@ -690,46 +684,55 @@ class _HomeContentState extends State<HomeContent> {
           return InkWell(
             onTap: () {
               if (item['label']!.contains('Painter KYC\nTracking')) {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (_) => const PainterKycTrackingPage()));
-              }
-              else if (item['label']!.contains('Universal Outlets\nRegistration')) {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => const UniversalOutletRegistrationPage()),
+                  MaterialPageRoute(
+                    builder: (_) => const PainterKycTrackingPage(),
+                  ),
                 );
-              }
-              else if (item['label']!.contains('Retailer\nRegistration')) {
+              } else if (item['label']!.contains(
+                'Universal Outlets\nRegistration',
+              )) {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => const RetailerRegistrationPage()),
+                  MaterialPageRoute(
+                    builder: (_) => const UniversalOutletRegistrationPage(),
+                  ),
                 );
-              }
-              else if (item['label']!.contains('Accounts\nStatement')) {
+              } else if (item['label']!.contains('Retailer\nRegistration')) {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => const AccountsStatementPage()),
+                  MaterialPageRoute(
+                    builder: (_) => const RetailerRegistrationPage(),
+                  ),
                 );
-              }
-              else if (item['label']!.contains('Scheme\nDocument')) {
+              } else if (item['label']!.contains('Accounts\nStatement')) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const AccountsStatementPage(),
+                  ),
+                );
+              } else if (item['label']!.contains('Scheme\nDocument')) {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (_) => const SchemeDocumentPage()),
                 );
-              }
-              else if (item['label']!.contains('Activity\nSummary')) {
+              } else if (item['label']!.contains('Activity\nSummary')) {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => const ActivitySummaryPage()),
+                  MaterialPageRoute(
+                    builder: (_) => const ActivitySummaryPage(),
+                  ),
                 );
-              }
-              else if (item['label']!.contains('Employee\nDashBoard')) {
+              } else if (item['label']!.contains('Employee\nDashBoard')) {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => const EmployeeDashboardPage()),
+                  MaterialPageRoute(
+                    builder: (_) => const EmployeeDashboardPage(),
+                  ),
                 );
-              }
-              else if (item['label']!.contains('GRC\nLead Entry')) {
+              } else if (item['label']!.contains('GRC\nLead Entry')) {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (_) => const GrcLeadEntryPage()),
@@ -800,34 +803,42 @@ class _HomeContentState extends State<HomeContent> {
     ];
 
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 8.0),
+      padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 4.0),
       decoration: BoxDecoration(
         borderRadius: const BorderRadius.all(Radius.circular(12.0)),
         border: Border.all(color: Colors.grey.shade300, width: 1),
         color: Colors.white,
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: mostlyUsedItems.map((item) {
-          return InkWell(
-            onTap: () {
-              if (item['route'] == 'dsr') {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const DsrEntry()),
-                );
-              } else if (item['route'] == 'scanner') {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const TokenScanPage(),
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children:
+            mostlyUsedItems.map((item) {
+              return Expanded(
+                child: InkWell(
+                  onTap: () {
+                    if (item['route'] == 'dsr') {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const DsrEntry(),
+                        ),
+                      );
+                    } else if (item['route'] == 'scanner') {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const TokenScanPage(),
+                        ),
+                      );
+                    }
+                  },
+                  child: _buildMostlyUsedAppItem(
+                    item['image']!,
+                    item['label']!,
                   ),
-                );
-              }
-            },
-            child: _buildMostlyUsedAppItem(item['image']!, item['label']!),
-          );
-        }).toList(),
+                ),
+              );
+            }).toList(),
       ),
     );
   }
@@ -903,9 +914,10 @@ class _HomeContentState extends State<HomeContent> {
                     height: 8,
                     margin: const EdgeInsets.symmetric(horizontal: 2),
                     decoration: BoxDecoration(
-                      color: _currentIndex == index
-                          ? Colors.blue
-                          : Colors.white.withOpacity(0.5),
+                      color:
+                          _currentIndex == index
+                              ? Colors.blue
+                              : Colors.white.withOpacity(0.5),
                       borderRadius: BorderRadius.circular(4),
                     ),
                   );
