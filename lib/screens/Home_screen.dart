@@ -307,78 +307,86 @@ class _HomeScreenState extends State<HomeScreen> {
             child: BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: List.generate(navItems.length, (index) {
                   // Skip index 2 so we can leave a gap for the floating button
-                  if (index == 2) return const SizedBox(width: 70);
+                  if (index == 2) return const SizedBox(width: 50);
 
                   final item = navItems[index];
                   final isActive = _selectedIndex == index;
                   final color = item['color'] as Color;
                   final gradient = item['gradient'] as Gradient;
 
-                  return GestureDetector(
-                    onTap: () {
-                      if (index == 3) {
-                        // “Scheme” tab: directly open Schema() screen
-                        _updateCurrentScreen(index, screen: const Schema());
-                      } else if (index == 4) {
-                        // “Profile” tab:
-                        _updateCurrentScreen(
-                          index,
-                          screen: const ProfilePage(),
-                        );
-                      } else {
-                        _updateCurrentScreen(index);
-                      }
-                    },
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.easeInOut,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
-                      ),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(16),
-                        gradient: isActive ? gradient : null,
-                        boxShadow:
-                            isActive
-                                ? [
-                                  BoxShadow(
-                                    color: color.withOpacity(0.3),
-                                    blurRadius: 10,
-                                    offset: const Offset(0, 4),
-                                  ),
-                                ]
-                                : null,
-                      ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            isActive ? item['activeIcon'] : item['icon'],
-                            color:
-                                isActive ? Colors.white : Colors.grey.shade600,
-                            size: 24,
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            item['label'],
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight:
-                                  isActive
-                                      ? FontWeight.bold
-                                      : FontWeight.normal,
+                  return Expanded(
+                    child: GestureDetector(
+                      onTap: () {
+                        if (index == 3) {
+                          // “Scheme” tab: directly open Schema() screen
+                          _updateCurrentScreen(index, screen: const Schema());
+                        } else if (index == 4) {
+                          // “Profile” tab:
+                          _updateCurrentScreen(
+                            index,
+                            screen: const ProfilePage(),
+                          );
+                        } else {
+                          _updateCurrentScreen(index);
+                        }
+                      },
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeInOut,
+                        margin: const EdgeInsets.symmetric(horizontal: 2),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 6,
+                          vertical: 8,
+                        ),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(16),
+                          gradient: isActive ? gradient : null,
+                          boxShadow:
+                              isActive
+                                  ? [
+                                    BoxShadow(
+                                      color: color.withOpacity(0.3),
+                                      blurRadius: 10,
+                                      offset: const Offset(0, 4),
+                                    ),
+                                  ]
+                                  : null,
+                        ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              isActive ? item['activeIcon'] : item['icon'],
                               color:
                                   isActive
                                       ? Colors.white
-                                      : Colors.grey.shade700,
+                                      : Colors.grey.shade600,
+                              size: 20,
                             ),
-                          ),
-                        ],
+                            const SizedBox(height: 4),
+                            Text(
+                              item['label'],
+                              style: TextStyle(
+                                fontSize: 10,
+                                fontWeight:
+                                    isActive
+                                        ? FontWeight.bold
+                                        : FontWeight.normal,
+                                color:
+                                    isActive
+                                        ? Colors.white
+                                        : Colors.grey.shade700,
+                              ),
+                              textAlign: TextAlign.center,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   );
@@ -656,7 +664,7 @@ class _HomeContentState extends State<HomeContent> {
         'label': 'Employee\nDashBoard',
       },
       {'image': 'assets/grc_lead_entry.png', 'label': 'GRC\nLead Entry'},
-      {'image': 'assets/rpl_6_enrolment.png', 'label': 'RPL 6\nEnrolment'},
+      {'image': 'assets/employee_dashboard.png', 'label': 'RPL 6\nEnrolment'},
     ];
 
     // Three columns to match your screenshot. Adjust to 4 if you’d prefer a 4‐column layout.
