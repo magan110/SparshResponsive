@@ -84,14 +84,7 @@ class _EmployeeDashboardPageState extends State<EmployeeDashboardPage> {
     return Container(
       // Full-screen blue gradient background
       decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            Color(0xFF7AB8FF),
-            Color(0xFFC1DAFF),
-          ],
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-        ),
+        color: Colors.blue,
       ),
       child: Scaffold(
         backgroundColor: Colors.transparent,

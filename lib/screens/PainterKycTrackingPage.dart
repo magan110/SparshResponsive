@@ -106,14 +106,7 @@ class _PainterKycTrackingPageState extends State<PainterKycTrackingPage> {
       // the card floats on a gradient background.
       body: Container(
         decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Color(0xFF7AB8FF),
-              Color(0xFFC1DAFF),
-            ],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
+          color: Colors.blue,
         ),
         child: SafeArea(
           child: Padding(

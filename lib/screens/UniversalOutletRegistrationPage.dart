@@ -90,14 +90,7 @@ class _UniversalOutletRegistrationPageState
     return Container(
       // Wrap the entire Scaffold in a Container with a blue gradient
       decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            Color(0xFF7AB8FF),
-            Color(0xFFC1DAFF),
-          ],
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-        ),
+        color: Colors.blue,
       ),
       child: Scaffold(
         // Make the Scaffold background transparent so the gradient shows through

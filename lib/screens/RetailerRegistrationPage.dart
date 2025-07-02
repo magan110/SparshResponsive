@@ -146,14 +146,7 @@ class _RetailerRegistrationPageState extends State<RetailerRegistrationPage> {
     return Container(
       // Full‐screen gradient background
       decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            Color(0xFF7AB8FF),
-            Color(0xFFC1DAFF),
-          ],
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-        ),
+        color: Colors.blue,
       ),
       child: Scaffold(
         // Make the Scaffold background transparent so the gradient shows behind AppBar
