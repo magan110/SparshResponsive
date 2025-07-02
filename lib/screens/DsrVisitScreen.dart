@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'edit_kyc_screen.dart';
 
 class DsrVisitScreen extends StatefulWidget {
   const DsrVisitScreen({Key? key}) : super(key: key);
@@ -167,566 +168,541 @@ class _DsrVisitScreenState extends State<DsrVisitScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('DSR Visit Entry')),
+      appBar: AppBar(
+        title: const Text('DSR Visit Entry'),
+        elevation: 4,
+        backgroundColor: theme.colorScheme.primary,
+        foregroundColor: theme.colorScheme.onPrimary,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(bottom: Radius.circular(18)),
+        ),
+      ),
+      backgroundColor: theme.colorScheme.surface.withOpacity(0.98),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.all(16),
           child: Form(
             key: _formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // --- Process Type ---
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text('Process Type', style: TextStyle(fontWeight: FontWeight.bold)),
-                        Row(
-                          children: [
-                            Radio<String>(
-                              value: 'A',
-                              groupValue: processType,
-                              onChanged: (v) => setState(() => processType = v!),
-                            ),
-                            const Text('Add'),
-                            Radio<String>(
-                              value: 'U',
-                              groupValue: processType,
-                              onChanged: (v) => setState(() => processType = v!),
-                            ),
-                            const Text('Update'),
-                            Radio<String>(
-                              value: 'D',
-                              groupValue: processType,
-                              onChanged: (v) => setState(() => processType = v!),
-                            ),
-                            const Text('Delete'),
-                          ],
-                        ),
-                        if (processType != 'A')
-                          DropdownButtonFormField<String>(
-                            value: documentNo,
-                            decoration: const InputDecoration(labelText: 'Document No'),
-                            items: documentNoList
-                                .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                                .toList(),
-                            onChanged: (v) => setState(() => documentNo = v),
+                _SectionHeader(icon: Icons.settings, label: 'Process Type'),
+                _FantasticCard(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Radio<String>(
+                            value: 'A',
+                            groupValue: processType,
+                            onChanged: (v) => setState(() => processType = v!),
                           ),
-                      ],
-                    ),
+                          const Text('Add'),
+                          Radio<String>(
+                            value: 'U',
+                            groupValue: processType,
+                            onChanged: (v) => setState(() => processType = v!),
+                          ),
+                          const Text('Update'),
+                          Radio<String>(
+                            value: 'D',
+                            groupValue: processType,
+                            onChanged: (v) => setState(() => processType = v!),
+                          ),
+                          const Text('Delete'),
+                        ],
+                      ),
+                      if (processType != 'A')
+                        DropdownButtonFormField<String>(
+                          value: documentNo,
+                          decoration: _fantasticInputDecoration('Document No'),
+                          items: documentNoList
+                              .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                              .toList(),
+                          onChanged: (v) => setState(() => documentNo = v),
+                        ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 12),
                 // --- Purchaser/Retailer Type, Area Code, Purchaser Code, Name, KYC ---
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        DropdownButtonFormField<String>(
-                          value: purchaserType,
-                          decoration: const InputDecoration(labelText: 'Purchaser / Retailer Type *'),
-                          items: purchaserTypeList
-                              .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                              .toList(),
-                          onChanged: (v) => setState(() => purchaserType = v),
-                          validator: (v) => v == null ? 'Required' : null,
-                        ),
-                        const SizedBox(height: 8),
-                        DropdownButtonFormField<String>(
-                          value: areaCode,
-                          decoration: const InputDecoration(labelText: 'Area Code *'),
-                          items: areaCodeList
-                              .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                              .toList(),
-                          onChanged: (v) => setState(() => areaCode = v),
-                          validator: (v) => v == null ? 'Required' : null,
-                        ),
-                        const SizedBox(height: 8),
-                        TextFormField(
-                          decoration: const InputDecoration(
-                            labelText: 'Purchaser Code *',
-                            suffixIcon: Icon(Icons.search),
+                _SectionHeader(icon: Icons.person, label: 'Purchaser / Retailer Details'),
+                _FantasticCard(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      DropdownButtonFormField<String>(
+                        value: purchaserType,
+                        decoration: _fantasticInputDecoration('Purchaser / Retailer Type *'),
+                        items: purchaserTypeList
+                            .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                            .toList(),
+                        onChanged: (v) => setState(() => purchaserType = v),
+                        validator: (v) => v == null ? 'Required' : null,
+                      ),
+                      const SizedBox(height: 10),
+                      DropdownButtonFormField<String>(
+                        value: areaCode,
+                        decoration: _fantasticInputDecoration('Area Code *'),
+                        items: areaCodeList
+                            .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                            .toList(),
+                        onChanged: (v) => setState(() => areaCode = v),
+                        validator: (v) => v == null ? 'Required' : null,
+                      ),
+                      const SizedBox(height: 10),
+                      TextFormField(
+                        decoration: _fantasticInputDecoration('Purchaser Code *', icon: Icons.search),
+                        onChanged: (v) => purchaserCode = v,
+                        validator: (v) => v == null || v.isEmpty ? 'Required' : null,
+                      ),
+                      const SizedBox(height: 10),
+                      Row(
+                        children: [
+                          const Text('Name: ', style: TextStyle(fontWeight: FontWeight.bold)),
+                          Text(name ?? '', style: const TextStyle(fontWeight: FontWeight.normal)),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: ElevatedButton.icon(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: theme.colorScheme.secondary,
+                            foregroundColor: theme.colorScheme.onSecondary,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
                           ),
-                          onChanged: (v) => purchaserCode = v,
-                          validator: (v) => v == null || v.isEmpty ? 'Required' : null,
-                        ),
-                        const SizedBox(height: 8),
-                        // Name display
-                        Row(
-                          children: [
-                            const Text('Name: ', style: TextStyle(fontWeight: FontWeight.bold)),
-                            Text(name ?? '', style: const TextStyle(fontWeight: FontWeight.normal)),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        // Edit KYC Button
-                        ElevatedButton(
                           onPressed: () {
-                            // TODO: Implement KYC edit navigation
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => const EditKycScreen(),
+                              ),
+                            );
                           },
-                          child: const Text('Edit KYC'),
+                          icon: const Icon(Icons.edit),
+                          label: const Text('Edit KYC'),
                         ),
-                        const SizedBox(height: 8),
-                        // KYC Status
-                        DropdownButtonFormField<String>(
-                          value: kycStatus,
-                          decoration: const InputDecoration(labelText: 'KYC Status'),
-                          items: ['Verified', 'Not Verified']
-                              .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                              .toList(),
-                          onChanged: null, // Disabled
-                        ),
-                      ],
-                    ),
+                      ),
+                      const SizedBox(height: 10),
+                      DropdownButtonFormField<String>(
+                        value: kycStatus,
+                        decoration: _fantasticInputDecoration('KYC Status'),
+                        items: ['Verified', 'Not Verified']
+                            .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                            .toList(),
+                        onChanged: null, // Disabled
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 12),
                 // --- Report Date, Market Name, Display Contest, Pending Issues ---
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        TextFormField(
-                          decoration: const InputDecoration(
-                            labelText: 'Report Date *',
-                            suffixIcon: Icon(Icons.calendar_today),
+                _SectionHeader(icon: Icons.event_note, label: 'Report & Market Details'),
+                _FantasticCard(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      TextFormField(
+                        decoration: _fantasticInputDecoration('Report Date *', icon: Icons.calendar_today),
+                        readOnly: true,
+                        onTap: () async {
+                          final picked = await showDatePicker(
+                            context: context,
+                            initialDate: DateTime.now(),
+                            firstDate: DateTime.now().subtract(const Duration(days: 3)),
+                            lastDate: DateTime.now(),
+                          );
+                          if (picked != null) {
+                            setState(() {
+                              reportDate = "${picked.day.toString().padLeft(2, '0')}/${picked.month.toString().padLeft(2, '0')}/${picked.year}";
+                            });
+                          }
+                        },
+                        controller: TextEditingController(text: reportDate),
+                        validator: (v) => v == null || v.isEmpty ? 'Required' : null,
+                      ),
+                      const SizedBox(height: 10),
+                      TextFormField(
+                        decoration: _fantasticInputDecoration('Market Name (Location Or Road Name) *'),
+                        onChanged: (v) => marketName = v,
+                        validator: (v) => v == null || v.isEmpty ? 'Required' : null,
+                      ),
+                      const SizedBox(height: 10),
+                      const Text('Participation of Display Contest *', style: TextStyle(fontWeight: FontWeight.w500)),
+                      Row(
+                        children: [
+                          Radio<String>(
+                            value: 'Y',
+                            groupValue: displayContest,
+                            onChanged: (v) => setState(() => displayContest = v),
                           ),
+                          const Text('Yes'),
+                          Radio<String>(
+                            value: 'N',
+                            groupValue: displayContest,
+                            onChanged: (v) => setState(() => displayContest = v),
+                          ),
+                          const Text('No'),
+                          Radio<String>(
+                            value: 'NA',
+                            groupValue: displayContest,
+                            onChanged: (v) => setState(() => displayContest = v),
+                          ),
+                          const Text('NA'),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      const Text('Any Pending Issues (Yes/No) *', style: TextStyle(fontWeight: FontWeight.w500)),
+                      Row(
+                        children: [
+                          Radio<String>(
+                            value: 'Y',
+                            groupValue: pendingIssue,
+                            onChanged: (v) => setState(() => pendingIssue = v),
+                          ),
+                          const Text('Yes'),
+                          Radio<String>(
+                            value: 'N',
+                            groupValue: pendingIssue,
+                            onChanged: (v) => setState(() => pendingIssue = v),
+                          ),
+                          const Text('No'),
+                        ],
+                      ),
+                      if (pendingIssue == 'Y') ...[
+                        DropdownButtonFormField<String>(
+                          value: pendingIssueDetail,
+                          decoration: _fantasticInputDecoration('If Yes, pending issue details *'),
+                          items: pendingIssueDetails
+                              .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                              .toList(),
+                          onChanged: (v) => setState(() => pendingIssueDetail = v),
+                          validator: (v) => v == null ? 'Required' : null,
+                        ),
+                        TextFormField(
+                          decoration: _fantasticInputDecoration('If Yes, Specify Issue'),
+                          onChanged: (v) => issueDetail = v,
+                          validator: (v) => v == null || v.isEmpty ? 'Required' : null,
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 12),
+                // --- Enrolment Slab ---
+                _SectionHeader(icon: Icons.bar_chart, label: 'Enrolment Slab (in MT)'),
+                _FantasticCard(
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: TextFormField(
+                          decoration: _fantasticInputDecoration('WC'),
+                          keyboardType: TextInputType.number,
+                          onChanged: (v) => wcEnrolment = v,
+                          validator: (v) => v == null || v.isEmpty ? 'Required' : null,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: TextFormField(
+                          decoration: _fantasticInputDecoration('WCP'),
+                          keyboardType: TextInputType.number,
+                          onChanged: (v) => wcpEnrolment = v,
+                          validator: (v) => v == null || v.isEmpty ? 'Required' : null,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: TextFormField(
+                          decoration: _fantasticInputDecoration('VAP'),
+                          keyboardType: TextInputType.number,
+                          onChanged: (v) => vapEnrolment = v,
+                          validator: (v) => v == null || v.isEmpty ? 'Required' : null,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 12),
+                // --- BW Stocks Availability ---
+                _SectionHeader(icon: Icons.inventory, label: 'BW Stocks Availability (in MT)'),
+                _FantasticCard(
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: TextFormField(
+                          decoration: _fantasticInputDecoration('WC'),
+                          keyboardType: TextInputType.number,
+                          onChanged: (v) => wcStock = v,
+                          validator: (v) => v == null || v.isEmpty ? 'Required' : null,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: TextFormField(
+                          decoration: _fantasticInputDecoration('WCP'),
+                          keyboardType: TextInputType.number,
+                          onChanged: (v) => wcpStock = v,
+                          validator: (v) => v == null || v.isEmpty ? 'Required' : null,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: TextFormField(
+                          decoration: _fantasticInputDecoration('VAP'),
+                          keyboardType: TextInputType.number,
+                          onChanged: (v) => vapStock = v,
+                          validator: (v) => v == null || v.isEmpty ? 'Required' : null,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 12),
+                // --- Brands Selling ---
+                _SectionHeader(icon: Icons.check_box, label: 'Brands Selling'),
+                _FantasticCard(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text('WC (Industry Volume)', style: TextStyle(fontWeight: FontWeight.w500)),
+                      Wrap(
+                        spacing: 8,
+                        children: brandsWc.keys.map((brand) {
+                          return Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Checkbox(
+                                value: brandsWc[brand],
+                                onChanged: (v) => setState(() => brandsWc[brand] = v ?? false),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                              ),
+                              Text(brand),
+                            ],
+                          );
+                        }).toList(),
+                      ),
+                      TextFormField(
+                        decoration: _fantasticInputDecoration('WC Industry Volume in (MT)'),
+                        onChanged: (v) => slWcVolume = v,
+                      ),
+                      const SizedBox(height: 10),
+                      const Text('WCP (Industry Volume)', style: TextStyle(fontWeight: FontWeight.w500)),
+                      Wrap(
+                        spacing: 8,
+                        children: brandsWcp.keys.map((brand) {
+                          return Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Checkbox(
+                                value: brandsWcp[brand],
+                                onChanged: (v) => setState(() => brandsWcp[brand] = v ?? false),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                              ),
+                              Text(brand),
+                            ],
+                          );
+                        }).toList(),
+                      ),
+                      TextFormField(
+                        decoration: _fantasticInputDecoration('WCP Industry Volume in (MT)'),
+                        onChanged: (v) => slWpVolume = v,
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 12),
+                // --- Last 3 Months Average ---
+                _SectionHeader(icon: Icons.timeline, label: 'Last 3 Months Average'),
+                _FantasticCard(
+                  child: Table(
+                    border: TableBorder.all(color: theme.dividerColor),
+                    children: [
+                      const TableRow(children: [
+                        SizedBox(),
+                        Center(child: Text('WC Qty', style: TextStyle(fontWeight: FontWeight.bold))),
+                        Center(child: Text('WCP Qty', style: TextStyle(fontWeight: FontWeight.bold))),
+                      ]),
+                      TableRow(children: [
+                        const Center(child: Text('JK')),
+                        TextFormField(
+                          initialValue: last3MonthsAvg['JK_WC'],
+                          decoration: _fantasticInputDecoration(''),
+                          onChanged: (v) => last3MonthsAvg['JK_WC'] = v,
+                        ),
+                        TextFormField(
+                          initialValue: last3MonthsAvg['JK_WCP'],
+                          decoration: _fantasticInputDecoration(''),
+                          onChanged: (v) => last3MonthsAvg['JK_WCP'] = v,
+                        ),
+                      ]),
+                      TableRow(children: [
+                        const Center(child: Text('Asian')),
+                        TextFormField(
+                          initialValue: last3MonthsAvg['AS_WC'],
+                          decoration: _fantasticInputDecoration(''),
+                          onChanged: (v) => last3MonthsAvg['AS_WC'] = v,
+                        ),
+                        TextFormField(
+                          initialValue: last3MonthsAvg['AS_WCP'],
+                          decoration: _fantasticInputDecoration(''),
+                          onChanged: (v) => last3MonthsAvg['AS_WCP'] = v,
+                        ),
+                      ]),
+                      TableRow(children: [
+                        const Center(child: Text('Other')),
+                        TextFormField(
+                          initialValue: last3MonthsAvg['OT_WC'],
+                          decoration: _fantasticInputDecoration(''),
+                          onChanged: (v) => last3MonthsAvg['OT_WC'] = v,
+                        ),
+                        TextFormField(
+                          initialValue: last3MonthsAvg['OT_WCP'],
+                          decoration: _fantasticInputDecoration(''),
+                          onChanged: (v) => last3MonthsAvg['OT_WCP'] = v,
+                        ),
+                      ]),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 12),
+                // --- Current Month - BW ---
+                _SectionHeader(icon: Icons.calendar_month, label: 'Current Month - BW (in MT)'),
+                _FantasticCard(
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: TextFormField(
+                          initialValue: currentMonthBW['WC'],
+                          decoration: _fantasticInputDecoration('WC'),
                           readOnly: true,
-                          onTap: () async {
-                            final picked = await showDatePicker(
-                              context: context,
-                              initialDate: DateTime.now(),
-                              firstDate: DateTime.now().subtract(const Duration(days: 3)),
-                              lastDate: DateTime.now(),
-                            );
-                            if (picked != null) {
-                              setState(() {
-                                reportDate = "${picked.day.toString().padLeft(2, '0')}/${picked.month.toString().padLeft(2, '0')}/${picked.year}";
-                              });
-                            }
-                          },
-                          controller: TextEditingController(text: reportDate),
-                          validator: (v) => v == null || v.isEmpty ? 'Required' : null,
                         ),
-                        const SizedBox(height: 8),
-                        TextFormField(
-                          decoration: const InputDecoration(labelText: 'Market Name (Location Or Road Name) *'),
-                          onChanged: (v) => marketName = v,
-                          validator: (v) => v == null || v.isEmpty ? 'Required' : null,
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: TextFormField(
+                          initialValue: currentMonthBW['WCP'],
+                          decoration: _fantasticInputDecoration('WCP'),
+                          readOnly: true,
                         ),
-                        const SizedBox(height: 8),
-                        // Display Contest
-                        const Text('Participation of Display Contest *'),
-                        Row(
-                          children: [
-                            Radio<String>(
-                              value: 'Y',
-                              groupValue: displayContest,
-                              onChanged: (v) => setState(() => displayContest = v),
-                            ),
-                            const Text('Yes'),
-                            Radio<String>(
-                              value: 'N',
-                              groupValue: displayContest,
-                              onChanged: (v) => setState(() => displayContest = v),
-                            ),
-                            const Text('No'),
-                            Radio<String>(
-                              value: 'NA',
-                              groupValue: displayContest,
-                              onChanged: (v) => setState(() => displayContest = v),
-                            ),
-                            const Text('NA'),
-                          ],
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: TextFormField(
+                          initialValue: currentMonthBW['VAP'],
+                          decoration: _fantasticInputDecoration('VAP'),
+                          readOnly: true,
                         ),
-                        const SizedBox(height: 8),
-                        // Pending Issues
-                        const Text('Any Pending Issues (Yes/No) *'),
-                        Row(
-                          children: [
-                            Radio<String>(
-                              value: 'Y',
-                              groupValue: pendingIssue,
-                              onChanged: (v) => setState(() => pendingIssue = v),
-                            ),
-                            const Text('Yes'),
-                            Radio<String>(
-                              value: 'N',
-                              groupValue: pendingIssue,
-                              onChanged: (v) => setState(() => pendingIssue = v),
-                            ),
-                            const Text('No'),
-                          ],
-                        ),
-                        if (pendingIssue == 'Y') ...[
-                          DropdownButtonFormField<String>(
-                            value: pendingIssueDetail,
-                            decoration: const InputDecoration(labelText: 'If Yes, pending issue details *'),
-                            items: pendingIssueDetails
-                                .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                                .toList(),
-                            onChanged: (v) => setState(() => pendingIssueDetail = v),
-                            validator: (v) => v == null ? 'Required' : null,
-                          ),
-                          TextFormField(
-                            decoration: const InputDecoration(labelText: 'If Yes, Specify Issue'),
-                            onChanged: (v) => issueDetail = v,
-                            validator: (v) => v == null || v.isEmpty ? 'Required' : null,
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 12),
+                // --- Order Booked in call/e meet (Dynamic List) ---
+                _SectionHeader(icon: Icons.shopping_cart, label: 'Order Booked in call/e meet'),
+                _FantasticCard(
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text('Order Booked in call/e meet', style: TextStyle(fontWeight: FontWeight.w500)),
+                          IconButton(
+                            icon: const Icon(Icons.add_circle_outline),
+                            onPressed: addProductRow,
                           ),
                         ],
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                // --- Enrolment Slab ---
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text('Enrolment Slab (in MT) *'),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: TextFormField(
-                                decoration: const InputDecoration(labelText: 'WC'),
-                                keyboardType: TextInputType.number,
-                                onChanged: (v) => wcEnrolment = v,
-                                validator: (v) => v == null || v.isEmpty ? 'Required' : null,
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: TextFormField(
-                                decoration: const InputDecoration(labelText: 'WCP'),
-                                keyboardType: TextInputType.number,
-                                onChanged: (v) => wcpEnrolment = v,
-                                validator: (v) => v == null || v.isEmpty ? 'Required' : null,
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: TextFormField(
-                                decoration: const InputDecoration(labelText: 'VAP'),
-                                keyboardType: TextInputType.number,
-                                onChanged: (v) => vapEnrolment = v,
-                                validator: (v) => v == null || v.isEmpty ? 'Required' : null,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                // --- BW Stocks Availability ---
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text('BW Stocks Availability (in MT) *'),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: TextFormField(
-                                decoration: const InputDecoration(labelText: 'WC'),
-                                keyboardType: TextInputType.number,
-                                onChanged: (v) => wcStock = v,
-                                validator: (v) => v == null || v.isEmpty ? 'Required' : null,
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: TextFormField(
-                                decoration: const InputDecoration(labelText: 'WCP'),
-                                keyboardType: TextInputType.number,
-                                onChanged: (v) => wcpStock = v,
-                                validator: (v) => v == null || v.isEmpty ? 'Required' : null,
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: TextFormField(
-                                decoration: const InputDecoration(labelText: 'VAP'),
-                                keyboardType: TextInputType.number,
-                                onChanged: (v) => vapStock = v,
-                                validator: (v) => v == null || v.isEmpty ? 'Required' : null,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                // --- Brands Selling ---
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text('Brands selling - WC (Industry Volume)'),
-                        Wrap(
-                          spacing: 8,
-                          children: brandsWc.keys.map((brand) {
-                            return Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Checkbox(
-                                  value: brandsWc[brand],
-                                  onChanged: (v) => setState(() => brandsWc[brand] = v ?? false),
-                                ),
-                                Text(brand),
-                              ],
-                            );
-                          }).toList(),
-                        ),
-                        TextFormField(
-                          decoration: const InputDecoration(labelText: 'WC Industry Volume in (MT)'),
-                          onChanged: (v) => slWcVolume = v,
-                        ),
-                        const SizedBox(height: 8),
-                        const Text('Brands selling - WCP (Industry Volume)'),
-                        Wrap(
-                          spacing: 8,
-                          children: brandsWcp.keys.map((brand) {
-                            return Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Checkbox(
-                                  value: brandsWcp[brand],
-                                  onChanged: (v) => setState(() => brandsWcp[brand] = v ?? false),
-                                ),
-                                Text(brand),
-                              ],
-                            );
-                          }).toList(),
-                        ),
-                        TextFormField(
-                          decoration: const InputDecoration(labelText: 'WCP Industry Volume in (MT)'),
-                          onChanged: (v) => slWpVolume = v,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                // --- Last 3 Months Average ---
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text('Last 3 Months Average'),
-                        Table(
-                          border: TableBorder.all(),
-                          children: [
-                            const TableRow(children: [
-                              SizedBox(),
-                              Center(child: Text('WC Qty')),
-                              Center(child: Text('WCP Qty')),
-                            ]),
-                            TableRow(children: [
-                              const Center(child: Text('JK')),
-                              TextFormField(
-                                initialValue: last3MonthsAvg['JK_WC'],
-                                decoration: const InputDecoration(),
-                                onChanged: (v) => last3MonthsAvg['JK_WC'] = v,
-                              ),
-                              TextFormField(
-                                initialValue: last3MonthsAvg['JK_WCP'],
-                                decoration: const InputDecoration(),
-                                onChanged: (v) => last3MonthsAvg['JK_WCP'] = v,
-                              ),
-                            ]),
-                            TableRow(children: [
-                              const Center(child: Text('Asian')),
-                              TextFormField(
-                                initialValue: last3MonthsAvg['AS_WC'],
-                                decoration: const InputDecoration(),
-                                onChanged: (v) => last3MonthsAvg['AS_WC'] = v,
-                              ),
-                              TextFormField(
-                                initialValue: last3MonthsAvg['AS_WCP'],
-                                decoration: const InputDecoration(),
-                                onChanged: (v) => last3MonthsAvg['AS_WCP'] = v,
-                              ),
-                            ]),
-                            TableRow(children: [
-                              const Center(child: Text('Other')),
-                              TextFormField(
-                                initialValue: last3MonthsAvg['OT_WC'],
-                                decoration: const InputDecoration(),
-                                onChanged: (v) => last3MonthsAvg['OT_WC'] = v,
-                              ),
-                              TextFormField(
-                                initialValue: last3MonthsAvg['OT_WCP'],
-                                decoration: const InputDecoration(),
-                                onChanged: (v) => last3MonthsAvg['OT_WCP'] = v,
-                              ),
-                            ]),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                // --- Current Month - BW ---
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text('Current Month - BW (in MT)'),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: TextFormField(
-                                initialValue: currentMonthBW['WC'],
-                                decoration: const InputDecoration(labelText: 'WC'),
-                                readOnly: true,
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: TextFormField(
-                                initialValue: currentMonthBW['WCP'],
-                                decoration: const InputDecoration(labelText: 'WCP'),
-                                readOnly: true,
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: TextFormField(
-                                initialValue: currentMonthBW['VAP'],
-                                decoration: const InputDecoration(labelText: 'VAP'),
-                                readOnly: true,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                // --- Order Booked in call/e meet (Dynamic List) ---
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text('Order Booked in call/e meet'),
-                            IconButton(
-                              icon: const Icon(Icons.add),
-                              onPressed: addProductRow,
-                            ),
-                          ],
-                        ),
-                        ListView.builder(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: productList.length,
-                          itemBuilder: (context, idx) {
-                            return Row(
+                      ),
+                      ListView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: productList.length,
+                        itemBuilder: (context, idx) {
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 4.0),
+                            child: Row(
                               children: [
                                 Expanded(
                                   child: TextFormField(
-                                    decoration: const InputDecoration(labelText: 'Product'),
+                                    decoration: _fantasticInputDecoration('Product'),
                                     onChanged: (v) => productList[idx]['product'] = v,
                                   ),
                                 ),
                                 const SizedBox(width: 8),
                                 Expanded(
                                   child: TextFormField(
-                                    decoration: const InputDecoration(labelText: 'SKU'),
+                                    decoration: _fantasticInputDecoration('SKU'),
                                     onChanged: (v) => productList[idx]['sku'] = v,
                                   ),
                                 ),
                                 const SizedBox(width: 8),
                                 Expanded(
                                   child: TextFormField(
-                                    decoration: const InputDecoration(labelText: 'Qty'),
+                                    decoration: _fantasticInputDecoration('Qty'),
                                     keyboardType: TextInputType.number,
                                     onChanged: (v) => productList[idx]['qty'] = v,
                                   ),
                                 ),
                                 IconButton(
-                                  icon: const Icon(Icons.delete),
+                                  icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
                                   onPressed: () => removeProductRow(idx),
                                 ),
                               ],
-                            );
-                          },
-                        ),
-                      ],
-                    ),
+                            ),
+                          );
+                        },
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 12),
                 // --- Market -- WCP (Highest selling SKU) (Dynamic List) ---
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text('Market -- WCP (Highest selling SKU)'),
-                            IconButton(
-                              icon: const Icon(Icons.add),
-                              onPressed: addMarketSkuRow,
-                            ),
-                          ],
-                        ),
-                        ListView.builder(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: marketSkuList.length,
-                          itemBuilder: (context, idx) {
-                            return Row(
+                _SectionHeader(icon: Icons.trending_up, label: 'Market -- WCP (Highest selling SKU)'),
+                _FantasticCard(
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text('Market -- WCP (Highest selling SKU)', style: TextStyle(fontWeight: FontWeight.w500)),
+                          IconButton(
+                            icon: const Icon(Icons.add_circle_outline),
+                            onPressed: addMarketSkuRow,
+                          ),
+                        ],
+                      ),
+                      ListView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: marketSkuList.length,
+                        itemBuilder: (context, idx) {
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 4.0),
+                            child: Row(
                               children: [
                                 Expanded(
                                   child: TextFormField(
-                                    decoration: const InputDecoration(labelText: 'Brand'),
+                                    decoration: _fantasticInputDecoration('Brand'),
                                     onChanged: (v) => marketSkuList[idx]['brand'] = v,
                                   ),
                                 ),
                                 const SizedBox(width: 8),
                                 Expanded(
                                   child: TextFormField(
-                                    decoration: const InputDecoration(labelText: 'Product'),
+                                    decoration: _fantasticInputDecoration('Product'),
                                     onChanged: (v) => marketSkuList[idx]['product'] = v,
                                   ),
                                 ),
                                 const SizedBox(width: 8),
                                 Expanded(
                                   child: TextFormField(
-                                    decoration: const InputDecoration(labelText: 'Price - B'),
+                                    decoration: _fantasticInputDecoration('Price - B'),
                                     keyboardType: TextInputType.number,
                                     onChanged: (v) => marketSkuList[idx]['priceB'] = v,
                                   ),
@@ -734,229 +710,226 @@ class _DsrVisitScreenState extends State<DsrVisitScreen> {
                                 const SizedBox(width: 8),
                                 Expanded(
                                   child: TextFormField(
-                                    decoration: const InputDecoration(labelText: 'Price - C'),
+                                    decoration: _fantasticInputDecoration('Price - C'),
                                     keyboardType: TextInputType.number,
                                     onChanged: (v) => marketSkuList[idx]['priceC'] = v,
                                   ),
                                 ),
                                 IconButton(
-                                  icon: const Icon(Icons.delete),
+                                  icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
                                   onPressed: () => removeMarketSkuRow(idx),
                                 ),
                               ],
-                            );
-                          },
-                        ),
-                      ],
-                    ),
+                            ),
+                          );
+                        },
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 12),
                 // --- Gift Distribution (Dynamic List) ---
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text('Gift Distribution'),
-                            IconButton(
-                              icon: const Icon(Icons.add),
-                              onPressed: addGiftRow,
-                            ),
-                          ],
-                        ),
-                        ListView.builder(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: giftList.length,
-                          itemBuilder: (context, idx) {
-                            return Row(
+                _SectionHeader(icon: Icons.card_giftcard, label: 'Gift Distribution'),
+                _FantasticCard(
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text('Gift Distribution', style: TextStyle(fontWeight: FontWeight.w500)),
+                          IconButton(
+                            icon: const Icon(Icons.add_circle_outline),
+                            onPressed: addGiftRow,
+                          ),
+                        ],
+                      ),
+                      ListView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: giftList.length,
+                        itemBuilder: (context, idx) {
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 4.0),
+                            child: Row(
                               children: [
                                 Expanded(
                                   child: TextFormField(
-                                    decoration: const InputDecoration(labelText: 'Gift Type'),
+                                    decoration: _fantasticInputDecoration('Gift Type'),
                                     onChanged: (v) => giftList[idx]['giftType'] = v,
                                   ),
                                 ),
                                 const SizedBox(width: 8),
                                 Expanded(
                                   child: TextFormField(
-                                    decoration: const InputDecoration(labelText: 'Qty'),
+                                    decoration: _fantasticInputDecoration('Qty'),
                                     keyboardType: TextInputType.number,
                                     onChanged: (v) => giftList[idx]['qty'] = v,
                                   ),
                                 ),
                                 IconButton(
-                                  icon: const Icon(Icons.delete),
+                                  icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
                                   onPressed: () => removeGiftRow(idx),
                                 ),
                               ],
-                            );
-                          },
-                        ),
-                      ],
-                    ),
+                            ),
+                          );
+                        },
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 12),
                 // --- Tile Adhesives ---
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text('Tile Adhesives'),
-                        DropdownButtonFormField<String>(
-                          value: tileAdhesiveSeller,
-                          decoration: const InputDecoration(labelText: 'Is this Tile Adhesives seller?'),
-                          items: tileAdhesiveOptions
-                              .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                              .toList(),
-                          onChanged: (v) => setState(() => tileAdhesiveSeller = v),
-                        ),
-                        TextFormField(
-                          decoration: const InputDecoration(labelText: 'Tile Adhesive Stock'),
-                          onChanged: (v) => tileAdhesiveStock = v,
-                        ),
-                      ],
-                    ),
+                _SectionHeader(icon: Icons.layers, label: 'Tile Adhesives'),
+                _FantasticCard(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      DropdownButtonFormField<String>(
+                        value: tileAdhesiveSeller,
+                        decoration: _fantasticInputDecoration('Is this Tile Adhesives seller?'),
+                        items: tileAdhesiveOptions
+                            .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                            .toList(),
+                        onChanged: (v) => setState(() => tileAdhesiveSeller = v),
+                      ),
+                      TextFormField(
+                        decoration: _fantasticInputDecoration('Tile Adhesive Stock'),
+                        onChanged: (v) => tileAdhesiveStock = v,
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 12),
                 // --- Order Execution Date, Remarks, Reason ---
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        TextFormField(
-                          decoration: const InputDecoration(
-                            labelText: 'Order Execution date',
-                            suffixIcon: Icon(Icons.calendar_today),
-                          ),
-                          readOnly: true,
-                          onTap: () async {
-                            final picked = await showDatePicker(
-                              context: context,
-                              initialDate: DateTime.now(),
-                              firstDate: DateTime.now().subtract(const Duration(days: 30)),
-                              lastDate: DateTime.now().add(const Duration(days: 365)),
-                            );
-                            if (picked != null) {
-                              setState(() {
-                                orderExecutionDate = "${picked.day.toString().padLeft(2, '0')}/${picked.month.toString().padLeft(2, '0')}/${picked.year}";
-                              });
-                            }
-                          },
-                          controller: TextEditingController(text: orderExecutionDate),
-                        ),
-                        const SizedBox(height: 8),
-                        TextFormField(
-                          decoration: const InputDecoration(labelText: 'Any other Remarks'),
-                          onChanged: (v) => remarks = v,
-                        ),
-                        const SizedBox(height: 8),
-                        DropdownButtonFormField<String>(
-                          value: cityReason,
-                          decoration: const InputDecoration(labelText: 'Select Reason'),
-                          items: cityReasons
-                              .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                              .toList(),
-                          onChanged: (v) => setState(() => cityReason = v),
-                        ),
-                      ],
-                    ),
+                _SectionHeader(icon: Icons.event, label: 'Order Execution & Remarks'),
+                _FantasticCard(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      TextFormField(
+                        decoration: _fantasticInputDecoration('Order Execution date', icon: Icons.calendar_today),
+                        readOnly: true,
+                        onTap: () async {
+                          final picked = await showDatePicker(
+                            context: context,
+                            initialDate: DateTime.now(),
+                            firstDate: DateTime.now().subtract(const Duration(days: 30)),
+                            lastDate: DateTime.now().add(const Duration(days: 365)),
+                          );
+                          if (picked != null) {
+                            setState(() {
+                              orderExecutionDate = "${picked.day.toString().padLeft(2, '0')}/${picked.month.toString().padLeft(2, '0')}/${picked.year}";
+                            });
+                          }
+                        },
+                        controller: TextEditingController(text: orderExecutionDate),
+                      ),
+                      const SizedBox(height: 10),
+                      TextFormField(
+                        decoration: _fantasticInputDecoration('Any other Remarks'),
+                        onChanged: (v) => remarks = v,
+                      ),
+                      const SizedBox(height: 10),
+                      DropdownButtonFormField<String>(
+                        value: cityReason,
+                        decoration: _fantasticInputDecoration('Select Reason'),
+                        items: cityReasons
+                            .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                            .toList(),
+                        onChanged: (v) => setState(() => cityReason = v),
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 12),
                 // --- Map/Location Placeholder ---
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
-                        Text('Map/Location (to be implemented)'),
-                        SizedBox(height: 100, child: Center(child: Text('Map widget placeholder'))),
-                      ],
-                    ),
+                _SectionHeader(icon: Icons.map, label: 'Map/Location'),
+                _FantasticCard(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: const [
+                      SizedBox(height: 8),
+                      Text('Map/Location (to be implemented)'),
+                      SizedBox(height: 100, child: Center(child: Text('Map widget placeholder'))),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 12),
                 // --- Last Billing date as per Tally ---
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text('Last Billing date as per Tally'),
-                        const SizedBox(height: 8),
-                        Table(
-                          border: TableBorder.all(),
-                          columnWidths: const {
-                            0: FlexColumnWidth(2),
-                            1: FlexColumnWidth(2),
-                            2: FlexColumnWidth(1),
-                          },
-                          children: [
-                            const TableRow(children: [
-                              Padding(
-                                padding: EdgeInsets.all(6.0),
-                                child: Text('Product', style: TextStyle(fontWeight: FontWeight.bold)),
-                              ),
-                              Padding(
-                                padding: EdgeInsets.all(6.0),
-                                child: Text('Date', style: TextStyle(fontWeight: FontWeight.bold)),
-                              ),
-                              Padding(
-                                padding: EdgeInsets.all(6.0),
-                                child: Text('Qty.', style: TextStyle(fontWeight: FontWeight.bold)),
-                              ),
-                            ]),
-                            ...lastBillingData.map((row) => TableRow(children: [
-                              Padding(
-                                padding: const EdgeInsets.all(6.0),
-                                child: Text(row['product'] ?? ''),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.all(6.0),
-                                child: Text(row['date'] ?? ''),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.all(6.0),
-                                child: Text(row['qty'] ?? ''),
-                              ),
-                            ])).toList(),
-                          ],
-                        ),
-                      ],
-                    ),
+                _SectionHeader(icon: Icons.receipt_long, label: 'Last Billing date as per Tally'),
+                _FantasticCard(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Table(
+                        border: TableBorder.all(color: theme.dividerColor),
+                        columnWidths: const {
+                          0: FlexColumnWidth(2),
+                          1: FlexColumnWidth(2),
+                          2: FlexColumnWidth(1),
+                        },
+                        children: [
+                          const TableRow(children: [
+                            Padding(
+                              padding: EdgeInsets.all(6.0),
+                              child: Text('Product', style: TextStyle(fontWeight: FontWeight.bold)),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.all(6.0),
+                              child: Text('Date', style: TextStyle(fontWeight: FontWeight.bold)),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.all(6.0),
+                              child: Text('Qty.', style: TextStyle(fontWeight: FontWeight.bold)),
+                            ),
+                          ]),
+                          ...lastBillingData.map((row) => TableRow(children: [
+                            Padding(
+                              padding: const EdgeInsets.all(6.0),
+                              child: Text(row['product'] ?? ''),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(6.0),
+                              child: Text(row['date'] ?? ''),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(6.0),
+                              child: Text(row['qty'] ?? ''),
+                            ),
+                          ])).toList(),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 20),
                 // --- Bottom Action Buttons ---
-                const SizedBox(height: 24),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        side: BorderSide(color: theme.colorScheme.primary, width: 2),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                      ),
                       onPressed: () {
                         // TODO: Add another activity logic
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(content: Text('Add Another Activity (mock)')),
                         );
                       },
-                      child: const Text('Add Another Activity'),
+                      child: const Text('Add Another Activity', style: TextStyle(fontWeight: FontWeight.bold)),
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 14),
                     ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: theme.colorScheme.primary,
+                        foregroundColor: theme.colorScheme.onPrimary,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                      ),
                       onPressed: () {
                         if (_formKey.currentState!.validate()) {
                           // TODO: Handle submit & exit
@@ -965,17 +938,22 @@ class _DsrVisitScreenState extends State<DsrVisitScreen> {
                           );
                         }
                       },
-                      child: const Text('Submit & Exit'),
+                      child: const Text('Submit & Exit', style: TextStyle(fontWeight: FontWeight.bold)),
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 14),
                     OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        side: BorderSide(color: theme.colorScheme.secondary, width: 2),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                      ),
                       onPressed: () {
                         // TODO: Show submitted data logic
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(content: Text('Show Submitted Data (mock)')),
                         );
                       },
-                      child: const Text('Click to See Submitted Data'),
+                      child: const Text('Click to See Submitted Data', style: TextStyle(fontWeight: FontWeight.bold)),
                     ),
                   ],
                 ),
@@ -987,4 +965,72 @@ class _DsrVisitScreenState extends State<DsrVisitScreen> {
       ),
     );
   }
+}
+
+// --- Fantastic Section Header Widget ---
+class _SectionHeader extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  const _SectionHeader({required this.icon, required this.label});
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 4, top: 16),
+      child: Row(
+        children: [
+          Icon(icon, color: Theme.of(context).colorScheme.primary, size: 22),
+          const SizedBox(width: 8),
+          Text(
+            label,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// --- Fantastic Card Widget ---
+class _FantasticCard extends StatelessWidget {
+  final Widget child;
+  const _FantasticCard({required this.child});
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 5,
+      margin: const EdgeInsets.symmetric(vertical: 2),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: child,
+      ),
+    );
+  }
+}
+
+// --- Fantastic Input Decoration Helper ---
+InputDecoration _fantasticInputDecoration(String label, {IconData? icon}) {
+  return InputDecoration(
+    labelText: label.isNotEmpty ? label : null,
+    filled: true,
+    fillColor: Colors.grey[100],
+    border: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(12),
+      borderSide: BorderSide(color: Colors.grey.shade300, width: 1.2),
+    ),
+    enabledBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(12),
+      borderSide: BorderSide(color: Colors.grey.shade300, width: 1.2),
+    ),
+    focusedBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(12),
+      borderSide: BorderSide(color: Colors.blue.shade300, width: 1.5),
+    ),
+    suffixIcon: icon != null ? Icon(icon, size: 20) : null,
+    contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+  );
 }
