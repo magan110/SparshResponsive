@@ -74,7 +74,7 @@ class _UniversalOutletRegistrationPageState
     super.dispose();
   }
 
-  /// Toggles a detail in the “Paint / Non-Paint Details” checklist.
+  /// Toggles a detail in the "Paint / Non-Paint Details" checklist.
   void _togglePaintNonPaintDetail(String detail) {
     setState(() {
       if (_selectedPaintNonPaintDetails.contains(detail)) {
@@ -90,7 +90,14 @@ class _UniversalOutletRegistrationPageState
     return Container(
       // Wrap the entire Scaffold in a Container with a blue gradient
       decoration: const BoxDecoration(
-        color: Colors.blue,
+        gradient: LinearGradient(
+          colors: [
+            Color(0xFF1976D2),
+            Color(0xFF42A5F5),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
       ),
       child: Scaffold(
         // Make the Scaffold background transparent so the gradient shows through
@@ -102,13 +109,26 @@ class _UniversalOutletRegistrationPageState
           centerTitle: true,
           title: const Text(
             'Universal Outlets Registration',
-            style: TextStyle(color: Colors.white),
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 22,
+              letterSpacing: 0.5,
+              shadows: [
+                Shadow(
+                  color: Colors.black26,
+                  blurRadius: 4,
+                  offset: Offset(0, 2),
+                ),
+              ],
+            ),
           ),
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.white),
+            icon: const Icon(Icons.arrow_back, color: Colors.white, size: 28),
             onPressed: () {
               Navigator.pop(context);
             },
+            tooltip: 'Back',
           ),
         ),
         body: SafeArea(
@@ -195,7 +215,7 @@ class _UniversalOutletRegistrationPageState
     );
   }
 
-  /// Left “Basic Details” card
+  /// Left "Basic Details" card
   Widget _buildBasicDetailsCard(bool isMobile) {
     return Card(
       elevation: 4,
@@ -427,7 +447,7 @@ class _UniversalOutletRegistrationPageState
     );
   }
 
-  /// Right “Contact Details” card
+  /// Right "Contact Details" card
   Widget _buildContactDetailsCard(bool isMobile) {
     return Card(
       elevation: 4,

@@ -111,22 +111,6 @@ class _EmployeeDashboardPageState extends State<EmployeeDashboardPage> {
             icon: const Icon(Icons.arrow_back, color: Colors.white),
             onPressed: () => Navigator.pop(context),
           ),
-          actions: [
-            // Add Home and Logout buttons for better UX
-            TextButton(
-              onPressed: () {
-                Navigator.popUntil(context, (route) => route.isFirst);
-              },
-              child: const Text('Home', style: TextStyle(color: Colors.white)),
-            ),
-            TextButton(
-              onPressed: () {
-                // TODO: implement logout
-              },
-              child: const Text('Logout', style: TextStyle(color: Colors.white)),
-            ),
-            const SizedBox(width: 8),
-          ],
         ),
         body: SafeArea(
           child: SingleChildScrollView(

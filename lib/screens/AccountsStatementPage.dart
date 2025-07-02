@@ -19,7 +19,7 @@ class _AccountsStatementPageState extends State<AccountsStatementPage> {
   String? _selectedPurchaserType;
   String? _selectedAreaCode;
 
-  // Controller for “Code” field
+  // Controller for "Code" field
   final TextEditingController _codeController = TextEditingController();
 
   // Sample items (replace with real data)
@@ -31,7 +31,7 @@ class _AccountsStatementPageState extends State<AccountsStatementPage> {
   ];
   final List<String> _areaCodes = ['Select', 'Area 1', 'Area 2', 'Area 3'];
 
-  // DateFormat for “dd/MM/yyyy”
+  // DateFormat for "dd/MM/yyyy"
   final DateFormat _dateFormatter = DateFormat('dd/MM/yyyy');
 
   @override
@@ -76,15 +76,15 @@ class _AccountsStatementPageState extends State<AccountsStatementPage> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      // Full‐screen gradient background
+      // Full-screen gradient background
       decoration: const BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            Color(0xFF7AB8FF),
-            Color(0xFFC1DAFF),
+            Color(0xFF1976D2),
+            Color(0xFF42A5F5),
           ],
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
         ),
       ),
       child: Scaffold(
@@ -95,11 +95,24 @@ class _AccountsStatementPageState extends State<AccountsStatementPage> {
           centerTitle: true,
           title: const Text(
             'Accounts Statement – Confidential',
-            style: TextStyle(color: Colors.white),
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 22,
+              letterSpacing: 0.5,
+              shadows: [
+                Shadow(
+                  color: Colors.black26,
+                  blurRadius: 4,
+                  offset: Offset(0, 2),
+                ),
+              ],
+            ),
           ),
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.white),
+            icon: const Icon(Icons.arrow_back, color: Colors.white, size: 28),
             onPressed: () => Navigator.pop(context),
+            tooltip: 'Back',
           ),
         ),
         body: SafeArea(
@@ -235,7 +248,7 @@ class _AccountsStatementPageState extends State<AccountsStatementPage> {
           alignment: Alignment.centerRight,
           child: ElevatedButton(
             onPressed: () {
-              // TODO: Implement “Go” logic
+              // TODO: Implement "Go" logic
               debugPrint('--- GO PRESSED ---');
               debugPrint('Start Date: ${_startDateController.text}');
               debugPrint('End Date: ${_endDateController.text}');
@@ -394,7 +407,7 @@ class _AccountsStatementPageState extends State<AccountsStatementPage> {
               height: 48,
               child: ElevatedButton(
                 onPressed: () {
-                  // TODO: Implement “Go” logic
+                  // TODO: Implement "Go" logic
                   debugPrint('--- GO PRESSED ---');
                   debugPrint('Start Date: ${_startDateController.text}');
                   debugPrint('End Date: ${_endDateController.text}');

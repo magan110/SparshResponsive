@@ -5,11 +5,11 @@ import 'package:intl/intl.dart';
 
 /// A fully responsive screen that matches the provided screenshot:
 /// - Blue gradient background
-/// - White, rounded “filter card” at top
+/// - White, rounded "filter card" at top
 /// - Searchable Report Type dropdown
 /// - Start Date / End Date fields with date pickers
-/// - “Go” button (blue)
-/// - “As on DD/MM/YYYY at HH:MM:SS” timestamp on the right
+/// - "Go" button (blue)
+/// - "As on DD/MM/YYYY at HH:MM:SS" timestamp on the right
 class PainterKycTrackingPage extends StatefulWidget {
   const PainterKycTrackingPage({super.key});
 
@@ -38,14 +38,14 @@ class _PainterKycTrackingPageState extends State<PainterKycTrackingPage> {
   final TextEditingController _startDateController = TextEditingController();
   final TextEditingController _endDateController = TextEditingController();
 
-  // DateFormat for “dd/MM/yyyy”
+  // DateFormat for "dd/MM/yyyy"
   final DateFormat _dateFormatter = DateFormat('dd/MM/yyyy');
 
   @override
   void initState() {
     super.initState();
 
-    // Default selected type → “Incentive Employee Wise Dashboard” if it exists
+    // Default selected type → "Incentive Employee Wise Dashboard" if it exists
     if (_reportTypes.contains('Incentive Employee Wise Dashboard')) {
       _selectedReportType = 'Incentive Employee Wise Dashboard';
     } else {
@@ -91,7 +91,7 @@ class _PainterKycTrackingPageState extends State<PainterKycTrackingPage> {
     }
   }
 
-  /// Returns “As on DD/MM/YYYY at HH:MM:SS” for the current moment
+  /// Returns "As on DD/MM/YYYY at HH:MM:SS" for the current moment
   String _formattedTimestamp() {
     DateTime now = DateTime.now();
     String datePart = _dateFormatter.format(now);
@@ -102,11 +102,18 @@ class _PainterKycTrackingPageState extends State<PainterKycTrackingPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // We don’t use an AppBar here because the screenshot didn’t show one—
+      // We don't use an AppBar here because the screenshot didn't show one—
       // the card floats on a gradient background.
       body: Container(
         decoration: const BoxDecoration(
-          color: Colors.blue,
+          gradient: LinearGradient(
+            colors: [
+              Color(0xFF1976D2), // Deep blue
+              Color(0xFF42A5F5), // Lighter blue
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
         ),
         child: SafeArea(
           child: Padding(
@@ -119,22 +126,61 @@ class _PainterKycTrackingPageState extends State<PainterKycTrackingPage> {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    // The white rounded “filter card”
+                    // Top bar with back button and title
+                    Row(
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.arrow_back, color: Colors.white, size: 28),
+                          onPressed: () => Navigator.of(context).pop(),
+                          tooltip: 'Back',
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            'Painter KYC Tracking',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 0.5,
+                              shadows: [
+                                Shadow(
+                                  color: Colors.black.withOpacity(0.15),
+                                  blurRadius: 4,
+                                  offset: Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        // To keep the title centered, add a dummy icon with opacity 0
+                        Opacity(
+                          opacity: 0,
+                          child: IconButton(
+                            icon: const Icon(Icons.arrow_back),
+                            onPressed: null,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 18),
+                    // The white rounded "filter card"
                     Container(
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.98),
-                        borderRadius: BorderRadius.circular(16),
+                        color: Colors.white.withOpacity(0.98),
+                        borderRadius: BorderRadius.circular(20),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.1),
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
+                            color: Colors.black.withOpacity(0.15),
+                            blurRadius: 24,
+                            offset: const Offset(0, 8),
                           ),
                         ],
                       ),
                       padding: const EdgeInsets.symmetric(
-                        vertical: 16,
-                        horizontal: 16,
+                        vertical: 24,
+                        horizontal: 24,
                       ),
                       child: isMobile
                           ? _buildMobileLayout()
@@ -147,8 +193,10 @@ class _PainterKycTrackingPageState extends State<PainterKycTrackingPage> {
                         child: Text(
                           'Your content goes here',
                           style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.7),
-                            fontSize: isMobile ? 16 : 24,
+                            color: Colors.white.withOpacity(0.85),
+                            fontSize: isMobile ? 18 : 28,
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 0.5,
                           ),
                         ),
                       ),
@@ -189,7 +237,7 @@ class _PainterKycTrackingPageState extends State<PainterKycTrackingPage> {
         // 4) Go button (full-width)
         ElevatedButton(
           onPressed: () {
-            // TODO: wire up your “Go” logic
+            // TODO: wire up your "Go" logic
             final sel = _selectedReportType ?? '(none)';
             final sd = _startDateController.text;
             final ed = _endDateController.text;
@@ -198,9 +246,11 @@ class _PainterKycTrackingPageState extends State<PainterKycTrackingPage> {
           style: ElevatedButton.styleFrom(
             minimumSize: const Size(double.infinity, 48),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(12),
             ),
-            backgroundColor: Colors.blue,
+            backgroundColor: const Color(0xFF1976D2),
+            elevation: 6,
+            shadowColor: Colors.blueAccent.withOpacity(0.3),
           ),
           child: const Text(
             'Go',
@@ -266,9 +316,11 @@ class _PainterKycTrackingPageState extends State<PainterKycTrackingPage> {
             },
             style: ElevatedButton.styleFrom(
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(12),
               ),
-              backgroundColor: Colors.blue,
+              backgroundColor: const Color(0xFF1976D2),
+              elevation: 6,
+              shadowColor: Colors.blueAccent.withOpacity(0.3),
             ),
             child: const Text(
               'Go',
@@ -296,7 +348,7 @@ class _PainterKycTrackingPageState extends State<PainterKycTrackingPage> {
     );
   }
 
-  /// A searchable “Report Type” dropdown using dropdown_search package.
+  /// A searchable "Report Type" dropdown using dropdown_search package.
   Widget _buildReportTypeDropdown() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -310,9 +362,14 @@ class _PainterKycTrackingPageState extends State<PainterKycTrackingPage> {
           value: _selectedReportType,
           decoration: InputDecoration(
             contentPadding:
-            const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(10),
+              borderSide: const BorderSide(color: Color(0xFF1976D2), width: 1.2),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: const BorderSide(color: Color(0xFF1976D2), width: 1.2),
             ),
             filled: true,
             fillColor: Colors.grey.shade50,
@@ -357,11 +414,16 @@ class _PainterKycTrackingPageState extends State<PainterKycTrackingPage> {
               decoration: InputDecoration(
                 isDense: true,
                 contentPadding:
-                const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: const BorderSide(color: Color(0xFF1976D2), width: 1.2),
                 ),
-                suffixIcon: const Icon(Icons.calendar_today),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: const BorderSide(color: Color(0xFF1976D2), width: 1.2),
+                ),
+                suffixIcon: const Icon(Icons.calendar_today, color: Color(0xFF1976D2)),
               ),
             ),
           ),

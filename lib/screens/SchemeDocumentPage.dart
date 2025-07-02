@@ -112,25 +112,6 @@ class _SchemeDocumentPageState extends State<SchemeDocumentPage> {
             icon: const Icon(Icons.arrow_back, color: Colors.white),
             onPressed: () => Navigator.pop(context),
           ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                // TODO: navigate to Home
-                Navigator.popUntil(context, (route) => route.isFirst);
-              },
-              child:
-              const Text('Home', style: TextStyle(color: Colors.white)),
-            ),
-            const SizedBox(width: 8),
-            TextButton(
-              onPressed: () {
-                // TODO: implement Log Out
-              },
-              child:
-              const Text('Log Out', style: TextStyle(color: Colors.white)),
-            ),
-            const SizedBox(width: 12),
-          ],
         ),
         body: SafeArea(
           child: SingleChildScrollView(

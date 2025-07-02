@@ -9,8 +9,8 @@ import 'package:dropdown_search/dropdown_search.dart';
 /// – Full‐screen blue gradient background
 /// – Transparent AppBar with back arrow, title, Home/Log Out
 /// – A large white card containing:
-///    * “Process Details” (many dropdown/text fields)
-///    * “Buyer Detail” (GST, PAN, Aadhar, Remarks, and upload buttons)
+///    * "Process Details" (many dropdown/text fields)
+///    * "Buyer Detail" (GST, PAN, Aadhar, Remarks, and upload buttons)
 ///    * A Submit button at the very bottom
 /// – Fully responsive: stacks vertically on mobile (width < 600), side‐by‐side on tablet/desktop.
 class GrcLeadEntryPage extends StatefulWidget {
@@ -109,11 +109,11 @@ class _GrcLeadEntryPageState extends State<GrcLeadEntryPage> {
       decoration: const BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            Color(0xFF7AB8FF),
-            Color(0xFFC1DAFF),
+            Color(0xFF1976D2),
+            Color(0xFF42A5F5),
           ],
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
         ),
       ),
       child: Scaffold(
@@ -122,14 +122,27 @@ class _GrcLeadEntryPageState extends State<GrcLeadEntryPage> {
           // Transparent AppBar
           backgroundColor: Colors.transparent,
           elevation: 0,
-          centerTitle: false,
+          centerTitle: true,
           title: const Text(
             'GRC Lead Entry',
-            style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 22,
+              letterSpacing: 0.5,
+              shadows: [
+                Shadow(
+                  color: Colors.black26,
+                  blurRadius: 4,
+                  offset: Offset(0, 2),
+                ),
+              ],
+            ),
           ),
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.white),
+            icon: const Icon(Icons.arrow_back, color: Colors.white, size: 28),
             onPressed: () => Navigator.pop(context),
+            tooltip: 'Back',
           ),
         ),
         body: SafeArea(
@@ -174,17 +187,17 @@ class _GrcLeadEntryPageState extends State<GrcLeadEntryPage> {
     );
   }
 
-  /// “Process Details” section
+  /// "Process Details" section
   Widget _buildProcessDetailsSection(bool isMobile) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.98),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            color: Colors.black.withOpacity(0.15),
+            blurRadius: 24,
+            offset: const Offset(0, 8),
           ),
         ],
       ),
@@ -200,7 +213,7 @@ class _GrcLeadEntryPageState extends State<GrcLeadEntryPage> {
             ),
           ),
           const SizedBox(height: 16),
-          // Use either single‐column or multi‐column rows depending on isMobile
+          // Use either single-column or multi-column rows depending on isMobile
           if (isMobile) ...[
             _buildDropdownField(
               label: 'Define Onsite/Offsite *',
@@ -427,17 +440,17 @@ class _GrcLeadEntryPageState extends State<GrcLeadEntryPage> {
     );
   }
 
-  /// “Buyer Detail” section
+  /// "Buyer Detail" section
   Widget _buildBuyerDetailSection(bool isMobile) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.98),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            color: Colors.black.withOpacity(0.15),
+            blurRadius: 24,
+            offset: const Offset(0, 8),
           ),
         ],
       ),
@@ -530,7 +543,7 @@ class _GrcLeadEntryPageState extends State<GrcLeadEntryPage> {
 
   /// Upload buttons and Submit
   Widget _buildUploadAndSubmit() {
-    // Each “upload” group: label + blue “Upload Image” button + a grey placeholder for “View”
+    // Each "upload" group: label + blue "Upload Image" button + a grey placeholder for "View"
     Widget uploadRow(String label) {
       return Row(
         children: [
@@ -620,7 +633,7 @@ class _GrcLeadEntryPageState extends State<GrcLeadEntryPage> {
     );
   }
 
-  /// Helper: build a date field (read‐only) with calendar icon
+  /// Helper: build a date field (read-only) with calendar icon
   Widget _buildDateField({
     required String label,
     required TextEditingController controller,
