@@ -60,19 +60,16 @@ class _AppDrawerState extends State<AppDrawer> {
           // Enhanced Drawer Header
           DrawerHeader(
             decoration: const BoxDecoration(
-              color: Colors.blueAccent, // A slightly more vibrant blue
               gradient: LinearGradient(
-                // Add a subtle gradient
-                colors: [Colors.blueAccent, Colors.lightBlueAccent],
+                colors: [Color(0xFF1976D2), Color(0xFF42A5F5)],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
               boxShadow: [
-                // Add a shadow for depth
                 BoxShadow(
                   color: Colors.black26,
-                  blurRadius: 10,
-                  offset: Offset(0, 2),
+                  blurRadius: 12,
+                  offset: Offset(0, 4),
                 ),
               ],
             ),
@@ -80,31 +77,40 @@ class _AppDrawerState extends State<AppDrawer> {
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Error handling for image loading is good
-                SizedBox(
-                  width: 700,
-                  child: Image.asset(
-                    'assets/image27.png', // Ensure this asset exists in pubspec.yaml
-                    height: 97,
-                    fit: BoxFit.fill,
-                    errorBuilder: (context, error, stackTrace) {
-                      print('Error loading drawer header image: $error');
-                      return const Icon(
-                        Icons.business,
-                        size: 60,
-                        color: Colors.white,
-                      ); // Placeholder icon
-                    },
+                CircleAvatar(
+                  radius: 38,
+                  backgroundColor: Colors.white,
+                  child: Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: Image.asset(
+                      'assets/image27.png',
+                      fit: BoxFit.contain,
+                      errorBuilder: (context, error, stackTrace) {
+                        print('Error loading drawer header image: $error');
+                        return const Icon(
+                          Icons.business,
+                          size: 48,
+                          color: Color(0xFF1976D2),
+                        );
+                      },
+                    ),
                   ),
                 ),
-                const SizedBox(height: 12), // Increased spacing
+                const SizedBox(height: 14),
                 const Text(
                   'Birla White',
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 18, // Slightly larger font size
+                    fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    letterSpacing: 1.2, // Added letter spacing
+                    letterSpacing: 1.5,
+                    shadows: [
+                      Shadow(
+                        color: Colors.black38,
+                        blurRadius: 4,
+                        offset: Offset(0, 2),
+                      ),
+                    ],
                   ),
                 ),
               ],
