@@ -59,24 +59,28 @@ class _DashboardScreenState extends State<DashboardScreen> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Dashboard',
-                  style: GoogleFonts.poppins(
-                    fontSize: 28,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.white,
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Dashboard',
+                    style: GoogleFonts.poppins(
+                      fontSize: 24,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  'Welcome back!',
-                  style: GoogleFonts.poppins(
-                      fontSize: 16, color: Colors.white.withOpacity(0.82)),
-                ),
-              ],
+                  const SizedBox(height: 6),
+                  Text(
+                    'Welcome back!',
+                    style: GoogleFonts.poppins(
+                        fontSize: 16, color: Colors.white.withOpacity(0.82)),
+                  ),
+                ],
+              ),
             ),
             Stack(
               children: [

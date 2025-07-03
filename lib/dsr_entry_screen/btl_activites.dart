@@ -152,6 +152,7 @@ class _BtlActivitiesState extends State<BtlActivities> {
   }) =>
       DropdownButtonFormField<String>(
         value: value,
+        isExpanded: true,
         decoration: InputDecoration(
           filled: true,
           fillColor: Colors.grey[100],
@@ -360,6 +361,21 @@ class _BtlActivitiesState extends State<BtlActivities> {
                 title: 'Supporting Documents',
                 icon: Icons.photo_library_rounded,
                 children: [
+                  Row(
+                    children: [
+                      Icon(Icons.photo_library_rounded, color: AppTheme.primaryColor, size: 24),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          'Supporting Documents',
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.primaryColor),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
                   Text(
                     'Upload up to 3 images related to your activity',
                     style: TextStyle(color: Colors.grey.shade600),

@@ -371,30 +371,33 @@ class _MeetingWithNewPurchaserState extends State<MeetingWithNewPurchaser> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Row(
-                            children: [
-                              Icon(Icons.photo_library_rounded, color: Colors.blue, size: 24),
-                              const SizedBox(width: 8),
-                              Text('Supporting Documents', style: Theme.of(context).textTheme.titleLarge),
-                            ],
+                          Icon(Icons.photo_library_rounded, color: Colors.blue, size: 24),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              'Supporting Documents',
+                              style: Theme.of(context).textTheme.titleLarge,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
-                          Row(
-                            children: [
-                              IconButton(
-                                icon: const Icon(Icons.add_circle),
-                                color: Colors.blue,
-                                onPressed: _addRow,
-                                tooltip: 'Add Image Row',
-                              ),
-                              IconButton(
-                                icon: const Icon(Icons.remove_circle),
-                                color: Colors.red,
-                                onPressed: _removeRow,
-                                tooltip: 'Remove Image Row',
-                              ),
-                            ],
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.add_circle),
+                            color: Colors.blue,
+                            onPressed: _addRow,
+                            tooltip: 'Add Image Row',
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.remove_circle),
+                            color: Colors.red,
+                            onPressed: _removeRow,
+                            tooltip: 'Remove Image Row',
                           ),
                         ],
                       ),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:learning2/screens/DsrVisitScreen.dart';
+import 'package:learning2/dsr_entry_screen/DsrVisitScreen.dart';
 import 'package:learning2/screens/Home_screen.dart';
 import 'package:learning2/screens/firebase_api.dart';
 import 'package:learning2/screens/notification_screen.dart';

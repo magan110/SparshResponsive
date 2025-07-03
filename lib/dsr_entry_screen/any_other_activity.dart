@@ -298,11 +298,11 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
                     children: [
                       const Icon(Icons.photo_library_rounded, color: AppTheme.primaryColor, size: 24),
                       const SizedBox(width: 8),
-                      Flexible(
+                      Expanded(
                         child: Text(
                           'Supporting Documents',
                           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.primaryColor),
-                          softWrap: true,
+                          maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),

@@ -165,6 +165,7 @@ class _CheckSamplingAtSiteState extends State<CheckSamplingAtSite> {
   }) =>
       DropdownButtonFormField<String>(
         value: value,
+        isExpanded: true,
         decoration: InputDecoration(
           filled: true,
           fillColor: Colors.grey[100],

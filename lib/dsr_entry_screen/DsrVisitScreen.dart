@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'edit_kyc_screen.dart';
+import '../screens/edit_kyc_screen.dart';
 
 class DsrVisitScreen extends StatefulWidget {
   const DsrVisitScreen({Key? key}) : super(key: key);
