@@ -447,7 +447,14 @@ class _MeetingsWithContractorState extends State<MeetingsWithContractor> {
                           children: [
                             const Icon(Icons.photo_library_rounded, color: AppTheme.primaryColor, size: 24),
                             const SizedBox(width: 8),
-                            Text('Supporting Documents', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.primaryColor)),
+                            Flexible(
+                              child: Text(
+                                'Supporting Documents',
+                                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.primaryColor),
+                                softWrap: true,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
                           ],
                         ),
                         const SizedBox(height: 4),

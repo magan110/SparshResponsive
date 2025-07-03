@@ -370,6 +370,7 @@ class _DsrRetailerInOutState extends State<DsrRetailerInOut>
                   title: 'Purchaser / Retailer',
                   child: DropdownButtonFormField<String>(
                     value: _purchaserRetailerItem,
+                    isExpanded: true,
                     decoration: _inputDecoration(),
                     items: _purchaserRetailerItems
                         .map((it) => DropdownMenuItem(value: it, child: Text(it)))
@@ -490,26 +491,56 @@ class _DsrRetailerInOutState extends State<DsrRetailerInOut>
                         readOnly: true,
                         decoration: _inputDecoration(labelText: 'Longitude'),
                       ),
-                      const SizedBox(height: 8),
-                      _buildElevatedButton(
-                        icon: Icons.location_on,
-                        label: 'Capture Customer Location',
-                        onPressed: _captureCustomerLocation,
-                      ),
                     ],
                   ),
                 ),
-                const SizedBox(height: 24),
-                _buildActionButton(
-                  label: 'IN',
-                  color: _primaryColor,
-                  onPressed: () => _onSubmit('IN'),
+                const SizedBox(height: 32),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    icon: const Icon(Icons.login, size: 24),
+                    label: const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 10.0),
+                      child: Text(
+                        'IN',
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                    onPressed: () => _onSubmit('IN'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: _primaryColor,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      elevation: 6,
+                      padding: const EdgeInsets.symmetric(vertical: 0),
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 12),
-                _buildActionButton(
-                  label: 'Exception Entry',
-                  color: Colors.orange,
-                  onPressed: () => _onSubmit('Exception'),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    icon: const Icon(Icons.error_outline, size: 24),
+                    label: const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 10.0),
+                      child: Text(
+                        'Exception Entry',
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                    onPressed: () => _onSubmit('Exception'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.orange,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      elevation: 6,
+                      padding: const EdgeInsets.symmetric(vertical: 0),
+                    ),
+                  ),
                 ),
               ],
             ),

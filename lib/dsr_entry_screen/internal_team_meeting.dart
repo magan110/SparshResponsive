@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:learning2/theme/app_theme.dart';
 
 import 'dsr_entry.dart';
 
@@ -300,13 +301,17 @@ class _InternalTeamMeetingState extends State<InternalTeamMeeting> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Row(
+                    Row(
                       children: [
-                        Icon(Icons.photo_library_rounded, color: Color.fromARGB(255, 33, 150, 243), size: 24),
-                        SizedBox(width: 8),
-                        Text(
-                          'Supporting Documents',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 33, 150, 243)),
+                        const Icon(Icons.photo_library_rounded, color: AppTheme.primaryColor, size: 24),
+                        const SizedBox(width: 8),
+                        Flexible(
+                          child: Text(
+                            'Supporting Documents',
+                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.primaryColor),
+                            softWrap: true,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
                       ],
                     ),

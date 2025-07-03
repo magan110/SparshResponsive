@@ -21,6 +21,7 @@ import 'SchemeDocumentPage.dart';
 import 'UniversalOutletRegistrationPage.dart';
 import 'mail_screen.dart';
 import 'app_drawer.dart';
+import '../navigation_registry.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -34,7 +35,13 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _isSearchVisible = false;
   final TextEditingController _searchController = TextEditingController();
 
-  // These are the four “root” screens for bottom navigation:
+  // List of searchable items (screens and reports) now comes from appRoutes
+  List<_SearchItem> get _searchItems => appRoutes
+      .map((route) => _SearchItem(route.title, route.type, route.builder))
+      .toList();
+  List<_SearchItem> _filteredSearchItems = [];
+
+  // These are the four "root" screens for bottom navigation:
   final List<Widget> _screens = [
     const HomeContent(),
     const DashboardScreen(),
@@ -69,14 +76,14 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      // Intercept Android “back” button:
+      // Intercept Android "back" button:
       onWillPop: () async {
         if (_selectedIndex != 0) {
-          // If we’re not on Home, send back to Home.
+          // If we're not on Home, send back to Home.
           _updateCurrentScreen(0);
           return false;
         }
-        return true; // Let the system handle “back” when already on Home.
+        return true; // Let the system handle "back" when already on Home.
       },
       child: Scaffold(
         backgroundColor: Colors.white,
@@ -86,7 +93,7 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             // The currently active screen (HomeContent / Dashboard / Mail / Profile):
             _currentScreen,
-            // The search‐overlay (if _isSearchVisible):
+            // The search-overlay (if _isSearchVisible):
             _buildSearchInput(context),
           ],
         ),
@@ -95,7 +102,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  /// Builds the gradient AppBar with a search‐icon and notifications‐icon.
+  /// Builds the gradient AppBar with a search-icon and notifications-icon.
   PreferredSizeWidget _buildAppBar() {
     return AppBar(
       elevation: 4,
@@ -183,7 +190,7 @@ class _HomeScreenState extends State<HomeScreen> {
               TextField(
                 controller: _searchController,
                 decoration: InputDecoration(
-                  hintText: 'Search for reports, orders, etc...',
+                  hintText: 'Search for reports, screens, etc...',
                   prefixIcon: const Icon(Icons.search),
                   suffixIcon: IconButton(
                     icon: const Icon(Icons.close),
@@ -191,6 +198,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       setState(() {
                         _isSearchVisible = false;
                         _searchController.clear();
+                        _filteredSearchItems = [];
                       });
                     },
                   ),
@@ -198,13 +206,49 @@ class _HomeScreenState extends State<HomeScreen> {
                     borderRadius: BorderRadius.circular(10.0),
                   ),
                 ),
+                onChanged: (value) {
+                  setState(() {
+                    _filteredSearchItems = value.isEmpty
+                        ? []
+                        : _searchItems.where((item) =>
+                            item.title.toLowerCase().contains(value.toLowerCase()) ||
+                            item.type.toLowerCase().contains(value.toLowerCase())
+                          ).toList();
+                  });
+                },
                 onSubmitted: (value) {
-                  // Implement your search logic here.
                   setState(() {
                     _isSearchVisible = false;
+                    _searchController.clear();
+                    _filteredSearchItems = [];
                   });
                 },
               ),
+              if (_filteredSearchItems.isNotEmpty)
+                Container(
+                  constraints: const BoxConstraints(maxHeight: 300),
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: _filteredSearchItems.length,
+                    itemBuilder: (context, index) {
+                      final item = _filteredSearchItems[index];
+                      return ListTile(
+                        title: Text(item.title),
+                        subtitle: Text(item.type),
+                        onTap: () {
+                          setState(() {
+                            _isSearchVisible = false;
+                            _searchController.clear();
+                            _filteredSearchItems = [];
+                          });
+                          Navigator.of(context).push(
+                            MaterialPageRoute(builder: (ctx) => item.builder(ctx)),
+                          );
+                        },
+                      );
+                    },
+                  ),
+                ),
             ],
           ),
         ),
@@ -212,7 +256,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  /// Bottom navigation bar with a center “floating QR scanner” button.
+  /// Bottom navigation bar with a center "floating QR scanner" button.
   Widget _buildPremiumBottomBar() {
     final List<Map<String, dynamic>> navItems = [
       {
@@ -275,7 +319,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Stack(
       alignment: Alignment.bottomCenter,
       children: [
-        // Glass‐morphism background behind the bottom bar
+        // Glass-morphism background behind the bottom bar
         ClipPath(
           clipper: BottomNavClipper(),
           child: Container(
@@ -321,10 +365,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: GestureDetector(
                       onTap: () {
                         if (index == 3) {
-                          // “Scheme” tab: directly open Schema() screen
+                          // "Scheme" tab: directly open Schema() screen
                           _updateCurrentScreen(index, screen: const Schema());
                         } else if (index == 4) {
-                          // “Profile” tab:
+                          // "Profile" tab:
                           _updateCurrentScreen(
                             index,
                             screen: const ProfilePage(),
@@ -396,7 +440,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
 
-        // Floating “Scanner” button in the center with shimmer/pulse animation:
+        // Floating "Scanner" button in the center with shimmer/pulse animation:
         Positioned(
           bottom: 30,
           child: GestureDetector(
@@ -464,7 +508,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-/// Custom clipper to “cut out” the notch for the floating button.
+/// Custom clipper to "cut out" the notch for the floating button.
 class BottomNavClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {
@@ -504,7 +548,7 @@ class BottomNavClipper extends CustomClipper<Path> {
   bool shouldReclip(CustomClipper<Path> oldClipper) => false;
 }
 
-/// The “Home” tab’s main content, including banners, “Mostly Used Apps,” horizontal menu, and Quick Menu.
+/// The "Home" tab's main content, including banners, "Mostly Used Apps," horizontal menu, and Quick Menu.
 class HomeContent extends StatefulWidget {
   const HomeContent({super.key});
 
@@ -625,7 +669,7 @@ class _HomeContentState extends State<HomeContent> {
     );
   }
 
-  /// Three‐column Quick Menu with 14 items (icons + labels).
+  /// Three-column Quick Menu with 14 items (icons + labels).
   Widget _quickMenu(double screenHeight, double screenWidth) {
     final List<Map<String, String>> quickMenuItems = [
       {
@@ -667,7 +711,7 @@ class _HomeContentState extends State<HomeContent> {
       {'image': 'assets/employee_dashboard.png', 'label': 'RPL 6\nEnrolment'},
     ];
 
-    // Three columns to match your screenshot. Adjust to 4 if you’d prefer a 4‐column layout.
+    // Three columns to match your screenshot. Adjust to 4 if you'd prefer a 4-column layout.
     final double itemWidth = screenWidth / 3;
 
     return Container(
@@ -789,7 +833,7 @@ class _HomeContentState extends State<HomeContent> {
     );
   }
 
-  /// “Mostly Used Apps” row (unchanged from before):
+  /// "Mostly Used Apps" row (unchanged from before):
   Widget _mostlyUsedApps(double screenWidth, double screenHeight) {
     final List<Map<String, String>> mostlyUsedItems = [
       {'image': 'assets/image33.png', 'label': 'DSR', 'route': 'dsr'},
@@ -1004,4 +1048,12 @@ class _HorizontalMenuState extends State<HorizontalMenu> {
       ),
     );
   }
+}
+
+// Helper class for search items
+class _SearchItem {
+  final String title;
+  final String type;
+  final Widget Function(BuildContext) builder;
+  _SearchItem(this.title, this.type, this.builder);
 }

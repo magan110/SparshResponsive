@@ -387,7 +387,20 @@ class _CheckSamplingAtSiteState extends State<CheckSamplingAtSite> {
               const SizedBox(height: 24),
 
               // Supporting Documents
-              _buildLabel('Upload Images'),
+              Row(
+                children: [
+                  const Icon(Icons.photo_library_rounded, color: AppTheme.primaryColor, size: 24),
+                  const SizedBox(width: 8),
+                  Flexible(
+                    child: Text(
+                      'Supporting Documents',
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.primaryColor),
+                      softWrap: true,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
               const SizedBox(height: 12),
               ...List.generate(_selectedImages.length, _buildImageRow),
               if (_selectedImages.length < 3)

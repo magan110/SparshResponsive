@@ -294,9 +294,19 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
                 title: 'Supporting Documents',
                 icon: Icons.photo_library_rounded,
                 children: [
-                  Text(
-                    'Upload up to 3 images related to your activity',
-                    style: TextStyle(color: Colors.grey.shade600),
+                  Row(
+                    children: [
+                      const Icon(Icons.photo_library_rounded, color: AppTheme.primaryColor, size: 24),
+                      const SizedBox(width: 8),
+                      Flexible(
+                        child: Text(
+                          'Supporting Documents',
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.primaryColor),
+                          softWrap: true,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 12),
                   // each image row
