@@ -360,6 +360,7 @@ class _PainterKycTrackingPageState extends State<PainterKycTrackingPage> {
         const SizedBox(height: 6),
         DropdownButtonFormField<String>(
           value: _selectedReportType,
+          isExpanded: true,
           decoration: InputDecoration(
             contentPadding:
             const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
@@ -379,6 +380,7 @@ class _PainterKycTrackingPageState extends State<PainterKycTrackingPage> {
               value: type,
               child: Text(
                 type,
+                maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
             );
