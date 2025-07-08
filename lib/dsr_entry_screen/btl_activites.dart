@@ -256,7 +256,7 @@ class _BtlActivitiesState extends State<BtlActivities> {
       appBar: AppBar(
         leading: IconButton(
           onPressed: () =>
-              Navigator.push(context, MaterialPageRoute(builder: (_) => DsrEntry())),
+              Navigator.push(context, MaterialPageRoute(builder: (_) => const DsrEntry())),
           icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
         ),
         title: const Text('BTL Activities'),
@@ -361,10 +361,10 @@ class _BtlActivitiesState extends State<BtlActivities> {
                 title: 'Supporting Documents',
                 icon: Icons.photo_library_rounded,
                 children: [
-                  Row(
+                  const Row(
                     children: [
                       Icon(Icons.photo_library_rounded, color: AppTheme.primaryColor, size: 24),
-                      const SizedBox(width: 8),
+                      SizedBox(width: 8),
                       Expanded(
                         child: Text(
                           'Supporting Documents',

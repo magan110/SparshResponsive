@@ -722,7 +722,7 @@ class _HomeContentState extends State<HomeContent> {
         color: Colors.white,
       ),
       child: GridView.builder(
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 3, // ← 3 columns for Quick Menu
           crossAxisSpacing: 12.0,
           mainAxisSpacing: 16.0,

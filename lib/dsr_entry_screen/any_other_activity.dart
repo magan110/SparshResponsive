@@ -294,10 +294,10 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
                 title: 'Supporting Documents',
                 icon: Icons.photo_library_rounded,
                 children: [
-                  Row(
+                  const Row(
                     children: [
-                      const Icon(Icons.photo_library_rounded, color: AppTheme.primaryColor, size: 24),
-                      const SizedBox(width: 8),
+                      Icon(Icons.photo_library_rounded, color: AppTheme.primaryColor, size: 24),
+                      SizedBox(width: 8),
                       Expanded(
                         child: Text(
                           'Supporting Documents',
@@ -347,7 +347,7 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
                         ],
                       ),
                     );
-                  }).toList(),
+                  }),
                   if (_uploadRows.length < 3)
                     Center(
                       child: TextButton.icon(

@@ -127,33 +127,33 @@ class ThemeUtils {
 
       // Typography
       fontFamily: 'Roboto',
-      textTheme: TextTheme(
-        displayLarge: const TextStyle(
+      textTheme: const TextTheme(
+        displayLarge: TextStyle(
             fontSize: 32, fontWeight: FontWeight.bold, color: primaryBlue),
-        displayMedium: const TextStyle(
+        displayMedium: TextStyle(
             fontSize: 28, fontWeight: FontWeight.bold, color: primaryBlue),
-        displaySmall: const TextStyle(
+        displaySmall: TextStyle(
             fontSize: 24, fontWeight: FontWeight.bold, color: primaryBlue),
-        headlineLarge: const TextStyle(
+        headlineLarge: TextStyle(
             fontSize: 22, fontWeight: FontWeight.w600, color: lightTextPrimary),
-        headlineMedium: const TextStyle(
+        headlineMedium: TextStyle(
             fontSize: 20, fontWeight: FontWeight.w600, color: lightTextPrimary),
-        headlineSmall: const TextStyle(
+        headlineSmall: TextStyle(
             fontSize: 18, fontWeight: FontWeight.w600, color: lightTextPrimary),
-        titleLarge: const TextStyle(
+        titleLarge: TextStyle(
             fontSize: 18, fontWeight: FontWeight.w600, color: lightTextPrimary),
-        titleMedium: const TextStyle(
+        titleMedium: TextStyle(
             fontSize: 16, fontWeight: FontWeight.w600, color: lightTextPrimary),
-        titleSmall: const TextStyle(
+        titleSmall: TextStyle(
             fontSize: 14, fontWeight: FontWeight.w600, color: lightTextPrimary),
-        bodyLarge: const TextStyle(fontSize: 16, color: lightTextSecondary),
-        bodyMedium: const TextStyle(fontSize: 14, color: lightTextSecondary),
-        bodySmall: const TextStyle(fontSize: 12, color: lightTextSecondary),
-        labelLarge: const TextStyle(
+        bodyLarge: TextStyle(fontSize: 16, color: lightTextSecondary),
+        bodyMedium: TextStyle(fontSize: 14, color: lightTextSecondary),
+        bodySmall: TextStyle(fontSize: 12, color: lightTextSecondary),
+        labelLarge: TextStyle(
             fontSize: 16, fontWeight: FontWeight.w600, color: primaryBlue),
-        labelMedium: const TextStyle(
+        labelMedium: TextStyle(
             fontSize: 14, fontWeight: FontWeight.w600, color: primaryBlue),
-        labelSmall: const TextStyle(
+        labelSmall: TextStyle(
             fontSize: 12, fontWeight: FontWeight.w600, color: primaryBlue),
       ).apply(
         // Enable font scaling for accessibility
@@ -162,17 +162,17 @@ class ThemeUtils {
       ),
 
       // AppBar theme
-      appBarTheme: AppBarTheme(
+      appBarTheme: const AppBarTheme(
         backgroundColor: primaryBlue,
         foregroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
-        titleTextStyle: const TextStyle(
+        titleTextStyle: TextStyle(
           fontSize: 20,
           fontWeight: FontWeight.bold,
           color: Colors.white,
         ),
-        shape: const RoundedRectangleBorder(
+        shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(
             bottom: Radius.circular(10),
           ),
@@ -285,25 +285,25 @@ class ThemeUtils {
 
       // Checkbox theme
       checkboxTheme: CheckboxThemeData(
-        fillColor: MaterialStateProperty.resolveWith<Color>((states) {
-          if (states.contains(MaterialState.disabled)) {
+        fillColor: WidgetStateProperty.resolveWith<Color>((states) {
+          if (states.contains(WidgetState.disabled)) {
             return Colors.grey.shade400;
           }
-          if (states.contains(MaterialState.selected)) {
+          if (states.contains(WidgetState.selected)) {
             return primaryBlue;
           }
-          if (states.contains(MaterialState.focused)) {
+          if (states.contains(WidgetState.focused)) {
             return primaryBlue.withOpacity(0.8);
           }
-          if (states.contains(MaterialState.hovered)) {
+          if (states.contains(WidgetState.hovered)) {
             return primaryBlue.withOpacity(0.6);
           }
-          if (states.contains(MaterialState.pressed)) {
+          if (states.contains(WidgetState.pressed)) {
             return primaryBlue.withOpacity(0.7);
           }
           return Colors.transparent; // Default unselected state
         }),
-        checkColor: MaterialStateProperty.all(Colors.white),
+        checkColor: WidgetStateProperty.all(Colors.white),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(4),
         ),
@@ -312,32 +312,32 @@ class ThemeUtils {
 
       // Radio button theme
       radioTheme: RadioThemeData(
-        fillColor: MaterialStateProperty.resolveWith<Color>((states) {
-          if (states.contains(MaterialState.disabled)) {
+        fillColor: WidgetStateProperty.resolveWith<Color>((states) {
+          if (states.contains(WidgetState.disabled)) {
             return Colors.grey.shade400;
           }
-          if (states.contains(MaterialState.selected)) {
+          if (states.contains(WidgetState.selected)) {
             return primaryBlue;
           }
-          if (states.contains(MaterialState.focused)) {
+          if (states.contains(WidgetState.focused)) {
             return primaryBlue.withOpacity(0.8);
           }
-          if (states.contains(MaterialState.hovered)) {
+          if (states.contains(WidgetState.hovered)) {
             return primaryBlue.withOpacity(0.6);
           }
-          if (states.contains(MaterialState.pressed)) {
+          if (states.contains(WidgetState.pressed)) {
             return primaryBlue.withOpacity(0.7);
           }
           return Colors.transparent; // Default unselected state
         }),
-        overlayColor: MaterialStateProperty.resolveWith<Color>((states) {
-          if (states.contains(MaterialState.pressed)) {
+        overlayColor: WidgetStateProperty.resolveWith<Color>((states) {
+          if (states.contains(WidgetState.pressed)) {
             return primaryBlue.withOpacity(0.1);
           }
-          if (states.contains(MaterialState.hovered)) {
+          if (states.contains(WidgetState.hovered)) {
             return primaryBlue.withOpacity(0.05);
           }
-          if (states.contains(MaterialState.focused)) {
+          if (states.contains(WidgetState.focused)) {
             return primaryBlue.withOpacity(0.1);
           }
           return Colors.transparent;
@@ -346,72 +346,72 @@ class ThemeUtils {
 
       // Switch theme
       switchTheme: SwitchThemeData(
-        thumbColor: MaterialStateProperty.resolveWith<Color>((states) {
-          if (states.contains(MaterialState.disabled)) {
-            return states.contains(MaterialState.selected)
+        thumbColor: WidgetStateProperty.resolveWith<Color>((states) {
+          if (states.contains(WidgetState.disabled)) {
+            return states.contains(WidgetState.selected)
                 ? Colors.grey.shade400
                 : Colors.grey.shade300;
           }
-          if (states.contains(MaterialState.selected)) {
-            if (states.contains(MaterialState.pressed)) {
+          if (states.contains(WidgetState.selected)) {
+            if (states.contains(WidgetState.pressed)) {
               return primaryBlue.withOpacity(0.9);
             }
-            if (states.contains(MaterialState.hovered)) {
+            if (states.contains(WidgetState.hovered)) {
               return primaryBlue.withOpacity(0.8);
             }
-            if (states.contains(MaterialState.focused)) {
+            if (states.contains(WidgetState.focused)) {
               return primaryBlue.withOpacity(0.9);
             }
             return primaryBlue;
           }
-          if (states.contains(MaterialState.pressed)) {
+          if (states.contains(WidgetState.pressed)) {
             return Colors.grey.shade300;
           }
-          if (states.contains(MaterialState.hovered)) {
+          if (states.contains(WidgetState.hovered)) {
             return Colors.grey.shade200;
           }
-          if (states.contains(MaterialState.focused)) {
+          if (states.contains(WidgetState.focused)) {
             return Colors.grey.shade200;
           }
           return Colors.grey.shade50;
         }),
-        trackColor: MaterialStateProperty.resolveWith<Color>((states) {
-          if (states.contains(MaterialState.disabled)) {
-            return states.contains(MaterialState.selected)
+        trackColor: WidgetStateProperty.resolveWith<Color>((states) {
+          if (states.contains(WidgetState.disabled)) {
+            return states.contains(WidgetState.selected)
                 ? Colors.grey.shade400.withOpacity(0.5)
                 : Colors.grey.shade300;
           }
-          if (states.contains(MaterialState.selected)) {
-            if (states.contains(MaterialState.pressed)) {
+          if (states.contains(WidgetState.selected)) {
+            if (states.contains(WidgetState.pressed)) {
               return primaryBlue.withOpacity(0.6);
             }
-            if (states.contains(MaterialState.hovered)) {
+            if (states.contains(WidgetState.hovered)) {
               return primaryBlue.withOpacity(0.5);
             }
-            if (states.contains(MaterialState.focused)) {
+            if (states.contains(WidgetState.focused)) {
               return primaryBlue.withOpacity(0.6);
             }
             return primaryBlue.withOpacity(0.5);
           }
-          if (states.contains(MaterialState.pressed)) {
+          if (states.contains(WidgetState.pressed)) {
             return Colors.grey.shade400;
           }
-          if (states.contains(MaterialState.hovered)) {
+          if (states.contains(WidgetState.hovered)) {
             return Colors.grey.shade400.withOpacity(0.8);
           }
-          if (states.contains(MaterialState.focused)) {
+          if (states.contains(WidgetState.focused)) {
             return Colors.grey.shade400.withOpacity(0.8);
           }
           return Colors.grey.shade300;
         }),
-        overlayColor: MaterialStateProperty.resolveWith<Color>((states) {
-          if (states.contains(MaterialState.pressed)) {
+        overlayColor: WidgetStateProperty.resolveWith<Color>((states) {
+          if (states.contains(WidgetState.pressed)) {
             return primaryBlue.withOpacity(0.1);
           }
-          if (states.contains(MaterialState.hovered)) {
+          if (states.contains(WidgetState.hovered)) {
             return primaryBlue.withOpacity(0.05);
           }
-          if (states.contains(MaterialState.focused)) {
+          if (states.contains(WidgetState.focused)) {
             return primaryBlue.withOpacity(0.1);
           }
           return Colors.transparent;
@@ -494,33 +494,33 @@ class ThemeUtils {
 
       // Typography
       fontFamily: 'Roboto',
-      textTheme: TextTheme(
-        displayLarge: const TextStyle(
+      textTheme: const TextTheme(
+        displayLarge: TextStyle(
             fontSize: 32, fontWeight: FontWeight.bold, color: primaryLightBlue),
-        displayMedium: const TextStyle(
+        displayMedium: TextStyle(
             fontSize: 28, fontWeight: FontWeight.bold, color: primaryLightBlue),
-        displaySmall: const TextStyle(
+        displaySmall: TextStyle(
             fontSize: 24, fontWeight: FontWeight.bold, color: primaryLightBlue),
-        headlineLarge: const TextStyle(
+        headlineLarge: TextStyle(
             fontSize: 22, fontWeight: FontWeight.w600, color: darkTextPrimary),
-        headlineMedium: const TextStyle(
+        headlineMedium: TextStyle(
             fontSize: 20, fontWeight: FontWeight.w600, color: darkTextPrimary),
-        headlineSmall: const TextStyle(
+        headlineSmall: TextStyle(
             fontSize: 18, fontWeight: FontWeight.w600, color: darkTextPrimary),
-        titleLarge: const TextStyle(
+        titleLarge: TextStyle(
             fontSize: 18, fontWeight: FontWeight.w600, color: darkTextPrimary),
-        titleMedium: const TextStyle(
+        titleMedium: TextStyle(
             fontSize: 16, fontWeight: FontWeight.w600, color: darkTextPrimary),
-        titleSmall: const TextStyle(
+        titleSmall: TextStyle(
             fontSize: 14, fontWeight: FontWeight.w600, color: darkTextPrimary),
-        bodyLarge: const TextStyle(fontSize: 16, color: darkTextSecondary),
-        bodyMedium: const TextStyle(fontSize: 14, color: darkTextSecondary),
-        bodySmall: const TextStyle(fontSize: 12, color: darkTextSecondary),
-        labelLarge: const TextStyle(
+        bodyLarge: TextStyle(fontSize: 16, color: darkTextSecondary),
+        bodyMedium: TextStyle(fontSize: 14, color: darkTextSecondary),
+        bodySmall: TextStyle(fontSize: 12, color: darkTextSecondary),
+        labelLarge: TextStyle(
             fontSize: 16, fontWeight: FontWeight.w600, color: primaryLightBlue),
-        labelMedium: const TextStyle(
+        labelMedium: TextStyle(
             fontSize: 14, fontWeight: FontWeight.w600, color: primaryLightBlue),
-        labelSmall: const TextStyle(
+        labelSmall: TextStyle(
             fontSize: 12, fontWeight: FontWeight.w600, color: primaryLightBlue),
       ).apply(
         // Enable font scaling for accessibility
@@ -529,17 +529,17 @@ class ThemeUtils {
       ),
 
       // AppBar theme
-      appBarTheme: AppBarTheme(
+      appBarTheme: const AppBarTheme(
         backgroundColor: darkSurface,
         foregroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
-        titleTextStyle: const TextStyle(
+        titleTextStyle: TextStyle(
           fontSize: 20,
           fontWeight: FontWeight.bold,
           color: Colors.white,
         ),
-        shape: const RoundedRectangleBorder(
+        shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(
             bottom: Radius.circular(10),
           ),
@@ -652,25 +652,25 @@ class ThemeUtils {
 
       // Checkbox theme
       checkboxTheme: CheckboxThemeData(
-        fillColor: MaterialStateProperty.resolveWith<Color>((states) {
-          if (states.contains(MaterialState.disabled)) {
+        fillColor: WidgetStateProperty.resolveWith<Color>((states) {
+          if (states.contains(WidgetState.disabled)) {
             return Colors.grey.shade700;
           }
-          if (states.contains(MaterialState.selected)) {
+          if (states.contains(WidgetState.selected)) {
             return primaryBlue;
           }
-          if (states.contains(MaterialState.focused)) {
+          if (states.contains(WidgetState.focused)) {
             return primaryBlue.withOpacity(0.8);
           }
-          if (states.contains(MaterialState.hovered)) {
+          if (states.contains(WidgetState.hovered)) {
             return primaryBlue.withOpacity(0.6);
           }
-          if (states.contains(MaterialState.pressed)) {
+          if (states.contains(WidgetState.pressed)) {
             return primaryBlue.withOpacity(0.7);
           }
           return Colors.transparent; // Default unselected state
         }),
-        checkColor: MaterialStateProperty.all(Colors.white),
+        checkColor: WidgetStateProperty.all(Colors.white),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(4),
         ),
@@ -679,32 +679,32 @@ class ThemeUtils {
 
       // Radio button theme
       radioTheme: RadioThemeData(
-        fillColor: MaterialStateProperty.resolveWith<Color>((states) {
-          if (states.contains(MaterialState.disabled)) {
+        fillColor: WidgetStateProperty.resolveWith<Color>((states) {
+          if (states.contains(WidgetState.disabled)) {
             return Colors.grey.shade700;
           }
-          if (states.contains(MaterialState.selected)) {
+          if (states.contains(WidgetState.selected)) {
             return primaryBlue;
           }
-          if (states.contains(MaterialState.focused)) {
+          if (states.contains(WidgetState.focused)) {
             return primaryBlue.withOpacity(0.8);
           }
-          if (states.contains(MaterialState.hovered)) {
+          if (states.contains(WidgetState.hovered)) {
             return primaryBlue.withOpacity(0.6);
           }
-          if (states.contains(MaterialState.pressed)) {
+          if (states.contains(WidgetState.pressed)) {
             return primaryBlue.withOpacity(0.7);
           }
           return Colors.transparent; // Default unselected state
         }),
-        overlayColor: MaterialStateProperty.resolveWith<Color>((states) {
-          if (states.contains(MaterialState.pressed)) {
+        overlayColor: WidgetStateProperty.resolveWith<Color>((states) {
+          if (states.contains(WidgetState.pressed)) {
             return primaryBlue.withOpacity(0.1);
           }
-          if (states.contains(MaterialState.hovered)) {
+          if (states.contains(WidgetState.hovered)) {
             return primaryBlue.withOpacity(0.05);
           }
-          if (states.contains(MaterialState.focused)) {
+          if (states.contains(WidgetState.focused)) {
             return primaryBlue.withOpacity(0.1);
           }
           return Colors.transparent;
@@ -713,72 +713,72 @@ class ThemeUtils {
 
       // Switch theme
       switchTheme: SwitchThemeData(
-        thumbColor: MaterialStateProperty.resolveWith<Color>((states) {
-          if (states.contains(MaterialState.disabled)) {
-            return states.contains(MaterialState.selected)
+        thumbColor: WidgetStateProperty.resolveWith<Color>((states) {
+          if (states.contains(WidgetState.disabled)) {
+            return states.contains(WidgetState.selected)
                 ? Colors.grey.shade600
                 : Colors.grey.shade700;
           }
-          if (states.contains(MaterialState.selected)) {
-            if (states.contains(MaterialState.pressed)) {
+          if (states.contains(WidgetState.selected)) {
+            if (states.contains(WidgetState.pressed)) {
               return primaryBlue.withOpacity(0.9);
             }
-            if (states.contains(MaterialState.hovered)) {
+            if (states.contains(WidgetState.hovered)) {
               return primaryBlue.withOpacity(0.8);
             }
-            if (states.contains(MaterialState.focused)) {
+            if (states.contains(WidgetState.focused)) {
               return primaryBlue.withOpacity(0.9);
             }
             return primaryBlue;
           }
-          if (states.contains(MaterialState.pressed)) {
+          if (states.contains(WidgetState.pressed)) {
             return Colors.grey.shade500;
           }
-          if (states.contains(MaterialState.hovered)) {
+          if (states.contains(WidgetState.hovered)) {
             return Colors.grey.shade500;
           }
-          if (states.contains(MaterialState.focused)) {
+          if (states.contains(WidgetState.focused)) {
             return Colors.grey.shade500;
           }
           return Colors.grey.shade400;
         }),
-        trackColor: MaterialStateProperty.resolveWith<Color>((states) {
-          if (states.contains(MaterialState.disabled)) {
-            return states.contains(MaterialState.selected)
+        trackColor: WidgetStateProperty.resolveWith<Color>((states) {
+          if (states.contains(WidgetState.disabled)) {
+            return states.contains(WidgetState.selected)
                 ? Colors.grey.shade700.withOpacity(0.5)
                 : Colors.grey.shade800;
           }
-          if (states.contains(MaterialState.selected)) {
-            if (states.contains(MaterialState.pressed)) {
+          if (states.contains(WidgetState.selected)) {
+            if (states.contains(WidgetState.pressed)) {
               return primaryBlue.withOpacity(0.6);
             }
-            if (states.contains(MaterialState.hovered)) {
+            if (states.contains(WidgetState.hovered)) {
               return primaryBlue.withOpacity(0.5);
             }
-            if (states.contains(MaterialState.focused)) {
+            if (states.contains(WidgetState.focused)) {
               return primaryBlue.withOpacity(0.6);
             }
             return primaryBlue.withOpacity(0.5);
           }
-          if (states.contains(MaterialState.pressed)) {
+          if (states.contains(WidgetState.pressed)) {
             return Colors.grey.shade600;
           }
-          if (states.contains(MaterialState.hovered)) {
+          if (states.contains(WidgetState.hovered)) {
             return Colors.grey.shade600;
           }
-          if (states.contains(MaterialState.focused)) {
+          if (states.contains(WidgetState.focused)) {
             return Colors.grey.shade600;
           }
           return Colors.grey.shade700;
         }),
-        overlayColor: MaterialStateProperty.resolveWith<Color>((states) {
-          if (states.contains(MaterialState.pressed)) {
+        overlayColor: WidgetStateProperty.resolveWith<Color>((states) {
+          if (states.contains(WidgetState.pressed)) {
             return primaryBlue.withOpacity(0.1);
           }
-          if (states.contains(MaterialState.hovered)) {
+          if (states.contains(WidgetState.hovered)) {
             return primaryBlue.withOpacity(0.05);
           }
-          if (states.contains(MaterialState.focused)) {
+          if (states.contains(WidgetState.focused)) {
             return primaryBlue.withOpacity(0.1);
           }
           return Colors.transparent;
@@ -795,10 +795,10 @@ class ThemeUtils {
       ),
 
       // Bottom sheet theme
-      bottomSheetTheme: BottomSheetThemeData(
+      bottomSheetTheme: const BottomSheetThemeData(
         backgroundColor: darkSurface,
         elevation: 5,
-        shape: const RoundedRectangleBorder(
+        shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(
             top: Radius.circular(20),
           ),

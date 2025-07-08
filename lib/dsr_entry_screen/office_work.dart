@@ -190,9 +190,9 @@ class _OfficeWorkState extends State<OfficeWork> {
                                 color: Colors.green.shade100,
                                 borderRadius: BorderRadius.circular(16),
                               ),
-                              child: Row(
+                              child: const Row(
                                 mainAxisSize: MainAxisSize.min,
-                                children: const [
+                                children: [
                                   Icon(Icons.check_circle, color: Colors.green, size: 16),
                                   SizedBox(width: 4),
                                   Text('Uploaded',

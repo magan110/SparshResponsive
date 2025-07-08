@@ -26,7 +26,7 @@ class _InternalTeamMeetingState extends State<InternalTeamMeeting> {
 
   final List<int> _uploadRows = [0];
   final ImagePicker _picker = ImagePicker();
-  List<List<String>> _selectedImagePaths = [[]]; // multiple per row
+  final List<List<String>> _selectedImagePaths = [[]]; // multiple per row
 
   final _formKey = GlobalKey<FormState>();
 
@@ -301,10 +301,10 @@ class _InternalTeamMeetingState extends State<InternalTeamMeeting> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
+                    const Row(
                       children: [
-                        const Icon(Icons.photo_library_rounded, color: AppTheme.primaryColor, size: 24),
-                        const SizedBox(width: 8),
+                        Icon(Icons.photo_library_rounded, color: AppTheme.primaryColor, size: 24),
+                        SizedBox(width: 8),
                         Flexible(
                           child: Text(
                             'Supporting Documents',

@@ -276,7 +276,7 @@ class EmployeeTable extends StatelessWidget {
             left: BorderSide(color: Colors.grey.shade300, width: 1),
             right: BorderSide(color: Colors.grey.shade300, width: 1),
           ),
-          headingRowColor: MaterialStateProperty.resolveWith((states) => Colors.blue.shade600),
+          headingRowColor: WidgetStateProperty.resolveWith((states) => Colors.blue.shade600),
           headingTextStyle: const TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
@@ -293,8 +293,8 @@ class EmployeeTable extends StatelessWidget {
           rows: List<DataRow>.generate(
             data.length,
                 (index) => DataRow(
-              color: MaterialStateProperty.resolveWith<Color?>(
-                    (Set<MaterialState> states) {
+              color: WidgetStateProperty.resolveWith<Color?>(
+                    (Set<WidgetState> states) {
                   return index % 2 == 0
                       ? Colors.white
                       : Colors.blue.shade50.withOpacity(0.7);

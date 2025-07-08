@@ -38,7 +38,7 @@ class _MovieBookingState extends State<MovieBooking> {
 
   String? _selectedShowTime;
   String? _selectedPersonalOfficial;
-  Set<int> _selectedSeats = {};
+  final Set<int> _selectedSeats = {};
   final Set<int> _bookedSeats = {};
 
   @override
@@ -83,11 +83,11 @@ class _MovieBookingState extends State<MovieBooking> {
             decoration: BoxDecoration(
               color: Colors.white.withOpacity(0.6),
               borderRadius: BorderRadius.circular(25.0),
-              boxShadow: [
+              boxShadow: const [
                 BoxShadow(
                   color: Colors.black12,
                   blurRadius: 10,
-                  offset: const Offset(0, 4),
+                  offset: Offset(0, 4),
                 )
               ],
             ),

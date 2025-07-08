@@ -127,7 +127,7 @@ class _WorkerAppDrawerState extends State<WorkerAppDrawer> {
             ),
 
             // Logout option
-            Divider(height: 1),
+            const Divider(height: 1),
             ListTile(
               leading: const Icon(Icons.logout, color: Colors.red),
               title: const Text(

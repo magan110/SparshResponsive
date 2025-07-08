@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../screens/edit_kyc_screen.dart';
 
 class DsrVisitScreen extends StatefulWidget {
-  const DsrVisitScreen({Key? key}) : super(key: key);
+  const DsrVisitScreen({super.key});
 
   @override
   State<DsrVisitScreen> createState() => _DsrVisitScreenState();
@@ -189,7 +189,7 @@ class _DsrVisitScreenState extends State<DsrVisitScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // --- Process Type ---
-                _SectionHeader(icon: Icons.settings, label: 'Process Type'),
+                const _SectionHeader(icon: Icons.settings, label: 'Process Type'),
                 _FantasticCard(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -230,7 +230,7 @@ class _DsrVisitScreenState extends State<DsrVisitScreen> {
                 ),
                 const SizedBox(height: 12),
                 // --- Purchaser/Retailer Type, Area Code, Purchaser Code, Name, KYC ---
-                _SectionHeader(icon: Icons.person, label: 'Purchaser / Retailer Details'),
+                const _SectionHeader(icon: Icons.person, label: 'Purchaser / Retailer Details'),
                 _FantasticCard(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -303,7 +303,7 @@ class _DsrVisitScreenState extends State<DsrVisitScreen> {
                 ),
                 const SizedBox(height: 12),
                 // --- Report Date, Market Name, Display Contest, Pending Issues ---
-                _SectionHeader(icon: Icons.event_note, label: 'Report & Market Details'),
+                const _SectionHeader(icon: Icons.event_note, label: 'Report & Market Details'),
                 _FantasticCard(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -396,77 +396,67 @@ class _DsrVisitScreenState extends State<DsrVisitScreen> {
                 ),
                 const SizedBox(height: 12),
                 // --- Enrolment Slab ---
-                _SectionHeader(icon: Icons.bar_chart, label: 'Enrolment Slab (in MT)'),
+                const _SectionHeader(icon: Icons.bar_chart, label: 'Enrolment Slab (in MT)'),
                 _FantasticCard(
-                  child: Row(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Expanded(
-                        child: TextFormField(
-                          decoration: _fantasticInputDecoration('WC'),
-                          keyboardType: TextInputType.number,
-                          onChanged: (v) => wcEnrolment = v,
-                          validator: (v) => v == null || v.isEmpty ? 'Required' : null,
-                        ),
+                      TextFormField(
+                        decoration: _fantasticInputDecoration('WC'),
+                        keyboardType: TextInputType.number,
+                        onChanged: (v) => wcEnrolment = v,
+                        validator: (v) => v == null || v.isEmpty ? 'Required' : null,
                       ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: TextFormField(
-                          decoration: _fantasticInputDecoration('WCP'),
-                          keyboardType: TextInputType.number,
-                          onChanged: (v) => wcpEnrolment = v,
-                          validator: (v) => v == null || v.isEmpty ? 'Required' : null,
-                        ),
+                      const SizedBox(height: 10),
+                      TextFormField(
+                        decoration: _fantasticInputDecoration('WCP'),
+                        keyboardType: TextInputType.number,
+                        onChanged: (v) => wcpEnrolment = v,
+                        validator: (v) => v == null || v.isEmpty ? 'Required' : null,
                       ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: TextFormField(
-                          decoration: _fantasticInputDecoration('VAP'),
-                          keyboardType: TextInputType.number,
-                          onChanged: (v) => vapEnrolment = v,
-                          validator: (v) => v == null || v.isEmpty ? 'Required' : null,
-                        ),
+                      const SizedBox(height: 10),
+                      TextFormField(
+                        decoration: _fantasticInputDecoration('VAP'),
+                        keyboardType: TextInputType.number,
+                        onChanged: (v) => vapEnrolment = v,
+                        validator: (v) => v == null || v.isEmpty ? 'Required' : null,
                       ),
                     ],
                   ),
                 ),
                 const SizedBox(height: 12),
                 // --- BW Stocks Availability ---
-                _SectionHeader(icon: Icons.inventory, label: 'BW Stocks Availability (in MT)'),
+                const _SectionHeader(icon: Icons.inventory, label: 'BW Stocks Availability (in MT)'),
                 _FantasticCard(
-                  child: Row(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Expanded(
-                        child: TextFormField(
-                          decoration: _fantasticInputDecoration('WC'),
-                          keyboardType: TextInputType.number,
-                          onChanged: (v) => wcStock = v,
-                          validator: (v) => v == null || v.isEmpty ? 'Required' : null,
-                        ),
+                      TextFormField(
+                        decoration: _fantasticInputDecoration('WC'),
+                        keyboardType: TextInputType.number,
+                        onChanged: (v) => wcStock = v,
+                        validator: (v) => v == null || v.isEmpty ? 'Required' : null,
                       ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: TextFormField(
-                          decoration: _fantasticInputDecoration('WCP'),
-                          keyboardType: TextInputType.number,
-                          onChanged: (v) => wcpStock = v,
-                          validator: (v) => v == null || v.isEmpty ? 'Required' : null,
-                        ),
+                      const SizedBox(height: 10),
+                      TextFormField(
+                        decoration: _fantasticInputDecoration('WCP'),
+                        keyboardType: TextInputType.number,
+                        onChanged: (v) => wcpStock = v,
+                        validator: (v) => v == null || v.isEmpty ? 'Required' : null,
                       ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: TextFormField(
-                          decoration: _fantasticInputDecoration('VAP'),
-                          keyboardType: TextInputType.number,
-                          onChanged: (v) => vapStock = v,
-                          validator: (v) => v == null || v.isEmpty ? 'Required' : null,
-                        ),
+                      const SizedBox(height: 10),
+                      TextFormField(
+                        decoration: _fantasticInputDecoration('VAP'),
+                        keyboardType: TextInputType.number,
+                        onChanged: (v) => vapStock = v,
+                        validator: (v) => v == null || v.isEmpty ? 'Required' : null,
                       ),
                     ],
                   ),
                 ),
                 const SizedBox(height: 12),
                 // --- Brands Selling ---
-                _SectionHeader(icon: Icons.check_box, label: 'Brands Selling'),
+                const _SectionHeader(icon: Icons.check_box, label: 'Brands Selling'),
                 _FantasticCard(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -519,7 +509,7 @@ class _DsrVisitScreenState extends State<DsrVisitScreen> {
                 ),
                 const SizedBox(height: 12),
                 // --- Last 3 Months Average ---
-                _SectionHeader(icon: Icons.timeline, label: 'Last 3 Months Average'),
+                const _SectionHeader(icon: Icons.timeline, label: 'Last 3 Months Average'),
                 _FantasticCard(
                   child: Table(
                     border: TableBorder.all(color: theme.dividerColor),
@@ -573,39 +563,34 @@ class _DsrVisitScreenState extends State<DsrVisitScreen> {
                 ),
                 const SizedBox(height: 12),
                 // --- Current Month - BW ---
-                _SectionHeader(icon: Icons.calendar_month, label: 'Current Month - BW (in MT)'),
+                const _SectionHeader(icon: Icons.calendar_month, label: 'Current Month - BW (in MT)'),
                 _FantasticCard(
-                  child: Row(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Expanded(
-                        child: TextFormField(
-                          initialValue: currentMonthBW['WC'],
-                          decoration: _fantasticInputDecoration('WC'),
-                          readOnly: true,
-                        ),
+                      TextFormField(
+                        initialValue: currentMonthBW['WC'],
+                        decoration: _fantasticInputDecoration('WC'),
+                        readOnly: true,
                       ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: TextFormField(
-                          initialValue: currentMonthBW['WCP'],
-                          decoration: _fantasticInputDecoration('WCP'),
-                          readOnly: true,
-                        ),
+                      const SizedBox(height: 10),
+                      TextFormField(
+                        initialValue: currentMonthBW['WCP'],
+                        decoration: _fantasticInputDecoration('WCP'),
+                        readOnly: true,
                       ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: TextFormField(
-                          initialValue: currentMonthBW['VAP'],
-                          decoration: _fantasticInputDecoration('VAP'),
-                          readOnly: true,
-                        ),
+                      const SizedBox(height: 10),
+                      TextFormField(
+                        initialValue: currentMonthBW['VAP'],
+                        decoration: _fantasticInputDecoration('VAP'),
+                        readOnly: true,
                       ),
                     ],
                   ),
                 ),
                 const SizedBox(height: 12),
                 // --- Order Booked in call/e meet (Dynamic List) ---
-                _SectionHeader(icon: Icons.shopping_cart, label: 'Order Booked in call/e meet'),
+                const _SectionHeader(icon: Icons.shopping_cart, label: 'Order Booked in call/e meet'),
                 _FantasticCard(
                   child: Column(
                     children: [
@@ -663,7 +648,7 @@ class _DsrVisitScreenState extends State<DsrVisitScreen> {
                 ),
                 const SizedBox(height: 12),
                 // --- Market -- WCP (Highest selling SKU) (Dynamic List) ---
-                _SectionHeader(icon: Icons.trending_up, label: 'Market -- WCP (Highest selling SKU)'),
+                const _SectionHeader(icon: Icons.trending_up, label: 'Market -- WCP (Highest selling SKU)'),
                 _FantasticCard(
                   child: Column(
                     children: [
@@ -729,7 +714,7 @@ class _DsrVisitScreenState extends State<DsrVisitScreen> {
                 ),
                 const SizedBox(height: 12),
                 // --- Gift Distribution (Dynamic List) ---
-                _SectionHeader(icon: Icons.card_giftcard, label: 'Gift Distribution'),
+                const _SectionHeader(icon: Icons.card_giftcard, label: 'Gift Distribution'),
                 _FantasticCard(
                   child: Column(
                     children: [
@@ -780,7 +765,7 @@ class _DsrVisitScreenState extends State<DsrVisitScreen> {
                 ),
                 const SizedBox(height: 12),
                 // --- Tile Adhesives ---
-                _SectionHeader(icon: Icons.layers, label: 'Tile Adhesives'),
+                const _SectionHeader(icon: Icons.layers, label: 'Tile Adhesives'),
                 _FantasticCard(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -802,7 +787,7 @@ class _DsrVisitScreenState extends State<DsrVisitScreen> {
                 ),
                 const SizedBox(height: 12),
                 // --- Order Execution Date, Remarks, Reason ---
-                _SectionHeader(icon: Icons.event, label: 'Order Execution & Remarks'),
+                const _SectionHeader(icon: Icons.event, label: 'Order Execution & Remarks'),
                 _FantasticCard(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -844,11 +829,11 @@ class _DsrVisitScreenState extends State<DsrVisitScreen> {
                 ),
                 const SizedBox(height: 12),
                 // --- Map/Location Placeholder ---
-                _SectionHeader(icon: Icons.map, label: 'Map/Location'),
-                _FantasticCard(
+                const _SectionHeader(icon: Icons.map, label: 'Map/Location'),
+                const _FantasticCard(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
+                    children: [
                       SizedBox(height: 8),
                       Text('Map/Location (to be implemented)'),
                       SizedBox(height: 100, child: Center(child: Text('Map widget placeholder'))),
@@ -857,7 +842,7 @@ class _DsrVisitScreenState extends State<DsrVisitScreen> {
                 ),
                 const SizedBox(height: 12),
                 // --- Last Billing date as per Tally ---
-                _SectionHeader(icon: Icons.receipt_long, label: 'Last Billing date as per Tally'),
+                const _SectionHeader(icon: Icons.receipt_long, label: 'Last Billing date as per Tally'),
                 _FantasticCard(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -897,7 +882,7 @@ class _DsrVisitScreenState extends State<DsrVisitScreen> {
                               padding: const EdgeInsets.all(6.0),
                               child: Text(row['qty'] ?? ''),
                             ),
-                          ])).toList(),
+                          ])),
                         ],
                       ),
                     ],

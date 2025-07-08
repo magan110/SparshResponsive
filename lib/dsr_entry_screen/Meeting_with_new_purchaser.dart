@@ -250,7 +250,7 @@ class _MeetingWithNewPurchaserState extends State<MeetingWithNewPurchaser> {
                   children: [
                     Row(
                       children: [
-                        Icon(Icons.settings_outlined, color: AppTheme.primaryColor),
+                        const Icon(Icons.settings_outlined, color: AppTheme.primaryColor),
                         const SizedBox(width: 8),
                         Text('Process', style: Theme.of(context).textTheme.titleLarge),
                       ],
@@ -286,7 +286,7 @@ class _MeetingWithNewPurchaserState extends State<MeetingWithNewPurchaser> {
                     children: [
                       Row(
                         children: [
-                          Icon(Icons.date_range_outlined, color: AppTheme.primaryColor),
+                          const Icon(Icons.date_range_outlined, color: AppTheme.primaryColor),
                           const SizedBox(width: 8),
                           Text('Date Information', style: Theme.of(context).textTheme.titleLarge),
                         ],
@@ -372,7 +372,7 @@ class _MeetingWithNewPurchaserState extends State<MeetingWithNewPurchaser> {
                     children: [
                       Row(
                         children: [
-                          Icon(Icons.photo_library_rounded, color: Colors.blue, size: 24),
+                          const Icon(Icons.photo_library_rounded, color: Colors.blue, size: 24),
                           const SizedBox(width: 8),
                           Expanded(
                             child: Text(

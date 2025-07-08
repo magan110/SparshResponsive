@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class AccountsStatementPage extends StatefulWidget {
-  const AccountsStatementPage({Key? key}) : super(key: key);
+  const AccountsStatementPage({super.key});
 
   @override
   State<AccountsStatementPage> createState() => _AccountsStatementPageState();

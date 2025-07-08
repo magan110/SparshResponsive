@@ -83,7 +83,7 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
         return true; // Allow closing the app from the home screen
       },
       child: Scaffold(
-        backgroundColor: Color(0xFFF1FFFF),
+        backgroundColor: const Color(0xFFF1FFFF),
         appBar: _buildAppBar(),
         drawer: const WorkerAppDrawer(),
         body: Stack(
@@ -673,7 +673,7 @@ class _HomeContentState extends State<HomeContent> {
         color: Colors.white,
       ),
       child: GridView.builder(
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 3,
           crossAxisSpacing: 15.0,
           mainAxisSpacing: 15.0,

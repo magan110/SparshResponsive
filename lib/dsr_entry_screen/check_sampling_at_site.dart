@@ -267,7 +267,7 @@ class _CheckSamplingAtSiteState extends State<CheckSamplingAtSite> {
       appBar: AppBar(
         leading: IconButton(
           onPressed: () =>
-              Navigator.push(context, MaterialPageRoute(builder: (_) => DsrEntry())),
+              Navigator.push(context, MaterialPageRoute(builder: (_) => const DsrEntry())),
           icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
         ),
         title: const Text('Check Sampling at Site'),
@@ -388,10 +388,10 @@ class _CheckSamplingAtSiteState extends State<CheckSamplingAtSite> {
               const SizedBox(height: 24),
 
               // Supporting Documents
-              Row(
+              const Row(
                 children: [
-                  const Icon(Icons.photo_library_rounded, color: AppTheme.primaryColor, size: 24),
-                  const SizedBox(width: 8),
+                  Icon(Icons.photo_library_rounded, color: AppTheme.primaryColor, size: 24),
+                  SizedBox(width: 8),
                   Flexible(
                     child: Text(
                       'Supporting Documents',

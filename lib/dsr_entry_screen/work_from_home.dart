@@ -128,7 +128,7 @@ class _WorkFromHomeState extends State<WorkFromHome> {
     showDialog(
       context: context,
       builder: (context) => Dialog(
-        child: Container(
+        child: SizedBox(
           width: MediaQuery.of(context).size.width * 0.8,
           height: MediaQuery.of(context).size.height * 0.6,
           child: ClipRRect(
@@ -364,7 +364,7 @@ class _WorkFromHomeState extends State<WorkFromHome> {
                 margin: const EdgeInsets.only(top: 20, bottom: 16),
                 padding: const EdgeInsets.all(16),
                 decoration: AppTheme.cardDecoration,
-                child: Column(
+                child: const Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // … your existing upload UI unchanged …

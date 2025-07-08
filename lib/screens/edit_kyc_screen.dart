@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class EditKycScreen extends StatefulWidget {
-  const EditKycScreen({Key? key}) : super(key: key);
+  const EditKycScreen({super.key});
 
   @override
   State<EditKycScreen> createState() => _EditKycScreenState();

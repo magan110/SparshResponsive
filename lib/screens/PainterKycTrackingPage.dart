@@ -148,17 +148,17 @@ class _PainterKycTrackingPageState extends State<PainterKycTrackingPage> {
                                 Shadow(
                                   color: Colors.black.withOpacity(0.15),
                                   blurRadius: 4,
-                                  offset: Offset(0, 2),
+                                  offset: const Offset(0, 2),
                                 ),
                               ],
                             ),
                           ),
                         ),
                         // To keep the title centered, add a dummy icon with opacity 0
-                        Opacity(
+                        const Opacity(
                           opacity: 0,
                           child: IconButton(
-                            icon: const Icon(Icons.arrow_back),
+                            icon: Icon(Icons.arrow_back),
                             onPressed: null,
                           ),
                         ),

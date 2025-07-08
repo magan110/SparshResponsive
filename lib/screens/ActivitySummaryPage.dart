@@ -5,7 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 
 class ActivitySummaryPage extends StatefulWidget {
-  const ActivitySummaryPage({Key? key}) : super(key: key);
+  const ActivitySummaryPage({super.key});
 
   @override
   State<ActivitySummaryPage> createState() => _ActivitySummaryPageState();

@@ -11,7 +11,7 @@ class DashboardScreen extends StatefulWidget {
 class _DashboardScreenState extends State<DashboardScreen> {
   @override
   Widget build(BuildContext context) {
-    final bgColor = const Color(0xFFF5F6FA);
+    const bgColor = Color(0xFFF5F6FA);
     return SafeArea(
       child: Scaffold(
         backgroundColor: bgColor,
@@ -85,8 +85,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
             Stack(
               children: [
                 Container(
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(
                       colors: [Color(0xFF64B5F6), Color(0xFF1976D2)],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
@@ -207,7 +207,7 @@ class PrimarySaleScreen extends StatelessWidget {
                   final prod = _products[i];
                   return ScatterSpot(i.toDouble(), prod.value, color: prod.color, radius: 6);
                 }),
-                gridData: FlGridData(
+                gridData: const FlGridData(
                   show: true,
                   drawVerticalLine: true,
                   horizontalInterval: 0.1,

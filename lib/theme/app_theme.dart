@@ -188,12 +188,12 @@ class AppTheme {
 
   // Dropdown button style
   static ButtonStyle dropdownButtonStyle = ButtonStyle(
-    elevation: MaterialStateProperty.all(3),
-    padding: MaterialStateProperty.all(const EdgeInsets.symmetric(horizontal: 16)),
-    shape: MaterialStateProperty.all(
+    elevation: WidgetStateProperty.all(3),
+    padding: WidgetStateProperty.all(const EdgeInsets.symmetric(horizontal: 16)),
+    shape: WidgetStateProperty.all(
       RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
     ),
-    foregroundColor: MaterialStateProperty.all(primaryTextColor),
+    foregroundColor: WidgetStateProperty.all(primaryTextColor),
   );
 
   // Card theme
@@ -227,16 +227,14 @@ class AppTheme {
     // No dropdown button theme in this Flutter version
     cardTheme: cardTheme,
     dialogTheme: dialogTheme,
-    colorScheme: ColorScheme.light(
+    colorScheme: const ColorScheme.light(
       primary: primaryColor,
       secondary: secondaryColor,
       error: errorColor,
-      background: scaffoldBackgroundColor,
       surface: cardColor,
       onPrimary: Colors.white,
       onSecondary: Colors.white,
       onSurface: primaryTextColor,
-      onBackground: primaryTextColor,
       onError: Colors.white,
     ),
   );

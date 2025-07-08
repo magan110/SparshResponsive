@@ -12,7 +12,7 @@ class _OvertimeReportSelfState extends State<OvertimeReportSelf> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Overtime Report Self'),
+        title: const Text('Overtime Report Self'),
       ),
       body: const Column(
         children: [

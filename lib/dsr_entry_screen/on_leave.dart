@@ -181,9 +181,9 @@ class _OnLeaveState extends State<OnLeave> {
                                 color: Colors.green.shade100,
                                 borderRadius: BorderRadius.circular(16),
                               ),
-                              child: Row(
+                              child: const Row(
                                 mainAxisSize: MainAxisSize.min,
-                                children: const [
+                                children: [
                                   Icon(Icons.check_circle, color: Colors.green, size: 16),
                                   SizedBox(width: 4),
                                   Text('Uploaded', style: TextStyle(color: Colors.green, fontWeight: FontWeight.w500, fontSize: 13)),

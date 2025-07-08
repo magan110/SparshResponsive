@@ -443,10 +443,10 @@ class _MeetingsWithContractorState extends State<MeetingsWithContractor> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Row(
+                        const Row(
                           children: [
-                            const Icon(Icons.photo_library_rounded, color: AppTheme.primaryColor, size: 24),
-                            const SizedBox(width: 8),
+                            Icon(Icons.photo_library_rounded, color: AppTheme.primaryColor, size: 24),
+                            SizedBox(width: 8),
                             Flexible(
                               child: Text(
                                 'Supporting Documents',

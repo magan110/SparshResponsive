@@ -833,7 +833,7 @@ class _TokenScanPageState extends State<TokenScanPage> {
       builder: (BuildContext context) {
         return AlertDialog(
           contentPadding: const EdgeInsets.all(0),
-          content: Container(
+          content: SizedBox(
             width: double.maxFinite,
             child: Column(
               mainAxisSize: MainAxisSize.min,

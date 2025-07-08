@@ -238,7 +238,7 @@ class _MovieBookingDetailsState extends State<MovieBookingDetails> {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => WorkerHomeScreen()),
+                MaterialPageRoute(builder: (context) => const WorkerHomeScreen()),
               );
             },
             icon: const Icon(Icons.arrow_back_ios_new),
@@ -318,7 +318,7 @@ class _MovieBookingDetailsState extends State<MovieBookingDetails> {
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
+                      boxShadow: const [
                         BoxShadow(
                           color: Colors.black12,
                           blurRadius: 8,
@@ -329,16 +329,16 @@ class _MovieBookingDetailsState extends State<MovieBookingDetails> {
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(16),
                       child: DataTable(
-                        headingRowColor: MaterialStateProperty.all(
+                        headingRowColor: WidgetStateProperty.all(
                             theme.primaryColor.withOpacity(0.2)),
                         headingTextStyle: theme.textTheme.titleMedium!.copyWith(
                           fontWeight: FontWeight.bold,
                           color: theme.primaryColor,
                         ),
                         dataRowColor:
-                        MaterialStateProperty.resolveWith<Color?>(
-                                (Set<MaterialState> states) {
-                              if (states.contains(MaterialState.selected)) {
+                        WidgetStateProperty.resolveWith<Color?>(
+                                (Set<WidgetState> states) {
+                              if (states.contains(WidgetState.selected)) {
                                 return theme.primaryColor.withOpacity(0.1);
                               }
                               return Colors.grey[50];

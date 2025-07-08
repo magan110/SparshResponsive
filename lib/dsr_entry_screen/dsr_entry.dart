@@ -61,18 +61,18 @@ class _DsrEntryState extends State<DsrEntry> {
 
   void _navigateTo(String label) {
     final map = {
-      'Personal Visit': () => DsrRetailerInOut(),
-      'Phone Call with Builder/Stockist': () => PhoneCallWithBuilder(),
-      'Meetings With Contractor / Stockist': () => MeetingsWithContractor(),
-      'Visit to Get / Check Sampling at Site': () => CheckSamplingAtSite(),
-      'Meeting with New Purchaser(Trade Purchaser)/Retailer': () => MeetingWithNewPurchaser(),
-      'BTL Activities': () => BtlActivities(),
-      'Internal Team Meetings / Review Meetings': () => InternalTeamMeeting(),
-      'Office Work': () => OfficeWork(),
-      'On Leave / Holiday / Off Day': () => OnLeave(),
-      'Work From Home': () => WorkFromHome(),
-      'Any Other Activity': () => AnyOtherActivity(),
-      'Phone call with Unregistered Purchasers': () => PhoneCallWithUnregisterdPurchaser(),
+      'Personal Visit': () => const DsrRetailerInOut(),
+      'Phone Call with Builder/Stockist': () => const PhoneCallWithBuilder(),
+      'Meetings With Contractor / Stockist': () => const MeetingsWithContractor(),
+      'Visit to Get / Check Sampling at Site': () => const CheckSamplingAtSite(),
+      'Meeting with New Purchaser(Trade Purchaser)/Retailer': () => const MeetingWithNewPurchaser(),
+      'BTL Activities': () => const BtlActivities(),
+      'Internal Team Meetings / Review Meetings': () => const InternalTeamMeeting(),
+      'Office Work': () => const OfficeWork(),
+      'On Leave / Holiday / Off Day': () => const OnLeave(),
+      'Work From Home': () => const WorkFromHome(),
+      'Any Other Activity': () => const AnyOtherActivity(),
+      'Phone call with Unregistered Purchasers': () => const PhoneCallWithUnregisterdPurchaser(),
     };
     final builder = map[label];
     if (builder != null) {
@@ -146,7 +146,7 @@ class _DsrEntryState extends State<DsrEntry> {
                     textAlign: TextAlign.center,
                     maxLines: 3,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
                       color: AppTheme.primaryColor,
@@ -215,21 +215,21 @@ class _DsrEntryState extends State<DsrEntry> {
                         ),
                       ],
                     ),
-                    child: Column(
+                    child: const Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Wrap(
                           spacing: 8,
                           crossAxisAlignment: WrapCrossAlignment.center,
-                          children: const [
+                          children: [
                             Icon(Icons.info_outline, color: Colors.white, size: 24),
                             Text('Instructions',
                                 style: TextStyle(
                                     color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
                           ],
                         ),
-                        const SizedBox(height: 8),
-                        const Text(
+                        SizedBox(height: 8),
+                        Text(
                           'Fill in the details below to submit your daily sales report.',
                           style: TextStyle(color: Colors.white70, fontSize: 14),
                         ),

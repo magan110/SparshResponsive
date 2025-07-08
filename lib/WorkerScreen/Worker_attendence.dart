@@ -12,7 +12,7 @@ class _WorkerAttendenceState extends State<WorkerAttendence> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Worker Attendence'),
+        title: const Text('Worker Attendence'),
       ),
       body: const Column(
         children: [

@@ -99,7 +99,7 @@ class _StaffAttendenceState extends State<StaffAttendence> {
             _buildLegend(),
             const SizedBox(height: 10),
             _buildCalendarHeader(),
-            ...weeks.map((week) => _buildWeekRow(week)).toList(),
+            ...weeks.map((week) => _buildWeekRow(week)),
             const SizedBox(height: 20),
           ],
         ),
@@ -312,7 +312,7 @@ class _StaffAttendenceState extends State<StaffAttendence> {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.light(primary: Colors.lightBlue),
+            colorScheme: const ColorScheme.light(primary: Colors.lightBlue),
           ),
           child: child!,
         );

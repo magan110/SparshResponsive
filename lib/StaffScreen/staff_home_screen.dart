@@ -76,7 +76,7 @@ class _StaffHomeScreenState extends State<StaffHomeScreen> {
         return true; // Allow closing the app from the home screen
       },
       child: Scaffold(
-        backgroundColor: Color(0xFFF1FFFF),
+        backgroundColor: const Color(0xFFF1FFFF),
         appBar: _buildAppBar(),
         drawer: const StaffAppDrawer(),
         body: Stack(
@@ -679,7 +679,7 @@ class _HomeContentState extends State<HomeContent> {
         color: Colors.white,
       ),
       child: GridView.builder(
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 3,
           crossAxisSpacing: 15.0,
           mainAxisSpacing: 15.0,
@@ -1091,7 +1091,7 @@ class _StaffAppDrawerState extends State<StaffAppDrawer> {
             ),
 
             // Logout option
-            Divider(height: 1),
+            const Divider(height: 1),
             ListTile(
               leading: const Icon(Icons.logout, color: Colors.red),
               title: const Text(

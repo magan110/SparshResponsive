@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 class ResponsiveUtil {
   static double _screenWidth = 0;
   static double _screenHeight = 0;
-  static double _designWidth = 375; // Base design width
-  static double _designHeight = 812; // Base design height
+  static final double _designWidth = 375; // Base design width
+  static final double _designHeight = 812; // Base design height
 
   static void init(BuildContext context) {
     MediaQueryData mediaQuery = MediaQuery.of(context);

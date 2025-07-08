@@ -14,7 +14,7 @@ import 'package:dropdown_search/dropdown_search.dart';
 ///    * A Submit button at the very bottom
 /// – Fully responsive: stacks vertically on mobile (width < 600), side‐by‐side on tablet/desktop.
 class GrcLeadEntryPage extends StatefulWidget {
-  const GrcLeadEntryPage({Key? key}) : super(key: key);
+  const GrcLeadEntryPage({super.key});
 
   @override
   State<GrcLeadEntryPage> createState() => _GrcLeadEntryPageState();

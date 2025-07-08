@@ -58,7 +58,7 @@ class _FoodCourtState extends State<FoodCourt> {
                   fontSize: 18,
                   color: Colors.grey[700],
                 )),
-            SizedBox(height: 12),
+            const SizedBox(height: 12),
             Text('Process Type',
                 style: GoogleFonts.poppins(
                   fontWeight: FontWeight.w600,

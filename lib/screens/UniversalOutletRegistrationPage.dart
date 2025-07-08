@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 
 class UniversalOutletRegistrationPage extends StatefulWidget {
-  const UniversalOutletRegistrationPage({Key? key}) : super(key: key);
+  const UniversalOutletRegistrationPage({super.key});
 
   @override
   State<UniversalOutletRegistrationPage> createState() =>
@@ -37,7 +37,7 @@ class _UniversalOutletRegistrationPageState
   String? _selectedCity;
   String? _selectedPinCode;
   String? _selectedPaintNonPaint;
-  List<String> _selectedPaintNonPaintDetails = [];
+  final List<String> _selectedPaintNonPaintDetails = [];
 
   // Toggle for address mode: 'geo' or 'pin'
   String _addressMode = 'geo';

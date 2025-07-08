@@ -113,7 +113,7 @@ class _EmployeeDetailsState extends State<EmployeeDetails> {
 
   @override
   Widget build(BuildContext context) {
-    final bgColor = const Color(0xFFF8FAFF);
+    const bgColor = Color(0xFFF8FAFF);
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -177,11 +177,11 @@ class _EmployeeDetailsState extends State<EmployeeDetails> {
                 ),
                 child: TextField(
                   controller: _searchController,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     hintText: 'Search...',
-                    prefixIcon: const Icon(Icons.search, color: Colors.blueAccent),
+                    prefixIcon: Icon(Icons.search, color: Colors.blueAccent),
                     border: InputBorder.none,
-                    contentPadding: const EdgeInsets.symmetric(vertical: 14, horizontal: 18),
+                    contentPadding: EdgeInsets.symmetric(vertical: 14, horizontal: 18),
                   ),
                   style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                 ),
@@ -262,7 +262,7 @@ class _EmployeeDetailsState extends State<EmployeeDetails> {
                         ),
                       )
                           .toList(),
-                      headingRowColor: MaterialStateProperty.resolveWith(
+                      headingRowColor: WidgetStateProperty.resolveWith(
                             (states) => Colors.transparent,
                       ),
                       dividerThickness: 0.65,
