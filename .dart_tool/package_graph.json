@@ -24,6 +24,7 @@
         "flutter",
         "flutter_animate",
         "flutter_hooks",
+        "flutter_map",
         "flutter_secure_storage",
         "flutter_svg",
         "flutter_typeahead",
@@ -35,6 +36,7 @@
         "http",
         "image_picker",
         "intl",
+        "latlong2",
         "mobile_scanner",
         "open_filex",
         "path",
@@ -96,6 +98,29 @@
         "test_api",
         "vector_math",
         "vm_service"
+      ]
+    },
+    {
+      "name": "latlong2",
+      "version": "0.9.1",
+      "dependencies": [
+        "intl"
+      ]
+    },
+    {
+      "name": "flutter_map",
+      "version": "6.2.1",
+      "dependencies": [
+        "async",
+        "collection",
+        "flutter",
+        "http",
+        "latlong2",
+        "logger",
+        "meta",
+        "polylabel",
+        "proj4dart",
+        "vector_math"
       ]
     },
     {
@@ -685,6 +710,27 @@
         "string_scanner",
         "term_glyph"
       ]
+    },
+    {
+      "name": "proj4dart",
+      "version": "2.1.0",
+      "dependencies": [
+        "meta",
+        "mgrs_dart",
+        "wkt_parser"
+      ]
+    },
+    {
+      "name": "polylabel",
+      "version": "1.0.1",
+      "dependencies": [
+        "collection"
+      ]
+    },
+    {
+      "name": "logger",
+      "version": "2.6.0",
+      "dependencies": []
     },
     {
       "name": "pointer_interceptor",
@@ -1436,6 +1482,18 @@
       "dependencies": []
     },
     {
+      "name": "wkt_parser",
+      "version": "2.0.0",
+      "dependencies": []
+    },
+    {
+      "name": "mgrs_dart",
+      "version": "2.0.0",
+      "dependencies": [
+        "unicode"
+      ]
+    },
+    {
       "name": "pointer_interceptor_web",
       "version": "0.10.3",
       "dependencies": [
@@ -1657,11 +1715,25 @@
       "dependencies": []
     },
     {
+      "name": "unicode",
+      "version": "0.3.1",
+      "dependencies": [
+        "lists"
+      ]
+    },
+    {
       "name": "html",
       "version": "0.15.6",
       "dependencies": [
         "csslib",
         "source_span"
+      ]
+    },
+    {
+      "name": "lists",
+      "version": "1.0.1",
+      "dependencies": [
+        "meta"
       ]
     },
     {

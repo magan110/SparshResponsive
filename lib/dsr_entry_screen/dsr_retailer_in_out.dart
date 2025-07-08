@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:convert';
 import 'dart:math' as math;
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:geolocator/geolocator.dart';
@@ -443,10 +444,40 @@ class _DsrRetailerInOutState extends State<DsrRetailerInOut>
           ElevatedButton(
             onPressed: () {
               Navigator.pop(context); // Close dialog
+              // --- Purchaser/Retailer Type mapping ---
+              final Map<String, String> codeToDescription = {
+                'R': 'Retailer',
+                'RR': 'Rural Retailer',
+                'S': 'Stockiest',
+                'DD': 'Direct Dealer',
+                'RS': 'Rural Stockiest',
+                'AD': 'AD',
+                'UBS': 'UBS',
+              };
+              final purchaserRetailerTypeDesc = codeToDescription[_selectedPurchaserRetailerType?.code] ?? _selectedPurchaserRetailerType?.description ?? '';
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => DsrVisitScreen(),
+                  builder: (context) => DsrVisitScreen(
+                    activityData: {
+                      'customerName': _customerNameController.text,
+                      'date': _dateController.text,
+                      'purchaserRetailerType': purchaserRetailerTypeDesc,
+                      'type': purchaserRetailerTypeDesc,
+                      'areaCode': _selectedAreaCode != null ? (_selectedAreaCode!.code + '-' + _selectedAreaCode!.name) : '',
+                      'codeSearch': _selectedCodeSearch ?? '',
+                      'distance': _calculatedDistance.toStringAsFixed(2),
+                      'documentNo': 'DOC${Random().nextInt(90000) + 10000}',
+                    },
+                    fieldLabels: {
+                      'customerName': 'Customer Name',
+                      'date': 'Date',
+                      'purchaserRetailerType': 'Purchaser/Retailer Type',
+                      'areaCode': 'Area Code',
+                      'codeSearch': 'Code Search',
+                      'distance': 'Distance (meters)',
+                    },
+                  ),
                 ),
               );
             },
@@ -634,7 +665,16 @@ class _DsrRetailerInOutState extends State<DsrRetailerInOut>
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
         setState(() {
-          _areaCodes = data.map((e) => AreaCodeModel.fromJson(e)).toList();
+          _areaCodes = data
+            .map((e) => AreaCodeModel.fromJson(e))
+            .where((area) =>
+              area.code != null &&
+              area.name != null &&
+              area.code.trim().isNotEmpty &&
+              area.name.trim().isNotEmpty &&
+              area.code.trim() != '-' &&
+              area.name.trim() != '-')
+            .toList();
         });
       }
     } catch (e) {

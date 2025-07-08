@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 
 import '../theme/app_theme.dart';
 import 'dsr_entry.dart';
+import 'DsrVisitScreen.dart';
 
 class AnyOtherActivity extends StatefulWidget {
   const AnyOtherActivity({super.key});
@@ -124,18 +125,43 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
   void _onSubmit(bool exitAfter) {
     if (!_formKey.currentState!.validate()) return;
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(exitAfter
-            ? 'Form validated. Exiting…'
-            : 'Form validated. Ready for new entry.'),
-        backgroundColor: Colors.green,
-      ),
-    );
-
     if (exitAfter) {
-      Navigator.of(context).pop();
+      // Prepare data and labels
+      final activityData = {
+        'processType': _processItem,
+        'submissionDate': _dateController.text,
+        'reportDate': _reportDateController.text,
+        'activity1': _activity1Controller.text,
+        'activity2': _activity2Controller.text,
+        'activity3': _activity3Controller.text,
+        'anyOtherPoints': _anyOtherPointsController.text,
+        'images': _selectedImages.map((x) => x?.path).toList(),
+      };
+      final fieldLabels = {
+        'processType': 'Process Type',
+        'submissionDate': 'Submission Date',
+        'reportDate': 'Report Date',
+        'activity1': 'Activity Details 1',
+        'activity2': 'Activity Details 2',
+        'activity3': 'Activity Details 3',
+        'anyOtherPoints': 'Any Other Points',
+        'images': 'Supporting Documents',
+      };
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => DsrVisitScreen(
+            activityData: activityData,
+            fieldLabels: fieldLabels,
+          ),
+        ),
+      );
     } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Form validated. Ready for new entry.'),
+          backgroundColor: Colors.green,
+        ),
+      );
       _formKey.currentState!.reset();
       setState(() {
         _processItem = 'Select';

@@ -1,8 +1,17 @@
 import 'package:flutter/material.dart';
 import '../screens/edit_kyc_screen.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
+import 'package:geolocator/geolocator.dart';
 
 class DsrVisitScreen extends StatefulWidget {
-  const DsrVisitScreen({super.key});
+  final Map<String, dynamic> activityData;
+  final Map<String, String> fieldLabels;
+  const DsrVisitScreen({
+    super.key,
+    required this.activityData,
+    required this.fieldLabels,
+  });
 
   @override
   State<DsrVisitScreen> createState() => _DsrVisitScreenState();
@@ -106,56 +115,17 @@ class _DsrVisitScreenState extends State<DsrVisitScreen> {
     {'product': 'Water Proofing Compound', 'date': '22 Jul 2023', 'qty': '0.01500'},
   ];
 
-  // Helper to add product row
-  void addProductRow() {
-    setState(() {
-      productList.add({
-        'product': '',
-        'sku': '',
-        'qty': '',
-      });
-    });
-  }
+  // For display: map code to label
+  final Map<String, String> areaCodeLabels = {
+    'Area1': 'Area1 - Area One',
+    'Area2': 'Area2 - Area Two',
+    'Area3': 'Area3 - Area Three',
+    'AGR': 'AGR - Agra', // Add your real codes and names here
+    // ...
+  };
 
-  void removeProductRow(int index) {
-    setState(() {
-      productList.removeAt(index);
-    });
-  }
-
-  // Helper to add gift row
-  void addGiftRow() {
-    setState(() {
-      giftList.add({
-        'giftType': '',
-        'qty': '',
-      });
-    });
-  }
-
-  void removeGiftRow(int index) {
-    setState(() {
-      giftList.removeAt(index);
-    });
-  }
-
-  // Helper to add market SKU row
-  void addMarketSkuRow() {
-    setState(() {
-      marketSkuList.add({
-        'brand': '',
-        'product': '',
-        'priceB': '',
-        'priceC': '',
-      });
-    });
-  }
-
-  void removeMarketSkuRow(int index) {
-    setState(() {
-      marketSkuList.removeAt(index);
-    });
-  }
+  LatLng? _currentPosition;
+  final LatLng _defaultPosition = LatLng(27.1767, 78.0081); // Taj Mahal as fallback
 
   @override
   void initState() {
@@ -164,11 +134,86 @@ class _DsrVisitScreenState extends State<DsrVisitScreen> {
     if (productList.isEmpty) addProductRow();
     if (giftList.isEmpty) addGiftRow();
     if (marketSkuList.isEmpty) addMarketSkuRow();
+
+    // Set initial values from activityData if present
+    final data = widget.activityData;
+    // --- JSP LOGIC: Area Code default ---
+    String mockArCode = 'AGR'; // Mock for log.getArCode() or UserBean.getArCode()
+    if (data.isNotEmpty) {
+      name = data['customerName'] ?? name;
+      reportDate = data['date'] ?? reportDate;
+      // Purchaser Type logic (unchanged)
+      if (data['type'] != null && purchaserTypeList.contains(data['type'])) {
+        purchaserType = data['type'];
+      } else if (data['purchaserRetailerType'] != null && purchaserTypeList.contains(data['purchaserRetailerType'])) {
+        purchaserType = data['purchaserRetailerType'];
+      } else {
+        purchaserType = null;
+      }
+      // Area code: if empty, set to mockArCode
+      if (data['areaCode'] != null && data['areaCode'].toString().isNotEmpty) {
+        String code = data['areaCode'];
+        if (code.contains(' - ')) {
+          code = code.split(' - ')[0];
+        }
+        if (areaCodeList.contains(code)) {
+          areaCode = code;
+        } else {
+          areaCode = mockArCode;
+        }
+      } else {
+        areaCode = mockArCode;
+      }
+      // Purchaser code: if not empty, use first 8 chars
+      if (data['codeSearch'] != null && data['codeSearch'].toString().isNotEmpty) {
+        purchaserCode = data['codeSearch'].toString().substring(0, data['codeSearch'].toString().length > 8 ? 8 : data['codeSearch'].toString().length);
+      }
+      // Optionally, set other fields as needed
+    } else {
+      // If no data, set area code to mockArCode
+      areaCode = mockArCode;
+    }
+    // --- Document number auto-generate for Add ---
+    if (processType == 'A' && (documentNo == null || documentNo!.isEmpty)) {
+      documentNo = 'DOC${DateTime.now().millisecondsSinceEpoch % 100000}';
+    }
+    _getCurrentLocation();
+  }
+
+  Future<void> _getCurrentLocation() async {
+    try {
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+      }
+      if (permission == LocationPermission.deniedForever) {
+        // Handle permission denied
+        setState(() {
+          _currentPosition = _defaultPosition;
+        });
+        return;
+      }
+      final pos = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+      setState(() {
+        _currentPosition = LatLng(pos.latitude, pos.longitude);
+      });
+    } catch (e) {
+      // If any error, use default position
+      setState(() {
+        _currentPosition = _defaultPosition;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    // Dynamically add the passed type if not in the list
+    final List<String> effectivePurchaserTypeList = [
+      if (widget.activityData['type'] != null && widget.activityData['type'].toString().isNotEmpty && !purchaserTypeList.contains(widget.activityData['type']))
+        widget.activityData['type'],
+      ...purchaserTypeList,
+    ];
     return Scaffold(
       appBar: AppBar(
         title: const Text('DSR Visit Entry'),
@@ -217,13 +262,26 @@ class _DsrVisitScreenState extends State<DsrVisitScreen> {
                         ],
                       ),
                       if (processType != 'A')
-                        DropdownButtonFormField<String>(
-                          value: documentNo,
-                          decoration: _fantasticInputDecoration('Document No'),
-                          items: documentNoList
-                              .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                              .toList(),
-                          onChanged: (v) => setState(() => documentNo = v),
+                        (widget.activityData['documentNo'] != null && widget.activityData['documentNo'].toString().isNotEmpty
+                          ? DropdownButtonFormField<String>(
+                              value: widget.activityData['documentNo'],
+                              decoration: _fantasticInputDecoration('Document No'),
+                              items: [
+                                DropdownMenuItem(
+                                  value: widget.activityData['documentNo'],
+                                  child: Text(widget.activityData['documentNo']),
+                                ),
+                              ],
+                              onChanged: null,
+                            )
+                          : DropdownButtonFormField<String>(
+                              value: documentNo,
+                              decoration: _fantasticInputDecoration('Document No'),
+                              items: documentNoList
+                                  .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                                  .toList(),
+                              onChanged: (v) => setState(() => documentNo = v),
+                            )
                         ),
                     ],
                   ),
@@ -236,38 +294,55 @@ class _DsrVisitScreenState extends State<DsrVisitScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       DropdownButtonFormField<String>(
-                        value: purchaserType,
+                        value: (widget.activityData['type'] != null && widget.activityData['type'].toString().isNotEmpty)
+                          ? widget.activityData['type']
+                          : purchaserType,
                         decoration: _fantasticInputDecoration('Purchaser / Retailer Type *'),
-                        items: purchaserTypeList
+                        items: effectivePurchaserTypeList
                             .map((e) => DropdownMenuItem(value: e, child: Text(e)))
                             .toList(),
-                        onChanged: (v) => setState(() => purchaserType = v),
+                        onChanged: (widget.activityData['type'] != null && widget.activityData['type'].toString().isNotEmpty)
+                          ? null
+                          : (widget.activityData['purchaserRetailerType'] != null ? null : (v) => setState(() => purchaserType = v)),
                         validator: (v) => v == null ? 'Required' : null,
                       ),
-                      const SizedBox(height: 10),
-                      DropdownButtonFormField<String>(
-                        value: areaCode,
-                        decoration: _fantasticInputDecoration('Area Code *'),
-                        items: areaCodeList
-                            .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                            .toList(),
-                        onChanged: (v) => setState(() => areaCode = v),
-                        validator: (v) => v == null ? 'Required' : null,
-                      ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 16),
+                      // Area Code: show as read-only if passed, else dropdown
+                      if (widget.activityData['areaCode'] != null && widget.activityData['areaCode'].toString().isNotEmpty)
+                        TextFormField(
+                          decoration: _fantasticInputDecoration('Area Code *'),
+                          initialValue: widget.activityData['areaCode'],
+                          readOnly: true,
+                        )
+                      else
+                        DropdownButtonFormField<String>(
+                          value: areaCode,
+                          decoration: _fantasticInputDecoration('Area Code *'),
+                          items: areaCodeList
+                              .map((e) => DropdownMenuItem(
+                                    value: e,
+                                    child: Text(areaCodeLabels[e] ?? e),
+                                  ))
+                              .toList(),
+                          onChanged: widget.activityData['areaCode'] != null ? null : (v) => setState(() => areaCode = v),
+                          validator: (v) => v == null ? 'Required' : null,
+                        ),
+                      const SizedBox(height: 16),
                       TextFormField(
                         decoration: _fantasticInputDecoration('Purchaser Code *', icon: Icons.search),
+                        initialValue: purchaserCode,
+                        readOnly: widget.activityData['codeSearch'] != null,
                         onChanged: (v) => purchaserCode = v,
                         validator: (v) => v == null || v.isEmpty ? 'Required' : null,
                       ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 16),
                       Row(
                         children: [
                           const Text('Name: ', style: TextStyle(fontWeight: FontWeight.bold)),
                           Text(name ?? '', style: const TextStyle(fontWeight: FontWeight.normal)),
                         ],
                       ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 16),
                       Align(
                         alignment: Alignment.centerLeft,
                         child: ElevatedButton.icon(
@@ -289,7 +364,7 @@ class _DsrVisitScreenState extends State<DsrVisitScreen> {
                           label: const Text('Edit KYC'),
                         ),
                       ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 16),
                       DropdownButtonFormField<String>(
                         value: kycStatus,
                         decoration: _fantasticInputDecoration('KYC Status'),
@@ -325,15 +400,16 @@ class _DsrVisitScreenState extends State<DsrVisitScreen> {
                           }
                         },
                         controller: TextEditingController(text: reportDate),
+                        enabled: widget.activityData['date'] == null,
                         validator: (v) => v == null || v.isEmpty ? 'Required' : null,
                       ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 16),
                       TextFormField(
                         decoration: _fantasticInputDecoration('Market Name (Location Or Road Name) *'),
                         onChanged: (v) => marketName = v,
                         validator: (v) => v == null || v.isEmpty ? 'Required' : null,
                       ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 16),
                       const Text('Participation of Display Contest *', style: TextStyle(fontWeight: FontWeight.w500)),
                       Row(
                         children: [
@@ -348,7 +424,6 @@ class _DsrVisitScreenState extends State<DsrVisitScreen> {
                             groupValue: displayContest,
                             onChanged: (v) => setState(() => displayContest = v),
                           ),
-                          const Text('No'),
                           Radio<String>(
                             value: 'NA',
                             groupValue: displayContest,
@@ -357,7 +432,7 @@ class _DsrVisitScreenState extends State<DsrVisitScreen> {
                           const Text('NA'),
                         ],
                       ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 16),
                       const Text('Any Pending Issues (Yes/No) *', style: TextStyle(fontWeight: FontWeight.w500)),
                       Row(
                         children: [
@@ -407,14 +482,14 @@ class _DsrVisitScreenState extends State<DsrVisitScreen> {
                         onChanged: (v) => wcEnrolment = v,
                         validator: (v) => v == null || v.isEmpty ? 'Required' : null,
                       ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 16),
                       TextFormField(
                         decoration: _fantasticInputDecoration('WCP'),
                         keyboardType: TextInputType.number,
                         onChanged: (v) => wcpEnrolment = v,
                         validator: (v) => v == null || v.isEmpty ? 'Required' : null,
                       ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 16),
                       TextFormField(
                         decoration: _fantasticInputDecoration('VAP'),
                         keyboardType: TextInputType.number,
@@ -437,14 +512,14 @@ class _DsrVisitScreenState extends State<DsrVisitScreen> {
                         onChanged: (v) => wcStock = v,
                         validator: (v) => v == null || v.isEmpty ? 'Required' : null,
                       ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 16),
                       TextFormField(
                         decoration: _fantasticInputDecoration('WCP'),
                         keyboardType: TextInputType.number,
                         onChanged: (v) => wcpStock = v,
                         validator: (v) => v == null || v.isEmpty ? 'Required' : null,
                       ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 16),
                       TextFormField(
                         decoration: _fantasticInputDecoration('VAP'),
                         keyboardType: TextInputType.number,
@@ -482,7 +557,7 @@ class _DsrVisitScreenState extends State<DsrVisitScreen> {
                         decoration: _fantasticInputDecoration('WC Industry Volume in (MT)'),
                         onChanged: (v) => slWcVolume = v,
                       ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 16),
                       const Text('WCP (Industry Volume)', style: TextStyle(fontWeight: FontWeight.w500)),
                       Wrap(
                         spacing: 8,
@@ -513,49 +588,90 @@ class _DsrVisitScreenState extends State<DsrVisitScreen> {
                 _FantasticCard(
                   child: Table(
                     border: TableBorder.all(color: theme.dividerColor),
+                    columnWidths: const {
+                      0: FlexColumnWidth(2),
+                      1: FlexColumnWidth(2),
+                      2: FlexColumnWidth(2),
+                    },
                     children: [
                       const TableRow(children: [
-                        SizedBox(),
-                        Center(child: Text('WC Qty', style: TextStyle(fontWeight: FontWeight.bold))),
-                        Center(child: Text('WCP Qty', style: TextStyle(fontWeight: FontWeight.bold))),
-                      ]),
-                      TableRow(children: [
-                        const Center(child: Text('JK')),
-                        TextFormField(
-                          initialValue: last3MonthsAvg['JK_WC'],
-                          decoration: _fantasticInputDecoration(''),
-                          onChanged: (v) => last3MonthsAvg['JK_WC'] = v,
+                        Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Center(child: Text('Brand', style: TextStyle(fontWeight: FontWeight.bold))),
                         ),
-                        TextFormField(
-                          initialValue: last3MonthsAvg['JK_WCP'],
-                          decoration: _fantasticInputDecoration(''),
-                          onChanged: (v) => last3MonthsAvg['JK_WCP'] = v,
+                        Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Center(child: Text('WC Qty', style: TextStyle(fontWeight: FontWeight.bold))),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Center(child: Text('WCP Qty', style: TextStyle(fontWeight: FontWeight.bold))),
                         ),
                       ]),
                       TableRow(children: [
-                        const Center(child: Text('Asian')),
-                        TextFormField(
-                          initialValue: last3MonthsAvg['AS_WC'],
-                          decoration: _fantasticInputDecoration(''),
-                          onChanged: (v) => last3MonthsAvg['AS_WC'] = v,
+                        const Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Center(child: Text('JK')),
                         ),
-                        TextFormField(
-                          initialValue: last3MonthsAvg['AS_WCP'],
-                          decoration: _fantasticInputDecoration(''),
-                          onChanged: (v) => last3MonthsAvg['AS_WCP'] = v,
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: TextFormField(
+                            initialValue: last3MonthsAvg['JK_WC'],
+                            decoration: _fantasticInputDecoration(''),
+                            onChanged: (v) => last3MonthsAvg['JK_WC'] = v,
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: TextFormField(
+                            initialValue: last3MonthsAvg['JK_WCP'],
+                            decoration: _fantasticInputDecoration(''),
+                            onChanged: (v) => last3MonthsAvg['JK_WCP'] = v,
+                          ),
                         ),
                       ]),
                       TableRow(children: [
-                        const Center(child: Text('Other')),
-                        TextFormField(
-                          initialValue: last3MonthsAvg['OT_WC'],
-                          decoration: _fantasticInputDecoration(''),
-                          onChanged: (v) => last3MonthsAvg['OT_WC'] = v,
+                        const Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Center(child: Text('Asian')),
                         ),
-                        TextFormField(
-                          initialValue: last3MonthsAvg['OT_WCP'],
-                          decoration: _fantasticInputDecoration(''),
-                          onChanged: (v) => last3MonthsAvg['OT_WCP'] = v,
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: TextFormField(
+                            initialValue: last3MonthsAvg['AS_WC'],
+                            decoration: _fantasticInputDecoration(''),
+                            onChanged: (v) => last3MonthsAvg['AS_WC'] = v,
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: TextFormField(
+                            initialValue: last3MonthsAvg['AS_WCP'],
+                            decoration: _fantasticInputDecoration(''),
+                            onChanged: (v) => last3MonthsAvg['AS_WCP'] = v,
+                          ),
+                        ),
+                      ]),
+                      TableRow(children: [
+                        const Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Center(child: Text('Other')),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: TextFormField(
+                            initialValue: last3MonthsAvg['OT_WC'],
+                            decoration: _fantasticInputDecoration(''),
+                            onChanged: (v) => last3MonthsAvg['OT_WC'] = v,
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: TextFormField(
+                            initialValue: last3MonthsAvg['OT_WCP'],
+                            decoration: _fantasticInputDecoration(''),
+                            onChanged: (v) => last3MonthsAvg['OT_WCP'] = v,
+                          ),
                         ),
                       ]),
                     ],
@@ -571,19 +687,19 @@ class _DsrVisitScreenState extends State<DsrVisitScreen> {
                       TextFormField(
                         initialValue: currentMonthBW['WC'],
                         decoration: _fantasticInputDecoration('WC'),
-                        readOnly: true,
+                        onChanged: (v) => currentMonthBW['WC'] = v,
                       ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 16),
                       TextFormField(
                         initialValue: currentMonthBW['WCP'],
                         decoration: _fantasticInputDecoration('WCP'),
-                        readOnly: true,
+                        onChanged: (v) => currentMonthBW['WCP'] = v,
                       ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 16),
                       TextFormField(
                         initialValue: currentMonthBW['VAP'],
                         decoration: _fantasticInputDecoration('VAP'),
-                        readOnly: true,
+                        onChanged: (v) => currentMonthBW['VAP'] = v,
                       ),
                     ],
                   ),
@@ -611,33 +727,33 @@ class _DsrVisitScreenState extends State<DsrVisitScreen> {
                         itemBuilder: (context, idx) {
                           return Padding(
                             padding: const EdgeInsets.symmetric(vertical: 4.0),
-                            child: Row(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Expanded(
-                                  child: TextFormField(
-                                    decoration: _fantasticInputDecoration('Product'),
-                                    onChanged: (v) => productList[idx]['product'] = v,
+                                TextFormField(
+                                  decoration: _fantasticInputDecoration('Product'),
+                                  onChanged: (v) => productList[idx]['product'] = v,
+                                ),
+                                const SizedBox(height: 16),
+                                TextFormField(
+                                  decoration: _fantasticInputDecoration('SKU'),
+                                  onChanged: (v) => productList[idx]['sku'] = v,
+                                ),
+                                const SizedBox(height: 16),
+                                TextFormField(
+                                  decoration: _fantasticInputDecoration('Qty'),
+                                  keyboardType: TextInputType.number,
+                                  onChanged: (v) => productList[idx]['qty'] = v,
+                                ),
+                                const SizedBox(height: 16),
+                                Align(
+                                  alignment: Alignment.centerRight,
+                                  child: IconButton(
+                                    icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
+                                    onPressed: () => removeProductRow(idx),
                                   ),
                                 ),
-                                const SizedBox(width: 8),
-                                Expanded(
-                                  child: TextFormField(
-                                    decoration: _fantasticInputDecoration('SKU'),
-                                    onChanged: (v) => productList[idx]['sku'] = v,
-                                  ),
-                                ),
-                                const SizedBox(width: 8),
-                                Expanded(
-                                  child: TextFormField(
-                                    decoration: _fantasticInputDecoration('Qty'),
-                                    keyboardType: TextInputType.number,
-                                    onChanged: (v) => productList[idx]['qty'] = v,
-                                  ),
-                                ),
-                                IconButton(
-                                  icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
-                                  onPressed: () => removeProductRow(idx),
-                                ),
+                                const Divider(),
                               ],
                             ),
                           );
@@ -669,41 +785,39 @@ class _DsrVisitScreenState extends State<DsrVisitScreen> {
                         itemBuilder: (context, idx) {
                           return Padding(
                             padding: const EdgeInsets.symmetric(vertical: 4.0),
-                            child: Row(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Expanded(
-                                  child: TextFormField(
-                                    decoration: _fantasticInputDecoration('Brand'),
-                                    onChanged: (v) => marketSkuList[idx]['brand'] = v,
+                                TextFormField(
+                                  decoration: _fantasticInputDecoration('Brand'),
+                                  onChanged: (v) => marketSkuList[idx]['brand'] = v,
+                                ),
+                                const SizedBox(height: 16),
+                                TextFormField(
+                                  decoration: _fantasticInputDecoration('Product'),
+                                  onChanged: (v) => marketSkuList[idx]['product'] = v,
+                                ),
+                                const SizedBox(height: 16),
+                                TextFormField(
+                                  decoration: _fantasticInputDecoration('Price - B'),
+                                  keyboardType: TextInputType.number,
+                                  onChanged: (v) => marketSkuList[idx]['priceB'] = v,
+                                ),
+                                const SizedBox(height: 16),
+                                TextFormField(
+                                  decoration: _fantasticInputDecoration('Price - C'),
+                                  keyboardType: TextInputType.number,
+                                  onChanged: (v) => marketSkuList[idx]['priceC'] = v,
+                                ),
+                                const SizedBox(height: 16),
+                                Align(
+                                  alignment: Alignment.centerRight,
+                                  child: IconButton(
+                                    icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
+                                    onPressed: () => removeMarketSkuRow(idx),
                                   ),
                                 ),
-                                const SizedBox(width: 8),
-                                Expanded(
-                                  child: TextFormField(
-                                    decoration: _fantasticInputDecoration('Product'),
-                                    onChanged: (v) => marketSkuList[idx]['product'] = v,
-                                  ),
-                                ),
-                                const SizedBox(width: 8),
-                                Expanded(
-                                  child: TextFormField(
-                                    decoration: _fantasticInputDecoration('Price - B'),
-                                    keyboardType: TextInputType.number,
-                                    onChanged: (v) => marketSkuList[idx]['priceB'] = v,
-                                  ),
-                                ),
-                                const SizedBox(width: 8),
-                                Expanded(
-                                  child: TextFormField(
-                                    decoration: _fantasticInputDecoration('Price - C'),
-                                    keyboardType: TextInputType.number,
-                                    onChanged: (v) => marketSkuList[idx]['priceC'] = v,
-                                  ),
-                                ),
-                                IconButton(
-                                  icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
-                                  onPressed: () => removeMarketSkuRow(idx),
-                                ),
+                                const Divider(),
                               ],
                             ),
                           );
@@ -735,26 +849,28 @@ class _DsrVisitScreenState extends State<DsrVisitScreen> {
                         itemBuilder: (context, idx) {
                           return Padding(
                             padding: const EdgeInsets.symmetric(vertical: 4.0),
-                            child: Row(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Expanded(
-                                  child: TextFormField(
-                                    decoration: _fantasticInputDecoration('Gift Type'),
-                                    onChanged: (v) => giftList[idx]['giftType'] = v,
+                                TextFormField(
+                                  decoration: _fantasticInputDecoration('Gift Type'),
+                                  onChanged: (v) => giftList[idx]['giftType'] = v,
+                                ),
+                                const SizedBox(height: 16),
+                                TextFormField(
+                                  decoration: _fantasticInputDecoration('Qty'),
+                                  keyboardType: TextInputType.number,
+                                  onChanged: (v) => giftList[idx]['qty'] = v,
+                                ),
+                                const SizedBox(height: 16),
+                                Align(
+                                  alignment: Alignment.centerRight,
+                                  child: IconButton(
+                                    icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
+                                    onPressed: () => removeGiftRow(idx),
                                   ),
                                 ),
-                                const SizedBox(width: 8),
-                                Expanded(
-                                  child: TextFormField(
-                                    decoration: _fantasticInputDecoration('Qty'),
-                                    keyboardType: TextInputType.number,
-                                    onChanged: (v) => giftList[idx]['qty'] = v,
-                                  ),
-                                ),
-                                IconButton(
-                                  icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
-                                  onPressed: () => removeGiftRow(idx),
-                                ),
+                                const Divider(),
                               ],
                             ),
                           );
@@ -810,12 +926,12 @@ class _DsrVisitScreenState extends State<DsrVisitScreen> {
                         },
                         controller: TextEditingController(text: orderExecutionDate),
                       ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 16),
                       TextFormField(
                         decoration: _fantasticInputDecoration('Any other Remarks'),
                         onChanged: (v) => remarks = v,
                       ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 16),
                       DropdownButtonFormField<String>(
                         value: cityReason,
                         decoration: _fantasticInputDecoration('Select Reason'),
@@ -830,15 +946,33 @@ class _DsrVisitScreenState extends State<DsrVisitScreen> {
                 const SizedBox(height: 12),
                 // --- Map/Location Placeholder ---
                 const _SectionHeader(icon: Icons.map, label: 'Map/Location'),
-                const _FantasticCard(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(height: 8),
-                      Text('Map/Location (to be implemented)'),
-                      SizedBox(height: 100, child: Center(child: Text('Map widget placeholder'))),
-                    ],
-                  ),
+                SizedBox(
+                  height: 200,
+                  child: _currentPosition == null
+                      ? const Center(child: CircularProgressIndicator())
+                      : FlutterMap(
+                          options: MapOptions(
+                            center: _currentPosition,
+                            zoom: 15,
+                          ),
+                          children: [
+                            TileLayer(
+                              urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                              subdomains: ['a', 'b', 'c'],
+                              userAgentPackageName: 'com.example.app',
+                            ),
+                            MarkerLayer(
+                              markers: [
+                                Marker(
+                                  width: 40,
+                                  height: 40,
+                                  point: _currentPosition!,
+                                  child: const Icon(Icons.location_pin, color: Colors.red, size: 40),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
                 ),
                 const SizedBox(height: 12),
                 // --- Last Billing date as per Tally ---
@@ -890,57 +1024,46 @@ class _DsrVisitScreenState extends State<DsrVisitScreen> {
                 ),
                 const SizedBox(height: 20),
                 // --- Bottom Action Buttons ---
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    OutlinedButton(
-                      style: OutlinedButton.styleFrom(
-                        side: BorderSide(color: theme.colorScheme.primary, width: 2),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                      ),
-                      onPressed: () {
-                        // TODO: Add another activity logic
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: theme.colorScheme.primary,
+                      foregroundColor: theme.colorScheme.onPrimary,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                    ),
+                    onPressed: () {
+                      if (_formKey.currentState!.validate()) {
+                        // Only keep valid productList entries (repoCatg/product not empty and qty or projQnty not zero)
+                        productList = productList.where((row) {
+                          final prod = row['product'] ?? '';
+                          final sku = row['sku'] ?? '';
+                          final qty = double.tryParse(row['qty'] ?? '0') ?? 0;
+                          return prod.isNotEmpty && (qty != 0);
+                        }).toList();
+                        // Only keep valid marketSkuList entries
+                        marketSkuList = marketSkuList.where((row) {
+                          final brand = row['brand'] ?? '';
+                          final product = row['product'] ?? '';
+                          final priceB = double.tryParse(row['priceB'] ?? '0') ?? 0;
+                          final priceC = double.tryParse(row['priceC'] ?? '0') ?? 0;
+                          return brand.isNotEmpty && product.isNotEmpty && (priceB != 0 || priceC != 0);
+                        }).toList();
+                        // Only keep valid giftList entries
+                        giftList = giftList.where((row) {
+                          final giftType = row['giftType'] ?? '';
+                          final qty = double.tryParse(row['qty'] ?? '0') ?? 0;
+                          return giftType.isNotEmpty && qty != 0;
+                        }).toList();
+                        // TODO: Handle submit & exit
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Add Another Activity (mock)')),
+                          const SnackBar(content: Text('Submitted & Exit (mock)')),
                         );
-                      },
-                      child: const Text('Add Another Activity', style: TextStyle(fontWeight: FontWeight.bold)),
-                    ),
-                    const SizedBox(height: 14),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: theme.colorScheme.primary,
-                        foregroundColor: theme.colorScheme.onPrimary,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                      ),
-                      onPressed: () {
-                        if (_formKey.currentState!.validate()) {
-                          // TODO: Handle submit & exit
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Submitted & Exit (mock)')),
-                          );
-                        }
-                      },
-                      child: const Text('Submit & Exit', style: TextStyle(fontWeight: FontWeight.bold)),
-                    ),
-                    const SizedBox(height: 14),
-                    OutlinedButton(
-                      style: OutlinedButton.styleFrom(
-                        side: BorderSide(color: theme.colorScheme.secondary, width: 2),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                      ),
-                      onPressed: () {
-                        // TODO: Show submitted data logic
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Show Submitted Data (mock)')),
-                        );
-                      },
-                      child: const Text('Click to See Submitted Data', style: TextStyle(fontWeight: FontWeight.bold)),
-                    ),
-                  ],
+                      }
+                    },
+                    child: const Text('Submit & Exit', style: TextStyle(fontWeight: FontWeight.bold)),
+                  ),
                 ),
                 const SizedBox(height: 24),
               ],
@@ -949,6 +1072,57 @@ class _DsrVisitScreenState extends State<DsrVisitScreen> {
         ),
       ),
     );
+  }
+
+  // Helper to add product row
+  void addProductRow() {
+    setState(() {
+      productList.add({
+        'product': '',
+        'sku': '',
+        'qty': '',
+      });
+    });
+  }
+
+  void removeProductRow(int index) {
+    setState(() {
+      productList.removeAt(index);
+    });
+  }
+
+  // Helper to add gift row
+  void addGiftRow() {
+    setState(() {
+      giftList.add({
+        'giftType': '',
+        'qty': '',
+      });
+    });
+  }
+
+  void removeGiftRow(int index) {
+    setState(() {
+      giftList.removeAt(index);
+    });
+  }
+
+  // Helper to add market SKU row
+  void addMarketSkuRow() {
+    setState(() {
+      marketSkuList.add({
+        'brand': '',
+        'product': '',
+        'priceB': '',
+        'priceC': '',
+      });
+    });
+  }
+
+  void removeMarketSkuRow(int index) {
+    setState(() {
+      marketSkuList.removeAt(index);
+    });
   }
 }
 
